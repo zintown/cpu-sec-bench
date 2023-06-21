@@ -1,4 +1,4 @@
-// builtin macro functions
+// api sensitive builtin macro functions
 
 #ifndef BUILTIN_HPP_INCLUDED
 #define BUILTIN_HPP_INCLUDED
@@ -10,7 +10,7 @@
     #endif
 
     #if defined(__GNUC__)
-        #include "include/gcc_builtin.hpp"
+        #include "posix/gcc_builtin.hpp"
         #if defined(__clang__)
             #define COMPILER_CLANG
         #else
