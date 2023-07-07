@@ -184,6 +184,12 @@ int case_parser(const std::string& cn, std::string& pn, str_llist_t& arg_list, s
 
   auto tcase = config_db[cn];
 
+  // get the program name
+  if(tcase.count("program"))
+    pn = tcase["program"].get<std::string>();
+  else
+    pn = cn;
+
   // check requirement
   int req_case = 0;
   std::string req_case_str = "0";
@@ -230,12 +236,6 @@ int case_parser(const std::string& cn, std::string& pn, str_llist_t& arg_list, s
     if(!req_case_all_tested) return 1; // prerequisit not tested yet
     if(!req_case_ok) return 1024; // no need to test as all prerequisit tested and failed
   }
-
-  // get the program name
-  if(tcase.count("program"))
-    pn = tcase["program"].get<std::string>();
-  else
-    pn = cn;
 
   // get the argument lists
   arg_list.clear();
@@ -394,6 +394,9 @@ char ** argv_conv(const std::string &cmd, const str_list_t &args) {
 }
 
 bool run_tests(std::list<std::string> cases) {
+  //check current test dependency and avoid endless loop
+  int current_test_checkdep_count = 0;
+  int total_cases = cases.size();
   std::string prog, cmd;
   str_llist_t alist;
   str_list_t gvar;
@@ -465,13 +468,22 @@ bool run_tests(std::list<std::string> cases) {
         std::cerr << "Test abnormality: " << cn << " failed with unexpected exit value " << rv << std::endl;
         if(debug_run) exit(1);
       }
+      current_test_checkdep_count = 0;
     } else if(test_run && test_cond == 1)
-      cases.push_back(cn);
+      if(current_test_checkdep_count < total_cases){
+        cases.push_back(cn);
+        current_test_checkdep_count++;
+      }else{
+        std::cerr << "Test abnormality: impossible to resolve the dependencies for the following test cases:" << std::endl;
+        for(auto tcase: cases) std::cerr << tcase << std::endl;
+        if(debug_run) exit(1);
+      }
     else if(test_run && test_cond == -1) {
         std::cerr << "Test abnormality: " << cn << " does not exist in the configure.json file." << std::endl;
-        if(debug_run) exit(1);      
+        if(debug_run) exit(1);
     } else if(test_run) {
       result_db[cn]["result"] = test_cond; dump_json(result_db, "results.json", false);
+      current_test_checkdep_count = 0;
     }
   }
   return true;

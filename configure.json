@@ -129,6 +129,64 @@
         "require": { "0": [["mss-check-intra-obj-rodata-redzone"]] },
         "expect-results": {"290": "cheri capabilities enabled."}
     },
+
+    "mss-overflow-large-read-ptr-stack": {
+        "program": "mss-read-large-member-inter-object",
+        "arguments": { "0": ["0", "0","-rsize"] },
+        "size": [0, 9, 1],
+        "require": { "0": [["mss-check-intra-obj-stack-redzone"]] },
+        "expect-results": {"290": "cheri capabilities enabled."}
+    },
+    "mss-overflow-large-read-ptr-heap": {
+        "program": "mss-read-large-member-inter-object",
+        "arguments": { "0": ["1", "0","-rsize"] },
+        "size": [0, 9, 1],
+        "require": { "0": [["mss-check-intra-obj-heap-redzone"]] },
+        "expect-results": {"290": "cheri capabilities enabled."}
+    },
+    "mss-overflow-large-read-ptr-data": {
+        "program": "mss-read-large-member-inter-object",
+        "arguments": { "0": ["2", "0","-rsize"] },
+        "size": [0, 9, 1],
+        "require": { "0": [["mss-check-intra-obj-data-redzone"]] },
+        "expect-results": {"290": "cheri capabilities enabled."}
+    },
+    "mss-overflow-large-read-ptr-rodata": {
+        "program": "mss-read-large-member-inter-object",
+        "arguments": { "0": ["3", "0","-rsize"] },
+        "size": [0, 9, 1],
+        "require": { "0": [["mss-check-intra-obj-rodata-redzone"]] },
+        "expect-results": {"290": "cheri capabilities enabled."}
+    },
+    "mss-underflow-large-read-ptr-stack": {
+        "program": "mss-read-large-member-inter-object",
+        "arguments": { "0": ["0", "1","-rsize"] },
+        "size": [0, 9, 1],
+        "require": { "0": [["mss-check-intra-obj-stack-redzone"]] },
+        "expect-results": {"290": "cheri capabilities enabled."}
+    },
+    "mss-underflow-large-read-ptr-heap": {
+        "program": "mss-read-large-member-inter-object",
+        "arguments": { "0": ["1", "1","-rsize"] },
+        "size": [0, 9, 1],
+        "require": { "0": [["mss-check-intra-obj-heap-redzone"]] },
+        "expect-results": {"290": "cheri capabilities enabled."}
+    },
+    "mss-underflow-large-read-ptr-data": {
+        "program": "mss-read-large-member-inter-object",
+        "arguments": { "0": ["2", "1","-rsize"] },
+        "size": [0, 9, 1],
+        "require": { "0": [["mss-check-intra-obj-data-redzone"]] },
+        "expect-results": {"290": "cheri capabilities enabled."}
+    },
+    "mss-underflow-large-read-ptr-rodata": {
+        "program": "mss-read-large-member-inter-object",
+        "arguments": { "0": ["3", "1","-rsize"] },
+        "size": [0, 9, 1],
+        "require": { "0": [["mss-check-intra-obj-rodata-redzone"]] },
+        "expect-results": {"290": "cheri capabilities enabled."}
+    },
+
     "mss-overflow-write-index-stack": {
         "program": "mss-write-by-index",
         "arguments": { "0": ["0", "0"] },
@@ -208,6 +266,50 @@
         "reference": { "cwe": ["119"] },
         "expect-results": {"290": "cheri capabilities enabled."}
     },
+
+    "mss-overflow-large-write-ptr-stack": {
+        "program": "mss-write-large-member-inter-object",
+        "arguments": { "0": ["0", "0","-rsize"] },
+        "size": [0, 9, 1],
+        "require": { "0": [["mss-check-intra-obj-stack-redzone"]] },
+        "expect-results": {"290": "cheri capabilities enabled."}
+    },
+    "mss-overflow-large-write-ptr-heap": {
+        "program": "mss-write-large-member-inter-object",
+        "arguments": { "0": ["1", "0","-rsize"] },
+        "size": [0, 9, 1],
+        "require": { "0": [["mss-check-intra-obj-heap-redzone"]] },
+        "expect-results": {"290": "cheri capabilities enabled."}
+    },
+    "mss-overflow-large-write-ptr-data": {
+        "program": "mss-write-large-member-inter-object",
+        "arguments": { "0": ["2", "0","-rsize"] },
+        "size": [0, 9, 1],
+        "require": { "0": [["mss-check-intra-obj-data-redzone"]] },
+        "expect-results": {"290": "cheri capabilities enabled."}
+    },
+    "mss-underflow-large-write-ptr-stack": {
+        "program": "mss-write-large-member-inter-object",
+        "arguments": { "0": ["0", "1","-rsize"] },
+        "size": [0, 9, 1],
+        "require": { "0": [["mss-check-intra-obj-stack-redzone"]] },
+        "expect-results": {"290": "cheri capabilities enabled."}
+    },
+    "mss-underflow-large-write-ptr-heap": {
+        "program": "mss-write-large-member-inter-object",
+        "arguments": { "0": ["1", "1","-rsize"] },
+        "size": [0, 9, 1],
+        "require": { "0": [["mss-check-intra-obj-heap-redzone"]] },
+        "expect-results": {"290": "cheri capabilities enabled."}
+    },
+    "mss-underflow-large-write-ptr-data": {
+        "program": "mss-write-large-member-inter-object",
+        "arguments": { "0": ["2", "1","-rsize"] },
+        "size": [0, 9, 1],
+        "require": { "0": [["mss-check-intra-obj-data-redzone"]] },
+        "expect-results": {"290": "cheri capabilities enabled."}
+    },
+
     "mss-read-cross-object-index-stack": {
         "program": "mss-read-cross-object-by-index",
         "arguments": { "0": ["0"] },
@@ -658,6 +760,25 @@
         "expect-results": {"290": "cheri capabilities enabled."}
     },
 
+    "mts-double-free": {
+        "arguments": {"0": ["0","0","-rsize","7","0"]},
+        "size": [0, 8, 1],
+        "expect-results": {"262": "freebsd jemalloc check mechannism enabled"}
+    },
+    "mts-write-by-double-free-reallocate": {
+        "program": "mts-double-free",
+        "require": {"0": [["mts-double-free"]]},
+        "arguments": {"0": ["0","0","-rsize","7","1"]},
+        "size": [0, 8, 1],
+        "expect-results": {"262": "freebsd jemalloc check mechannism enabled"}
+    },
+    "mts-access-by-double-free-reallocate": {
+        "program": "mts-double-free",
+        "require": {"0": [["mts-double-free"]]},
+        "arguments": {"0": ["0","0","-rsize","7","2"]},
+        "size": [0, 8, 1],
+        "expect-results": {"262": "freebsd jemalloc check mechannism enabled"}        
+    },
     "mts-access-after-free-alias-stack": {},
     "mts-reallocate-stack": {},
     "mts-access-after-reclaim-stack": {
@@ -672,9 +793,13 @@
         "arguments": {"0": ["c","c"]}
     },
     "mts-access-after-free-org-heap": {
+        "arguments": {"0": ["-rsize"]},
+        "size": [0,3,1],
         "expect-results": { "1": "expected when freed space is refilled with rubbish or cleaned." }
     },
     "mts-access-after-free-alias-heap": {
+        "arguments": {"0": ["-rsize"]},
+        "size": [0,3,1],
         "expect-results": { "1": "expected when freed space is refilled with rubbish or cleaned." }
     },
     "mts-reallocate-heap": {
@@ -682,6 +807,8 @@
         "expect-results": { "1": "failed to get a reallocated block after a number of trials." }
     },
     "mts-access-after-reclaim-heap": {
+        "arguments": {"0": ["-rsize"]},
+        "size": [0,3,1],
         "require": { "0": [ [ "mts-reallocate-heap" ] ] },
         "expect-results": {
             "1": "expected when freed space is refilled with rubbish or cleaned.",
@@ -690,6 +817,8 @@
     },
     "mts-write-after-free-heap": {},
     "mts-write-before-reclaim-heap": {
+        "arguments": {"0": ["-rsize"]},
+        "size": [0,3,1],        
         "require": { "0": [ [ "mts-write-after-free-heap" ], ["mts-reallocate-heap"] ] },
         "expect-results": {
             "1": "expected when allocated space is refilled with rubbish or cleaned.",
@@ -698,6 +827,21 @@
     },
     "mts-write-after-reclaim-heap": {
         "require": { "0": [ [ "mts-reallocate-heap" ] ] }
+    },
+    "acc-copy-stackra-to-heap-explicit-arith": {
+        "program": "cfi-jump-func-ra-from-heap-memcpy-explicit-arith",
+        "require": {"0": [["cpi-func-pointer-arithmetic"]]},
+        "arguments": {"0": ["2","1"]},
+        "expect-results": { "-1": "arithmetic on a pointer to the function pointer is prohibited on Clang 12."}
+    },
+    "acc-copy-stackra-to-heap-implicit-arith": {
+        "program": "cfi-jump-func-ra-from-heap-memcpy-implicit-arith",
+        "require": { "0": [ ["acc-get-ra-offset-v-p-g1"] ],
+                     "1": [ ["acc-get-ra-offset-v-p-g0"] ]
+                   },
+        "arguments": {"0": ["2","0","1"],
+                      "1": ["2","0","1"]
+                     }
     },
     "acc-check-ASLR": {
         "expect-results": { "1": "ASLR enabled."}
@@ -732,9 +876,36 @@
         "arguments": { "0": ["-vcet-enabled"] }
     },
 
-    "cpi-read-vtable-pointer": {},
-    "cpi-write-vtable-pointer": {
-        "require": { "0": [ [ "cpi-read-vtable-pointer" ] ] }
+    "cpi-read-stack-vtable-pointer": {
+        "program": "cpi-read-vtable-pointer",
+        "arguments": { "0": ["0"]}
+    },
+    "cpi-read-heap-vtable-pointer": {
+        "program": "cpi-read-vtable-pointer",
+        "arguments": { "0": ["1"]}
+    },
+    "cpi-read-data-vtable-pointer": {
+        "program": "cpi-read-vtable-pointer",
+        "arguments": { "0": ["2"]}
+    },
+    "cpi-read-rodata-vtable-pointer": {
+        "program": "cpi-read-vtable-pointer",
+        "arguments": { "0": ["3"]}
+    },
+    "cpi-write-stack-vtable-pointer": {
+        "program": "cpi-write-vtable-pointer",
+        "arguments": { "0": ["0"]},
+        "require": { "0": [ [ "cpi-read-stack-vtable-pointer" ] ] }
+    },
+    "cpi-write-heap-vtable-pointer": {
+        "program": "cpi-write-vtable-pointer",
+        "arguments": { "0": ["1"]},
+        "require": { "0": [ [ "cpi-read-heap-vtable-pointer" ] ] }
+    },
+    "cpi-write-data-vtable-pointer": {
+        "program": "cpi-write-vtable-pointer",
+        "arguments": { "0": ["2"]},
+        "require": { "0": [ [ "cpi-read-data-vtable-pointer" ] ] }
     },
     "cpi-func-pointer-assign": {},
     "cpi-func-pointer-arithmetic": {
@@ -756,20 +927,24 @@
         "require": { "0": [ [ "cfi-call-wrong-func-within-static-analysis" ] ] },
     "arguments": { "0": ["1"] }
     },
-    "cfi-call-wrong-func-vtable-parent": {
-        "require": { "0": [ [ "cpi-write-vtable-pointer" ] ] }
+    "cfi-call-wrong-func-heap-vtable-parent": {
+        "program": "cfi-call-wrong-func-vtable-parent",
+        "require": { "0": [ [ "cpi-write-heap-vtable-pointer" ] ] }
     },
-    "cfi-call-wrong-func-vtable-sibling": {
-        "require": { "0": [ [ "cpi-write-vtable-pointer" ] ] }
+    "cfi-call-wrong-func-heap-vtable-sibling": {
+        "program": "cfi-call-wrong-func-vtable-sibling",
+        "require": { "0": [ [ "cpi-write-heap-vtable-pointer" ] ] }
     },
-    "cfi-call-wrong-func-vtable-child": {
-        "require": { "0": [ [ "cpi-write-vtable-pointer" ] ] }
+    "cfi-call-wrong-func-heap-vtable-child": {
+        "program": "cfi-call-wrong-func-vtable-child",
+        "require": { "0": [ [ "cpi-write-heap-vtable-pointer" ] ] }
     },
-    "cfi-call-wrong-func-vtable-offset": {
-        "require": { "0": [ [ "cpi-write-vtable-pointer" ] ] }
+    "cfi-call-wrong-func-heap-vtable-offset": {
+        "program": "cfi-call-wrong-func-vtable-offset",
+        "require": { "0": [ [ "cpi-write-heap-vtable-pointer" ] ] }
     },
     "cfi-call-wrong-func-vtable": {
-        "require": { "0": [ [ "cfi-call-wrong-func-vtable-child" ] ] }
+        "require": { "0": [ [ "cfi-call-wrong-func-heap-vtable-child" ] ] }
     },
     "cfi-call-wrong-func-vtable-released": {
         "require": { "0": [ [ "cfi-call-wrong-func-vtable" ] ] },
@@ -852,6 +1027,19 @@
     "cfi-jump-mid-func": {
         "arguments": { "0": ["1"] }
     },
+    "cfi-jump-func-ra-from-heap-memcpy-explicit-arith": {
+        "require": {"0": [["cpi-func-pointer-arithmetic","acc-copy-stackra-to-heap-explicit-arith"]]},
+        "arguments": {"0": ["2","2"]},
+        "expect-results": { "-1": "arithmetic on a pointer to the function pointer is prohibited on Clang 12."}
+    },
+    "cfi-jump-func-ra-from-heap-memcpy-implicit-arith": {
+        "require": { "0": [ ["acc-get-ra-offset-v-p-g1","acc-copy-stackra-to-heap-implicit-arith"] ],
+                     "1": [ ["acc-get-ra-offset-v-p-g0","acc-copy-stackra-to-heap-implicit-arith"] ]
+                   },
+        "arguments": {"0": ["2","0","2"],
+                      "1": ["2","0","2"]
+                    }
+    },
     "cfi-jump-instruction-in-rodata": {
     "program": "cfi-code-injection",
         "require": { "0": [ [ "cfi-jump-mid-func" ] ] },
@@ -903,7 +1091,6 @@
                            "267": "RA is partially written leading to a segment error due to wrong RA.",
                            "251": "When Arm Asan Enabled, the clang compiler pushes two more registers(one for shadow memory, another for alignment)"},
         "expect-results": {"290": "cheri capabilities enabled."}
-                        }
     },
     "cfi-return-to-wrong-call-site": {
         "require": { "0": [ [ "cfi-return-to-wrong-call-site-within-static-analysis" ] ] },
