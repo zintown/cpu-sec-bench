@@ -36,7 +36,7 @@ test-path = $(base)/test
 LD_LIBRARY_PATH=$(test-path)
 
 # define compiling flags
-CXXFLAGS := -I./lib -$(GCC_OPT_LEVEL) -std=c++11 -Wall
+CXXFLAGS := -I./lib -$(GCC_OPT_LEVEL) -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=bti
 LDFLAGS  :=
 OBJDUMPFLAGS := -D -l -S
 RUN_PREFIX :=
@@ -137,7 +137,7 @@ all: run-test
 
 # json.hpp needs C++11, which might be problematic on some systems
 run-test: $(base)/scheduler/run-test.cpp $(base)/lib/common/temp_file.cpp $(base)/lib/include/temp_file.hpp $(base)/scheduler/json.hpp $(test-path)/sys_info.txt
-	$(CXX) -O2 --std=c++11 -I. -I./lib -DRUN_PREFIX="\"$(RUN_PREFIX)\"" $< $(base)/lib/common/temp_file.cpp -o $@
+	$(CXX) -O2 --std=c++11 -I. -I./lib -march=armv8.8-a+memtag+pauth -mbranch-protection=bti -DRUN_PREFIX="\"$(RUN_PREFIX)\"" $< $(base)/lib/common/temp_file.cpp -o $@
 
 rubbish += run-test
 
