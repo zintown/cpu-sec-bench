@@ -1,0 +1,3765 @@
+Need to add extra evironment variables
+
+========== acc-check-ASLR =========
+make test/acc-check-ASLR
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key -c lib/common/global_var.cpp -o lib/common/global_var.o
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key -c lib/common/signal.cpp -o lib/common/signal.o
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key -c lib/common/temp_file.cpp -o lib/common/temp_file.o
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key -c lib/aarch64/assembly.cpp -o lib/aarch64/assembly.o
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key acc/check-ASLR.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -o test/acc-check-ASLR 
+
+test/acc-check-ASLR
+
+========== acc-check-CET =========
+make test/acc-check-CET
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key acc/check-CET.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -o test/acc-check-CET 
+
+test/acc-check-CET 1
+set runtime variable cet-enabled to 0
+
+========== acc-get-frame-size =========
+make test/acc-get-frame-size
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key acc/get-frame-size.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -o test/acc-get-frame-size 
+
+test/acc-get-frame-size
+set runtime variable frame-size to 8
+
+========== acc-get-ra-offset-v-p-g0 =========
+make test/acc-get-ra-offset
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key acc/get-ra-offset.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -o test/acc-get-ra-offset 
+
+test/acc-get-ra-offset 1 v-p-g0
+Test abnormality: acc-get-ra-offset-v-p-g0 failed with unexpected exit value 1
+Test abnormality: acc-get-ra-offset-v-p-g0 failed with unexpected exit value 1
+
+========== acc-get-ra-offset-v-p-g1 =========
+make test/acc-get-ra-offset
+make: 'test/acc-get-ra-offset' is up to date.
+
+test/acc-get-ra-offset 1 v-p-g1
+Test abnormality: acc-get-ra-offset-v-p-g1 failed with unexpected exit value 1
+Test abnormality: acc-get-ra-offset-v-p-g1 failed with unexpected exit value 1
+
+========== acc-read-GOT =========
+make test/acc-read-GOT
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key acc/read-GOT.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -o test/acc-read-GOT 
+
+test/acc-read-GOT 0
+
+========== acc-read-func =========
+make test/acc-read-func.gen
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key acc/read-func.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -o test/acc-read-func 
+script/get_aarch64_func_inst.sh test/acc-read-func helper 8 test/acc-read-func-func-opcode.tmp
+cp test/acc-read-func test/acc-read-func.gen
+
+test/acc-read-func.gen ./test/acc-read-func-func-opcode.tmp
+Test abnormality: acc-read-func failed with unexpected exit value 1
+Test abnormality: acc-read-func failed with unexpected exit value 1
+
+========== cfi-call-instruction-in-data =========
+make test/cfi-code-injection
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key -shared -fPIC lib/common/cfi.cpp -o libcfi.so
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/code-injection.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-code-injection -lcfi 
+cfi/code-injection.cpp: In function ‘int main(int, char**)’:
+cfi/code-injection.cpp:102:10: warning: ‘void operator delete(void*)’ called on pointer returned from a mismatched allocation function [-Wmismatched-new-delete]
+  102 |   delete m_heap;
+      |          ^~~~~~
+cfi/code-injection.cpp:34:48: note: returned from ‘void* operator new [](std::size_t)’
+   34 |   unsigned char *m_heap = new unsigned char [16];
+      |                                                ^
+
+test/cfi-code-injection 1 1
+
+========== cfi-call-instruction-in-heap =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 1 3
+
+========== cfi-call-instruction-in-rodata =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 1 0
+
+========== cfi-call-instruction-in-stack =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 1 2
+
+========== cfi-call-mid-func =========
+make test/cfi-call-mid-func
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-mid-func.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-mid-func -lcfi 
+
+test/cfi-call-mid-func
+
+========== cfi-call-wrong-func-within-static-analysis =========
+make test/cfi-call-wrong-func-within-static-analysis
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-func-within-static-analysis.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-func-within-static-analysis -lcfi 
+
+test/cfi-call-wrong-func-within-static-analysis 1
+
+========== cfi-call-wrong-num-arg-func =========
+make test/cfi-call-wrong-num-arg-func
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-num-arg-func.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-num-arg-func -lcfi 
+
+test/cfi-call-wrong-num-arg-func
+
+========== cfi-call-wrong-type-arg-dp2fp-func-rodata =========
+make test/cfi-call-wrong-type-arg-dp2fp-func-rodata
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-type-arg-dp2fp-func-rodata.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-type-arg-dp2fp-func-rodata -lcfi 
+
+test/cfi-call-wrong-type-arg-dp2fp-func-rodata
+
+========== cfi-call-wrong-type-arg-fp2dp-func =========
+make test/cfi-call-wrong-type-arg-fp2dp-func
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-type-arg-fp2dp-func.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-type-arg-fp2dp-func -lcfi 
+
+test/cfi-call-wrong-type-arg-fp2dp-func
+
+========== cfi-call-wrong-type-arg-int2double-func =========
+make test/cfi-call-wrong-type-arg-int2double-func
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-type-arg-int2double-func.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-type-arg-int2double-func -lcfi 
+
+test/cfi-call-wrong-type-arg-int2double-func
+
+========== cfi-call-wrong-type-arg-op2doublep-func =========
+make test/cfi-call-wrong-type-arg-op2doublep-func
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-type-arg-op2doublep-func.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-type-arg-op2doublep-func -lcfi 
+
+test/cfi-call-wrong-type-arg-op2doublep-func 2
+
+========== cfi-call-wrong-type-arg-op2intp-func =========
+make test/cfi-call-wrong-type-arg-op2intp-func
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-type-arg-op2intp-func.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-type-arg-op2intp-func -lcfi 
+
+test/cfi-call-wrong-type-arg-op2intp-func 2
+
+========== cfi-jump-mid-func =========
+make test/cfi-jump-mid-func
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/jump-mid-func.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-jump-mid-func -lcfi 
+
+test/cfi-jump-mid-func 1
+
+========== cfi-return-without-call =========
+make test/cfi-return-without-call
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/return-without-call.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-return-without-call -lcfi 
+
+test/cfi-return-without-call 1 8
+
+========== cpi-func-pointer-assign =========
+make test/cpi-func-pointer-assign
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cpi/func-pointer-assign.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cpi-func-pointer-assign -lcfi 
+
+test/cpi-func-pointer-assign
+
+========== cpi-modify-GOT =========
+make test/cpi-modify-GOT
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cpi/modify-GOT.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cpi-modify-GOT -lcfi 
+
+test/cpi-modify-GOT 0
+
+========== cpi-read-data-vtable-pointer =========
+make test/cpi-read-vtable-pointer
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cpi/read-vtable-pointer.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cpi-read-vtable-pointer -lcfi 
+
+test/cpi-read-vtable-pointer 2
+
+========== cpi-read-heap-vtable-pointer =========
+make test/cpi-read-vtable-pointer
+make: 'test/cpi-read-vtable-pointer' is up to date.
+
+test/cpi-read-vtable-pointer 1
+
+========== cpi-read-rodata-vtable-pointer =========
+make test/cpi-read-vtable-pointer
+make: 'test/cpi-read-vtable-pointer' is up to date.
+
+test/cpi-read-vtable-pointer 3
+
+========== cpi-read-stack-vtable-pointer =========
+make test/cpi-read-vtable-pointer
+make: 'test/cpi-read-vtable-pointer' is up to date.
+
+test/cpi-read-vtable-pointer 0
+
+========== cpi-write-data-vtable-pointer =========
+make test/cpi-write-vtable-pointer
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cpi/write-vtable-pointer.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cpi-write-vtable-pointer -lcfi 
+
+test/cpi-write-vtable-pointer 2
+
+========== cpi-write-heap-vtable-pointer =========
+make test/cpi-write-vtable-pointer
+make: 'test/cpi-write-vtable-pointer' is up to date.
+
+test/cpi-write-vtable-pointer 1
+
+========== cpi-write-stack-vtable-pointer =========
+make test/cpi-write-vtable-pointer
+make: 'test/cpi-write-vtable-pointer' is up to date.
+
+test/cpi-write-vtable-pointer 0
+
+========== mss-check-inter-obj-data-redzone =========
+make test/mss-check-inter-nonalloc-redzone
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key -c lib/common/mss.cpp -o lib/common/mss.o
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/check-inter-nonalloc-redzone.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-check-inter-nonalloc-redzone 
+
+test/mss-check-inter-nonalloc-redzone 1
+
+========== mss-check-inter-obj-heap-redzone =========
+make test/mss-check-inter-alloc-redzone
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/check-inter-alloc-redzone.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-check-inter-alloc-redzone 
+
+test/mss-check-inter-alloc-redzone
+test/mss-check-inter-alloc-redzone terminated with signal 4
+Test abnormality: mss-check-inter-obj-heap-redzone failed with unexpected exit value 260
+Test abnormality: mss-check-inter-obj-heap-redzone failed with unexpected exit value 260
+
+========== mss-check-inter-obj-rodata-redzone =========
+make test/mss-check-inter-nonalloc-redzone
+make: 'test/mss-check-inter-nonalloc-redzone' is up to date.
+
+test/mss-check-inter-nonalloc-redzone 2
+
+========== mss-check-inter-obj-stack-redzone =========
+make test/mss-check-inter-nonalloc-redzone
+make: 'test/mss-check-inter-nonalloc-redzone' is up to date.
+
+test/mss-check-inter-nonalloc-redzone 0
+
+========== mss-check-intra-obj-data-redzone =========
+make test/mss-check-intra-redzone
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/check-intra-redzone.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-check-intra-redzone 
+
+test/mss-check-intra-redzone 2
+
+========== mss-check-intra-obj-heap-redzone =========
+make test/mss-check-intra-redzone
+make: 'test/mss-check-intra-redzone' is up to date.
+
+test/mss-check-intra-redzone 1
+
+========== mss-check-intra-obj-rodata-redzone =========
+make test/mss-check-intra-redzone
+make: 'test/mss-check-intra-redzone' is up to date.
+
+test/mss-check-intra-redzone 3
+
+========== mss-check-intra-obj-stack-redzone =========
+make test/mss-check-intra-redzone
+make: 'test/mss-check-intra-redzone' is up to date.
+
+test/mss-check-intra-redzone 0
+
+========== mss-overflow-large-read-ptr-data =========
+make test/mss-read-large-member-inter-object
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/read-large-member-inter-object.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-read-large-member-inter-object 
+
+test/mss-read-large-member-inter-object 2 0 0
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 0 1
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 0 2
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 0 3
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 0 4
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 0 5
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 0 6
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 0 7
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 0 8
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+========== mss-overflow-large-read-ptr-heap =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 1 0 0
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 0 1
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 0 2
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 0 3
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 0 4
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 0 5
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 0 6
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 0 7
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 0 8
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+========== mss-overflow-large-read-ptr-rodata =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 3 0 0
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 0 1
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 0 2
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 0 3
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 0 4
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 0 5
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 0 6
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 0 7
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 0 8
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+========== mss-overflow-large-read-ptr-stack =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 0 0 0
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 0 1
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 0 2
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 0 3
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 0 4
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 0 5
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 0 6
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 0 7
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 0 8
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+========== mss-overflow-large-write-ptr-data =========
+make test/mss-write-large-member-inter-object
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/write-large-member-inter-object.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-write-large-member-inter-object 
+
+test/mss-write-large-member-inter-object 2 0 0
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 0 1
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 0 2
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 0 3
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 0 4
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 0 5
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 0 6
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 0 7
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 0 8
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+========== mss-overflow-large-write-ptr-heap =========
+make test/mss-write-large-member-inter-object
+make: 'test/mss-write-large-member-inter-object' is up to date.
+
+test/mss-write-large-member-inter-object 1 0 0
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 0 1
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 0 2
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 0 3
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 0 4
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 0 5
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 0 6
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 0 7
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 0 8
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+========== mss-overflow-large-write-ptr-stack =========
+make test/mss-write-large-member-inter-object
+make: 'test/mss-write-large-member-inter-object' is up to date.
+
+test/mss-write-large-member-inter-object 0 0 0
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 0 1
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 0 2
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 0 3
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 0 4
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 0 5
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 0 6
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 0 7
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 0 8
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+========== mss-overflow-read-index-data =========
+make test/mss-read-by-index
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/read-by-index.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-read-by-index 
+
+test/mss-read-by-index 2 0
+
+========== mss-overflow-read-index-heap =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 1 0
+
+========== mss-overflow-read-index-rodata =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 3 0
+
+========== mss-overflow-read-index-stack =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 0 0
+
+========== mss-overflow-read-ptr-data =========
+make test/mss-read-by-pointer
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/read-by-pointer.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-read-by-pointer 
+
+test/mss-read-by-pointer 2 0
+
+========== mss-overflow-read-ptr-heap =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 1 0
+
+========== mss-overflow-read-ptr-rodata =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 3 0
+
+========== mss-overflow-read-ptr-stack =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 0 0
+
+========== mss-overflow-read-scalar-cast-to-array-data =========
+make test/mss-overflow-read-scalar-cast-to-array
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/overflow-read-scalar-cast-to-array.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-overflow-read-scalar-cast-to-array 
+mss/overflow-read-scalar-cast-to-array.cpp: In function ‘int main(int, char**)’:
+mss/overflow-read-scalar-cast-to-array.cpp:16:7: warning: ‘rv’ may be used uninitialized [-Wmaybe-uninitialized]
+   16 |   int rv;
+      |       ^~
+
+test/mss-overflow-read-scalar-cast-to-array 2
+
+========== mss-overflow-read-scalar-cast-to-array-heap =========
+make test/mss-overflow-read-scalar-cast-to-array
+make: 'test/mss-overflow-read-scalar-cast-to-array' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-array 1
+
+========== mss-overflow-read-scalar-cast-to-array-rodata =========
+make test/mss-overflow-read-scalar-cast-to-array
+make: 'test/mss-overflow-read-scalar-cast-to-array' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-array 3
+
+========== mss-overflow-read-scalar-cast-to-array-stack =========
+make test/mss-overflow-read-scalar-cast-to-array
+make: 'test/mss-overflow-read-scalar-cast-to-array' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-array 0
+
+========== mss-overflow-read-scalar-cast-to-scalar-data =========
+make test/mss-overflow-read-scalar-cast-to-scalar
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/overflow-read-scalar-cast-to-scalar.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-overflow-read-scalar-cast-to-scalar 
+mss/overflow-read-scalar-cast-to-scalar.cpp: In function ‘int main(int, char**)’:
+mss/overflow-read-scalar-cast-to-scalar.cpp:17:7: warning: ‘rv’ may be used uninitialized [-Wmaybe-uninitialized]
+   17 |   int rv;
+      |       ^~
+
+test/mss-overflow-read-scalar-cast-to-scalar 2
+dummy print to avoid dead code removal 1
+
+========== mss-overflow-read-scalar-cast-to-scalar-heap =========
+make test/mss-overflow-read-scalar-cast-to-scalar
+make: 'test/mss-overflow-read-scalar-cast-to-scalar' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-scalar 1
+dummy print to avoid dead code removal 1
+
+========== mss-overflow-read-scalar-cast-to-scalar-rodata =========
+make test/mss-overflow-read-scalar-cast-to-scalar
+make: 'test/mss-overflow-read-scalar-cast-to-scalar' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-scalar 3
+dummy print to avoid dead code removal 1
+
+========== mss-overflow-read-scalar-cast-to-scalar-stack =========
+make test/mss-overflow-read-scalar-cast-to-scalar
+make: 'test/mss-overflow-read-scalar-cast-to-scalar' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-scalar 0
+dummy print to avoid dead code removal 1
+
+========== mss-overflow-write-index-data =========
+make test/mss-write-by-index
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/write-by-index.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-write-by-index 
+
+test/mss-write-by-index 2 0
+
+========== mss-overflow-write-index-heap =========
+make test/mss-write-by-index
+make: 'test/mss-write-by-index' is up to date.
+
+test/mss-write-by-index 1 0
+
+========== mss-overflow-write-index-stack =========
+make test/mss-write-by-index
+make: 'test/mss-write-by-index' is up to date.
+
+test/mss-write-by-index 0 0
+
+========== mss-overflow-write-ptr-data =========
+make test/mss-write-by-pointer
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/write-by-pointer.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-write-by-pointer 
+
+test/mss-write-by-pointer 2 0
+
+========== mss-overflow-write-ptr-heap =========
+make test/mss-write-by-pointer
+make: 'test/mss-write-by-pointer' is up to date.
+
+test/mss-write-by-pointer 1 0
+
+========== mss-overflow-write-ptr-stack =========
+make test/mss-write-by-pointer
+make: 'test/mss-write-by-pointer' is up to date.
+
+test/mss-write-by-pointer 0 0
+
+========== mss-underflow-large-read-ptr-data =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 2 1 0
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 1 1
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 1 2
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 1 3
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 1 4
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 1 5
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 1 6
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 1 7
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 1 8
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+========== mss-underflow-large-read-ptr-heap =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 1 1 0
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 1 1
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 1 2
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 1 3
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 1 4
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 1 5
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 1 6
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 1 7
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 1 8
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+========== mss-underflow-large-read-ptr-rodata =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 3 1 0
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 1 1
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 1 2
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 1 3
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 1 4
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 1 5
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 1 6
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 1 7
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 1 8
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+========== mss-underflow-large-read-ptr-stack =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 0 1 0
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 1 1
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 1 2
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 1 3
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 1 4
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 1 5
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 1 6
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 1 7
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 1 8
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+========== mss-underflow-large-write-ptr-data =========
+make test/mss-write-large-member-inter-object
+make: 'test/mss-write-large-member-inter-object' is up to date.
+
+test/mss-write-large-member-inter-object 2 1 0
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 1 1
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 1 2
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 1 3
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 1 4
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 1 5
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 1 6
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 1 7
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 1 8
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+========== mss-underflow-large-write-ptr-heap =========
+make test/mss-write-large-member-inter-object
+make: 'test/mss-write-large-member-inter-object' is up to date.
+
+test/mss-write-large-member-inter-object 1 1 0
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 1 1
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 1 2
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 1 3
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 1 4
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 1 5
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 1 6
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 1 7
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 1 8
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+========== mss-underflow-large-write-ptr-stack =========
+make test/mss-write-large-member-inter-object
+make: 'test/mss-write-large-member-inter-object' is up to date.
+
+test/mss-write-large-member-inter-object 0 1 0
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 1 1
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 1 2
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 1 3
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 1 4
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 1 5
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 1 6
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 1 7
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 1 8
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+========== mss-underflow-read-index-data =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 2 1
+
+========== mss-underflow-read-index-heap =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 1 1
+
+========== mss-underflow-read-index-rodata =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 3 1
+
+========== mss-underflow-read-index-stack =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 0 1
+
+========== mss-underflow-read-ptr-data =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 2 1
+
+========== mss-underflow-read-ptr-heap =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 1 1
+
+========== mss-underflow-read-ptr-rodata =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 3 1
+
+========== mss-underflow-read-ptr-stack =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 0 1
+
+========== mss-underflow-write-index-data =========
+make test/mss-write-by-index
+make: 'test/mss-write-by-index' is up to date.
+
+test/mss-write-by-index 2 1
+
+========== mss-underflow-write-index-heap =========
+make test/mss-write-by-index
+make: 'test/mss-write-by-index' is up to date.
+
+test/mss-write-by-index 1 1
+
+========== mss-underflow-write-index-stack =========
+make test/mss-write-by-index
+make: 'test/mss-write-by-index' is up to date.
+
+test/mss-write-by-index 0 1
+
+========== mss-underflow-write-ptr-data =========
+make test/mss-write-by-pointer
+make: 'test/mss-write-by-pointer' is up to date.
+
+test/mss-write-by-pointer 2 1
+
+========== mss-underflow-write-ptr-heap =========
+make test/mss-write-by-pointer
+make: 'test/mss-write-by-pointer' is up to date.
+
+test/mss-write-by-pointer 1 1
+
+========== mss-underflow-write-ptr-stack =========
+make test/mss-write-by-pointer
+make: 'test/mss-write-by-pointer' is up to date.
+
+test/mss-write-by-pointer 0 1
+
+========== mss-write-cross-frame-index =========
+make test/mss-write-cross-frame-by-index
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/write-cross-frame-by-index.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-write-cross-frame-by-index 
+
+test/mss-write-cross-frame-by-index
+
+========== mss-write-cross-frame-ptr =========
+make test/mss-write-cross-frame-by-pointer
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/write-cross-frame-by-pointer.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-write-cross-frame-by-pointer 
+
+test/mss-write-cross-frame-by-pointer
+
+========== mss-write-cross-page-index-stack =========
+make test/mss-write-cross-page-by-index-in-stack
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/write-cross-page-by-index-in-stack.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-write-cross-page-by-index-in-stack 
+
+test/mss-write-cross-page-by-index-in-stack
+
+========== mss-write-cross-page-ptr-stack =========
+make test/mss-write-cross-page-by-pointer-in-stack
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/write-cross-page-by-pointer-in-stack.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-write-cross-page-by-pointer-in-stack 
+
+test/mss-write-cross-page-by-pointer-in-stack
+
+========== mss-write-cross-segment-data-to-heap-index =========
+make test/mss-write-cross-segment
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/write-cross-segment.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-write-cross-segment 
+In file included from ./lib/include/assembly.hpp:20,
+                 from mss/write-cross-segment.cpp:2:
+./lib/aarch64/assembly.hpp: In function ‘int main(int, char**)’:
+./lib/aarch64/assembly.hpp:6:3: warning: ‘pdes’ may be used uninitialized [-Wmaybe-uninitialized]
+    6 |   asm volatile(                              \
+      |   ^~~
+mss/write-cross-segment.cpp:20:16: note: ‘pdes’ was declared here
+   20 |   char *psrc, *pdes;
+      |                ^~~~
+./lib/aarch64/assembly.hpp:6:3: warning: ‘psrc’ may be used uninitialized [-Wmaybe-uninitialized]
+    6 |   asm volatile(                              \
+      |   ^~~
+mss/write-cross-segment.cpp:20:9: note: ‘psrc’ was declared here
+   20 |   char *psrc, *pdes;
+      |         ^~~~
+
+test/mss-write-cross-segment 2 1 0
+
+========== mss-write-cross-segment-data-to-heap-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 2 1 1
+
+========== mss-write-cross-segment-data-to-stack-index =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 2 0 0
+
+========== mss-write-cross-segment-data-to-stack-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 2 0 1
+
+========== mss-write-cross-segment-heap-to-data-index =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 1 2 0
+
+========== mss-write-cross-segment-heap-to-data-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 1 2 1
+
+========== mss-write-cross-segment-heap-to-stack-index =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 1 0 0
+
+========== mss-write-cross-segment-heap-to-stack-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 1 0 1
+
+========== mss-write-cross-segment-stack-to-data-index =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 0 2 0
+
+========== mss-write-cross-segment-stack-to-data-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 0 2 1
+
+========== mss-write-cross-segment-stack-to-heap-index =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 0 1 0
+
+========== mss-write-cross-segment-stack-to-heap-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 0 1 1
+
+========== mts-access-after-free-alias-heap =========
+make test/mts-access-after-free-alias-heap
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mts/access-after-free-alias-heap.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mts-access-after-free-alias-heap 
+
+test/mts-access-after-free-alias-heap 0
+
+test/mts-access-after-free-alias-heap 1
+
+test/mts-access-after-free-alias-heap 2
+
+========== mts-access-after-free-alias-stack =========
+make test/mts-access-after-free-alias-stack
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mts/access-after-free-alias-stack.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mts-access-after-free-alias-stack 
+mts/access-after-free-alias-stack.cpp: In function ‘void helper()’:
+mts/access-after-free-alias-stack.cpp:7:11: warning: storing the address of local variable ‘buffer_stack’ in ‘gbuffer’ [-Wdangling-pointer=]
+    7 |   gbuffer = &buffer_stack;
+      |   ~~~~~~~~^~~~~~~~~~~~~~~
+mts/access-after-free-alias-stack.cpp:6:14: note: ‘buffer_stack’ declared here
+    6 |   charBuffer buffer_stack('u','d','o');
+      |              ^~~~~~~~~~~~
+mts/access-after-free-alias-stack.cpp:3:13: note: ‘gbuffer’ declared here
+    3 | charBuffer *gbuffer;
+      |             ^~~~~~~
+
+test/mts-access-after-free-alias-stack
+
+========== mts-access-after-free-org-heap =========
+make test/mts-access-after-free-org-heap
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mts/access-after-free-org-heap.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mts-access-after-free-org-heap 
+mts/access-after-free-org-heap.cpp: In function ‘int main(int, char**)’:
+mts/access-after-free-org-heap.cpp:11:26: warning: pointer may be used after ‘void operator delete(void*)’ [-Wuse-after-free]
+   11 |     return check(buffer->underflow, 7,  1, 'u');
+      |                  ~~~~~~~~^~~~~~~~~
+mts/access-after-free-org-heap.cpp:5:10: note: call to ‘void operator delete(void*)’ here
+    5 |   delete buffer;
+      |          ^~~~~~
+mts/access-after-free-org-heap.cpp:14:26: warning: pointer may be used after ‘void operator delete(void*)’ [-Wuse-after-free]
+   14 |     return check(buffer->data, 7,  1, 'd');
+      |                  ~~~~~~~~^~~~
+mts/access-after-free-org-heap.cpp:5:10: note: call to ‘void operator delete(void*)’ here
+    5 |   delete buffer;
+      |          ^~~~~~
+mts/access-after-free-org-heap.cpp:17:26: warning: pointer may be used after ‘void operator delete(void*)’ [-Wuse-after-free]
+   17 |     return check(buffer->overflow, 7,  1, 'o');
+      |                  ~~~~~~~~^~~~~~~~
+mts/access-after-free-org-heap.cpp:5:10: note: call to ‘void operator delete(void*)’ here
+    5 |   delete buffer;
+      |          ^~~~~~
+
+test/mts-access-after-free-org-heap 0
+
+test/mts-access-after-free-org-heap 1
+
+test/mts-access-after-free-org-heap 2
+
+========== mts-double-free =========
+make test/mts-double-free
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mts/double-free.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mts-double-free 
+
+test/mts-double-free 0 0 0 7 0
+test/mts-double-free terminated with signal 4
+Test abnormality: mts-double-free failed with unexpected exit value 260
+
+test/mts-double-free 0 0 1 7 0
+test/mts-double-free terminated with signal 4
+Test abnormality: mts-double-free failed with unexpected exit value 260
+
+test/mts-double-free 0 0 2 7 0
+test/mts-double-free terminated with signal 4
+Test abnormality: mts-double-free failed with unexpected exit value 260
+
+test/mts-double-free 0 0 3 7 0
+test/mts-double-free terminated with signal 4
+Test abnormality: mts-double-free failed with unexpected exit value 260
+
+test/mts-double-free 0 0 4 7 0
+test/mts-double-free terminated with signal 4
+Test abnormality: mts-double-free failed with unexpected exit value 260
+
+test/mts-double-free 0 0 5 7 0
+test/mts-double-free terminated with signal 4
+Test abnormality: mts-double-free failed with unexpected exit value 260
+
+test/mts-double-free 0 0 6 7 0
+test/mts-double-free terminated with signal 4
+Test abnormality: mts-double-free failed with unexpected exit value 260
+
+test/mts-double-free 0 0 7 7 0
+test/mts-double-free terminated with signal 4
+Test abnormality: mts-double-free failed with unexpected exit value 260
+Test abnormality: mts-double-free failed with unexpected exit value 260
+
+========== mts-reallocate-heap =========
+make test/mts-reallocate-heap
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mts/reallocate-heap.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mts-reallocate-heap 
+
+test/mts-reallocate-heap
+
+========== mts-reallocate-stack =========
+make test/mts-reallocate-stack
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mts/reallocate-stack.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mts-reallocate-stack 
+mts/reallocate-stack.cpp: In function ‘intptr_t helper(bool)’:
+mts/reallocate-stack.cpp:11:8: warning: storing the address of local variable ‘buffer’ in ‘pb’ [-Wdangling-pointer=]
+   11 |     pb = &buffer;
+      |     ~~~^~~~~~~~~
+mts/reallocate-stack.cpp:7:14: note: ‘buffer’ declared here
+    7 |   charBuffer buffer;
+      |              ^~~~~~
+mts/reallocate-stack.cpp:4:13: note: ‘pb’ declared here
+    4 | charBuffer *pb;
+      |             ^~
+
+test/mts-reallocate-stack
+
+========== mts-write-after-free-heap =========
+make test/mts-write-after-free-heap
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mts/write-after-free-heap.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mts-write-after-free-heap 
+
+test/mts-write-after-free-heap
+
+========== mts-write-after-free-stack =========
+make test/mts-write-after-free-stack
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mts/write-after-free-stack.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mts-write-after-free-stack 
+mts/write-after-free-stack.cpp: In function ‘void helper()’:
+mts/write-after-free-stack.cpp:9:11: warning: storing the address of local variable ‘buffer_stack’ in ‘gbuffer’ [-Wdangling-pointer=]
+    9 |   gbuffer = buffer_stack+40;
+      |   ~~~~~~~~^~~~~~~~~~~~~~~~~
+mts/write-after-free-stack.cpp:6:14: note: ‘buffer_stack’ declared here
+    6 |   charBuffer buffer_stack[80];
+      |              ^~~~~~~~~~~~
+mts/write-after-free-stack.cpp:3:13: note: ‘gbuffer’ declared here
+    3 | charBuffer *gbuffer;
+      |             ^~~~~~~
+
+test/mts-write-after-free-stack
+
+========== mts-write-after-reclaim-heap =========
+make test/mts-write-after-reclaim-heap
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mts/write-after-reclaim-heap.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mts-write-after-reclaim-heap 
+mts/write-after-reclaim-heap.cpp: In function ‘int main()’:
+mts/write-after-reclaim-heap.cpp:26:31: warning: ‘dangle’ may be used uninitialized [-Wmaybe-uninitialized]
+   26 |     update_by_pointer(dangle->data, 0, 8,  1, 'c');
+      |                       ~~~~~~~~^~~~
+mts/write-after-reclaim-heap.cpp:8:24: note: ‘dangle’ was declared here
+    8 |   charBuffer *buffer, *dangle;
+      |                        ^~~~~~
+
+test/mts-write-after-reclaim-heap
+test/mts-write-after-reclaim-heap terminated with signal 4
+Test abnormality: mts-write-after-reclaim-heap failed with unexpected exit value 260
+Test abnormality: mts-write-after-reclaim-heap failed with unexpected exit value 260
+
+========== mts-write-after-reclaim-stack =========
+make test/mts-write-after-reclaim-stack
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mts/write-after-reclaim-stack.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mts-write-after-reclaim-stack 
+
+test/mts-write-after-reclaim-stack c c
+
+========== mts-write-before-reclaim-heap =========
+make test/mts-write-before-reclaim-heap
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mts/write-before-reclaim-heap.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mts-write-before-reclaim-heap 
+mts/write-before-reclaim-heap.cpp: In function ‘int main(int, char**)’:
+mts/write-before-reclaim-heap.cpp:11:29: warning: pointer may be used after ‘void operator delete(void*)’ [-Wuse-after-free]
+   11 |   update_by_pointer(buffer->overflow, 0, 8,  1, 'n');
+      |                     ~~~~~~~~^~~~~~~~
+mts/write-before-reclaim-heap.cpp:8:10: note: call to ‘void operator delete(void*)’ here
+    8 |   delete buffer;
+      |          ^~~~~~
+mts/write-before-reclaim-heap.cpp:10:29: warning: pointer may be used after ‘void operator delete(void*)’ [-Wuse-after-free]
+   10 |   update_by_pointer(buffer->data, 0, 8,  1, 'c');
+      |                     ~~~~~~~~^~~~
+mts/write-before-reclaim-heap.cpp:8:10: note: call to ‘void operator delete(void*)’ here
+    8 |   delete buffer;
+      |          ^~~~~~
+mts/write-before-reclaim-heap.cpp:9:29: warning: pointer used after ‘void operator delete(void*)’ [-Wuse-after-free]
+    9 |   update_by_pointer(buffer->underflow, 0, 8,  1, 't');
+      |                     ~~~~~~~~^~~~~~~~~
+mts/write-before-reclaim-heap.cpp:8:10: note: call to ‘void operator delete(void*)’ here
+    8 |   delete buffer;
+      |          ^~~~~~
+mts/write-before-reclaim-heap.cpp:41:31: warning: pointer used after ‘void operator delete(void*)’ [-Wuse-after-free]
+   41 |     update_by_pointer(buffer->data, 0, 8,  1, 'c');
+      |                       ~~~~~~~~^~~~
+mts/write-before-reclaim-heap.cpp:40:12: note: call to ‘void operator delete(void*)’ here
+   40 |     delete buffer;
+      |            ^~~~~~
+
+test/mts-write-before-reclaim-heap 0
+
+========== mts-write-before-reclaim-stack =========
+make test/mts-write-before-reclaim-stack
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mts/write-before-reclaim-stack.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mts-write-before-reclaim-stack 
+mts/write-before-reclaim-stack.cpp: In function ‘int helper(bool)’:
+mts/write-before-reclaim-stack.cpp:10:13: warning: storing the address of local variable ‘buffer’ in ‘gbuffer’ [-Wdangling-pointer=]
+   10 |     gbuffer = buffer+40;
+      |     ~~~~~~~~^~~~~~~~~~~
+mts/write-before-reclaim-stack.cpp:6:14: note: ‘buffer’ declared here
+    6 |   charBuffer buffer[80];
+      |              ^~~~~~
+mts/write-before-reclaim-stack.cpp:3:13: note: ‘gbuffer’ declared here
+    3 | charBuffer *gbuffer;
+      |             ^~~~~~~
+mts/write-before-reclaim-stack.cpp:8:17: warning: ‘buffer’ may be used uninitialized [-Wmaybe-uninitialized]
+    8 |     return check(buffer[40].data, 8,  1, 'c');
+      |            ~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from mts/write-before-reclaim-stack.cpp:1:
+./lib/include/mss.hpp:120:5: note: by argument 1 of type ‘const char*’ to ‘int check(const T*, int, int, T) [with T = char]’ declared here
+  120 | int check(const T *buf, int size, int step, T c) {
+      |     ^~~~~
+mts/write-before-reclaim-stack.cpp:6:14: note: ‘buffer’ declared here
+    6 |   charBuffer buffer[80];
+      |              ^~~~~~
+
+test/mts-write-before-reclaim-stack
+
+========== cfi-call-wrong-func =========
+make test/cfi-call-wrong-func
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-func.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-func -lcfi 
+
+test/cfi-call-wrong-func 1
+
+========== cfi-call-wrong-func-heap-vtable-child =========
+make test/cfi-call-wrong-func-vtable-child
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-func-vtable-child.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-func-vtable-child -lcfi 
+
+test/cfi-call-wrong-func-vtable-child
+
+========== cfi-call-wrong-func-heap-vtable-offset =========
+make test/cfi-call-wrong-func-vtable-offset
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-func-vtable-offset.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-func-vtable-offset -lcfi 
+
+test/cfi-call-wrong-func-vtable-offset
+
+========== cfi-call-wrong-func-heap-vtable-parent =========
+make test/cfi-call-wrong-func-vtable-parent
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-func-vtable-parent.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-func-vtable-parent -lcfi 
+
+test/cfi-call-wrong-func-vtable-parent
+
+========== cfi-call-wrong-func-heap-vtable-sibling =========
+make test/cfi-call-wrong-func-vtable-sibling
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-func-vtable-sibling.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-func-vtable-sibling -lcfi 
+
+test/cfi-call-wrong-func-vtable-sibling
+
+========== cfi-call-wrong-func-vtable =========
+make test/cfi-call-wrong-func-vtable
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-func-vtable.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-func-vtable -lcfi 
+
+test/cfi-call-wrong-func-vtable
+
+========== cfi-call-wrong-func-vtable-released =========
+make test/cfi-call-wrong-func-vtable-released
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-func-vtable-released.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-func-vtable-released -lcfi 
+
+test/cfi-call-wrong-func-vtable-released
+
+========== cfi-call-wrong-num-arg-vtable =========
+make test/cfi-call-wrong-num-arg-vtable
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-num-arg-vtable.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-num-arg-vtable -lcfi 
+
+test/cfi-call-wrong-num-arg-vtable
+
+========== cfi-call-wrong-num-func-vtable =========
+make test/cfi-call-wrong-num-func-vtable
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-num-func-vtable.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-num-func-vtable -lcfi 
+
+test/cfi-call-wrong-num-func-vtable
+
+========== cfi-call-wrong-num-func-vtable-data =========
+make test/cfi-call-wrong-num-func-vtable-data
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-num-func-vtable-data.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-num-func-vtable-data -lcfi 
+
+test/cfi-call-wrong-num-func-vtable-data
+
+========== cfi-call-wrong-num-func-vtable-heap =========
+make test/cfi-call-wrong-num-func-vtable-heap
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-num-func-vtable-heap.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-num-func-vtable-heap -lcfi 
+
+test/cfi-call-wrong-num-func-vtable-heap
+
+========== cfi-call-wrong-num-func-vtable-stack =========
+make test/cfi-call-wrong-num-func-vtable-stack
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/call-wrong-num-func-vtable-stack.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-call-wrong-num-func-vtable-stack -lcfi 
+
+test/cfi-call-wrong-num-func-vtable-stack
+
+========== cfi-jump-instruction-in-data =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 2 1 0
+
+========== cfi-jump-instruction-in-heap =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 2 3 0
+
+========== cfi-jump-instruction-in-rodata =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 2 0 0
+
+========== cfi-jump-instruction-in-stack =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 2 2 0
+
+========== cfi-return-to-wrong-call-site-within-static-analysis =========
+make test/cfi-return-to-wrong-call-site-within-static-analysis
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/return-to-wrong-call-site-within-static-analysis.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-return-to-wrong-call-site-within-static-analysis -lcfi 
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 0
+terminate called after throwing an instance of 'std::logic_error'
+  what():  basic_string: construction from null is not valid
+test/cfi-return-to-wrong-call-site-within-static-analysis terminated with signal 6
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 1
+terminate called after throwing an instance of 'std::logic_error'
+  what():  basic_string: construction from null is not valid
+test/cfi-return-to-wrong-call-site-within-static-analysis terminated with signal 6
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 2
+terminate called after throwing an instance of 'std::logic_error'
+  what():  basic_string: construction from null is not valid
+test/cfi-return-to-wrong-call-site-within-static-analysis terminated with signal 6
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 3
+terminate called after throwing an instance of 'std::logic_error'
+  what():  basic_string: construction from null is not valid
+test/cfi-return-to-wrong-call-site-within-static-analysis terminated with signal 6
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 4
+terminate called after throwing an instance of 'std::logic_error'
+  what():  basic_string: construction from null is not valid
+test/cfi-return-to-wrong-call-site-within-static-analysis terminated with signal 6
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 5
+terminate called after throwing an instance of 'std::logic_error'
+  what():  basic_string: construction from null is not valid
+test/cfi-return-to-wrong-call-site-within-static-analysis terminated with signal 6
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 6
+terminate called after throwing an instance of 'std::logic_error'
+  what():  basic_string: construction from null is not valid
+test/cfi-return-to-wrong-call-site-within-static-analysis terminated with signal 6
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 7
+terminate called after throwing an instance of 'std::logic_error'
+  what():  basic_string: construction from null is not valid
+test/cfi-return-to-wrong-call-site-within-static-analysis terminated with signal 6
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+
+========== cpi-func-pointer-arithmetic =========
+make test/cpi-func-pointer-arithmetic
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cpi/func-pointer-arithmetic.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cpi-func-pointer-arithmetic -lcfi 
+cpi/func-pointer-arithmetic.cpp: In function ‘void call_helper(intptr_t, intptr_t)’:
+cpi/func-pointer-arithmetic.cpp:14:8: warning: pointer to a function used in arithmetic [-Wpointer-arith]
+   14 |   func += diff;
+      |   ~~~~~^~~~~~~
+
+test/cpi-func-pointer-arithmetic
+
+========== mss-overflow-write-cross-object-index-data =========
+make test/mss-write-cross-object-by-index
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/write-cross-object-by-index.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-write-cross-object-by-index 
+
+test/mss-write-cross-object-by-index 2 0
+
+========== mss-overflow-write-cross-object-index-heap =========
+make test/mss-write-cross-object-by-index
+make: 'test/mss-write-cross-object-by-index' is up to date.
+
+test/mss-write-cross-object-by-index 1 0
+
+========== mss-overflow-write-cross-object-index-stack =========
+make test/mss-write-cross-object-by-index
+make: 'test/mss-write-cross-object-by-index' is up to date.
+
+test/mss-write-cross-object-by-index 0 0
+
+========== mss-overflow-write-cross-object-ptr-data =========
+make test/mss-write-cross-object-by-pointer
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/write-cross-object-by-pointer.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-write-cross-object-by-pointer 
+
+test/mss-write-cross-object-by-pointer 2 0
+
+========== mss-overflow-write-cross-object-ptr-heap =========
+make test/mss-write-cross-object-by-pointer
+make: 'test/mss-write-cross-object-by-pointer' is up to date.
+
+test/mss-write-cross-object-by-pointer 1 0
+
+========== mss-overflow-write-cross-object-ptr-stack =========
+make test/mss-write-cross-object-by-pointer
+make: 'test/mss-write-cross-object-by-pointer' is up to date.
+
+test/mss-write-cross-object-by-pointer 0 0
+
+========== mss-read-cross-frame-index =========
+make test/mss-read-cross-frame-by-index
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/read-cross-frame-by-index.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-read-cross-frame-by-index 
+mss/read-cross-frame-by-index.cpp: In function ‘int helper(const char*)’:
+mss/read-cross-frame-by-index.cpp:10:23: warning: ‘dummy’ may be used uninitialized [-Wmaybe-uninitialized]
+   10 |   return read_by_index(dummy, delta, 7, 1, 'd');
+      |          ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from mss/read-cross-frame-by-index.cpp:1:
+./lib/include/mss.hpp:109:12: note: by argument 1 of type ‘const charBuffer&’ to ‘int read_by_index(const charBuffer&, long long int, long long int, int, char)’ declared here
+  109 | extern int read_by_index(const charBuffer& cb, long long offset, long long size, int step, char c);
+      |            ^~~~~~~~~~~~~
+mss/read-cross-frame-by-index.cpp:8:14: note: ‘dummy’ declared here
+    8 |   charBuffer dummy;
+      |              ^~~~~
+
+test/mss-read-cross-frame-by-index
+
+========== mss-read-cross-frame-ptr =========
+make test/mss-read-cross-frame-by-pointer
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/read-cross-frame-by-pointer.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-read-cross-frame-by-pointer 
+mss/read-cross-frame-by-pointer.cpp: In function ‘int helper(const char*)’:
+mss/read-cross-frame-by-pointer.cpp:10:25: warning: ‘dummy’ may be used uninitialized [-Wmaybe-uninitialized]
+   10 |   return read_by_pointer(dummy.data, delta, 7, 1, 'd');
+      |          ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from mss/read-cross-frame-by-pointer.cpp:1:
+./lib/include/mss.hpp:112:5: note: by argument 1 of type ‘const char*’ to ‘int read_by_pointer(const T*, long long int, long long int, int, T) [with T = char]’ declared here
+  112 | int read_by_pointer(const T *buf, long long offset, long long size, int step, T c) {
+      |     ^~~~~~~~~~~~~~~
+mss/read-cross-frame-by-pointer.cpp:8:14: note: ‘dummy’ declared here
+    8 |   charBuffer dummy;
+      |              ^~~~~
+
+test/mss-read-cross-frame-by-pointer
+
+========== mss-read-cross-object-index-data =========
+make test/mss-read-cross-object-by-index
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/read-cross-object-by-index.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-read-cross-object-by-index 
+
+test/mss-read-cross-object-by-index 2
+
+========== mss-read-cross-object-index-heap =========
+make test/mss-read-cross-object-by-index
+make: 'test/mss-read-cross-object-by-index' is up to date.
+
+test/mss-read-cross-object-by-index 1
+
+========== mss-read-cross-object-index-rodata =========
+make test/mss-read-cross-object-by-index
+make: 'test/mss-read-cross-object-by-index' is up to date.
+
+test/mss-read-cross-object-by-index 3
+
+========== mss-read-cross-object-index-stack =========
+make test/mss-read-cross-object-by-index
+make: 'test/mss-read-cross-object-by-index' is up to date.
+
+test/mss-read-cross-object-by-index 0
+
+========== mss-read-cross-object-ptr-data =========
+make test/mss-read-cross-object-by-pointer
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/read-cross-object-by-pointer.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-read-cross-object-by-pointer 
+
+test/mss-read-cross-object-by-pointer 2
+
+========== mss-read-cross-object-ptr-heap =========
+make test/mss-read-cross-object-by-pointer
+make: 'test/mss-read-cross-object-by-pointer' is up to date.
+
+test/mss-read-cross-object-by-pointer 1
+
+========== mss-read-cross-object-ptr-rodata =========
+make test/mss-read-cross-object-by-pointer
+make: 'test/mss-read-cross-object-by-pointer' is up to date.
+
+test/mss-read-cross-object-by-pointer 3
+
+========== mss-read-cross-object-ptr-stack =========
+make test/mss-read-cross-object-by-pointer
+make: 'test/mss-read-cross-object-by-pointer' is up to date.
+
+test/mss-read-cross-object-by-pointer 0
+
+========== mss-read-cross-page-index-stack =========
+make test/mss-read-cross-page-by-index-in-stack
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/read-cross-page-by-index-in-stack.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-read-cross-page-by-index-in-stack 
+mss/read-cross-page-by-index-in-stack.cpp: In function ‘int helper(const char*, int)’:
+mss/read-cross-page-by-index-in-stack.cpp:12:25: warning: ‘dummy’ may be used uninitialized [-Wmaybe-uninitialized]
+   12 |     return read_by_index(dummy, delta, 7, 1, 'm');
+      |            ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from mss/read-cross-page-by-index-in-stack.cpp:1:
+./lib/include/mss.hpp:109:12: note: by argument 1 of type ‘const charBuffer&’ to ‘int read_by_index(const charBuffer&, long long int, long long int, int, char)’ declared here
+  109 | extern int read_by_index(const charBuffer& cb, long long offset, long long size, int step, char c);
+      |            ^~~~~~~~~~~~~
+mss/read-cross-page-by-index-in-stack.cpp:7:14: note: ‘dummy’ declared here
+    7 |   charBuffer dummy;
+      |              ^~~~~
+
+test/mss-read-cross-page-by-index-in-stack
+
+========== mss-read-cross-page-ptr-stack =========
+make test/mss-read-cross-page-by-pointer-in-stack
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/read-cross-page-by-pointer-in-stack.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-read-cross-page-by-pointer-in-stack 
+mss/read-cross-page-by-pointer-in-stack.cpp: In function ‘int helper(const char*, int)’:
+mss/read-cross-page-by-pointer-in-stack.cpp:12:27: warning: ‘dummy’ may be used uninitialized [-Wmaybe-uninitialized]
+   12 |     return read_by_pointer(dummy.data, delta, 7, 1, 'm');
+      |            ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from mss/read-cross-page-by-pointer-in-stack.cpp:1:
+./lib/include/mss.hpp:112:5: note: by argument 1 of type ‘const char*’ to ‘int read_by_pointer(const T*, long long int, long long int, int, T) [with T = char]’ declared here
+  112 | int read_by_pointer(const T *buf, long long offset, long long size, int step, T c) {
+      |     ^~~~~~~~~~~~~~~
+mss/read-cross-page-by-pointer-in-stack.cpp:7:14: note: ‘dummy’ declared here
+    7 |   charBuffer dummy;
+      |              ^~~~~
+
+test/mss-read-cross-page-by-pointer-in-stack
+
+========== mss-read-cross-segment-data-to-heap-index =========
+make test/mss-read-cross-segment
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/read-cross-segment.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-read-cross-segment 
+mss/read-cross-segment.cpp: In function ‘int main(int, char**)’:
+mss/read-cross-segment.cpp:41:7: warning: ‘rv’ may be used uninitialized [-Wmaybe-uninitialized]
+   41 |   int rv;
+      |       ^~
+mss/read-cross-segment.cpp:51:25: warning: ‘tc’ may be used uninitialized [-Wmaybe-uninitialized]
+   51 |     rv = read_by_pointer(psrc, distance, 7, 1, tc);
+      |          ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+mss/read-cross-segment.cpp:23:8: note: ‘tc’ was declared here
+   23 |   char tc;
+      |        ^~
+In file included from ./lib/include/assembly.hpp:20,
+                 from mss/read-cross-segment.cpp:2:
+./lib/aarch64/assembly.hpp:6:3: warning: ‘pdes’ may be used uninitialized [-Wmaybe-uninitialized]
+    6 |   asm volatile(                              \
+      |   ^~~
+mss/read-cross-segment.cpp:22:22: note: ‘pdes’ was declared here
+   22 |   const char *psrc, *pdes;
+      |                      ^~~~
+./lib/aarch64/assembly.hpp:6:3: warning: ‘psrc’ may be used uninitialized [-Wmaybe-uninitialized]
+    6 |   asm volatile(                              \
+      |   ^~~
+mss/read-cross-segment.cpp:22:15: note: ‘psrc’ was declared here
+   22 |   const char *psrc, *pdes;
+      |               ^~~~
+
+test/mss-read-cross-segment 2 1 0
+
+========== mss-read-cross-segment-data-to-heap-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 1 1
+
+========== mss-read-cross-segment-data-to-rodata-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 3 0
+
+========== mss-read-cross-segment-data-to-rodata-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 3 1
+
+========== mss-read-cross-segment-data-to-stack-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 0 0
+
+========== mss-read-cross-segment-data-to-stack-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 0 1
+
+========== mss-read-cross-segment-heap-to-data-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 2 0
+
+========== mss-read-cross-segment-heap-to-data-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 2 1
+
+========== mss-read-cross-segment-heap-to-rodata-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 3 0
+
+========== mss-read-cross-segment-heap-to-rodata-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 3 1
+
+========== mss-read-cross-segment-heap-to-stack-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 0 0
+
+========== mss-read-cross-segment-heap-to-stack-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 0 1
+
+========== mss-read-cross-segment-rodata-to-data-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 2 0
+
+========== mss-read-cross-segment-rodata-to-data-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 2 1
+
+========== mss-read-cross-segment-rodata-to-heap-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 1 0
+
+========== mss-read-cross-segment-rodata-to-heap-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 1 1
+
+========== mss-read-cross-segment-rodata-to-stack-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 0 0
+
+========== mss-read-cross-segment-rodata-to-stack-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 0 1
+
+========== mss-read-cross-segment-stack-to-data-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 2 0
+
+========== mss-read-cross-segment-stack-to-data-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 2 1
+
+========== mss-read-cross-segment-stack-to-heap-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 1 0
+
+========== mss-read-cross-segment-stack-to-heap-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 1 1
+
+========== mss-read-cross-segment-stack-to-rodata-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 3 0
+
+========== mss-read-cross-segment-stack-to-rodata-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 3 1
+
+========== mss-spray-cross-frame =========
+make test/mss-spray-cross-frame
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/spray-cross-frame.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-spray-cross-frame 
+
+test/mss-spray-cross-frame
+
+========== mss-spray-cross-page-stack =========
+make test/mss-spray-cross-page-in-stack
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/spray-cross-page-in-stack.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-spray-cross-page-in-stack 
+mss/spray-cross-page-in-stack.cpp: In function ‘void helper(const char*, int)’:
+mss/spray-cross-page-in-stack.cpp:6:21: warning: infinite recursion detected [-Winfinite-recursion]
+    6 | void FORCE_NOINLINE helper(const char* b, int level) {
+      |                     ^~~~~~
+mss/spray-cross-page-in-stack.cpp:10:11: note: recursive call
+   10 |     helper(b, level-1);
+      |     ~~~~~~^~~~~~~~~~~~
+
+test/mss-spray-cross-page-in-stack
+
+========== mss-underflow-write-cross-object-index-data =========
+make test/mss-write-cross-object-by-index
+make: 'test/mss-write-cross-object-by-index' is up to date.
+
+test/mss-write-cross-object-by-index 2 1
+
+========== mss-underflow-write-cross-object-index-heap =========
+make test/mss-write-cross-object-by-index
+make: 'test/mss-write-cross-object-by-index' is up to date.
+
+test/mss-write-cross-object-by-index 1 1
+
+========== mss-underflow-write-cross-object-index-stack =========
+make test/mss-write-cross-object-by-index
+make: 'test/mss-write-cross-object-by-index' is up to date.
+
+test/mss-write-cross-object-by-index 0 1
+
+========== mss-underflow-write-cross-object-ptr-data =========
+make test/mss-write-cross-object-by-pointer
+make: 'test/mss-write-cross-object-by-pointer' is up to date.
+
+test/mss-write-cross-object-by-pointer 2 1
+
+========== mss-underflow-write-cross-object-ptr-heap =========
+make test/mss-write-cross-object-by-pointer
+make: 'test/mss-write-cross-object-by-pointer' is up to date.
+
+test/mss-write-cross-object-by-pointer 1 1
+
+========== mss-underflow-write-cross-object-ptr-stack =========
+make test/mss-write-cross-object-by-pointer
+make: 'test/mss-write-cross-object-by-pointer' is up to date.
+
+test/mss-write-cross-object-by-pointer 0 1
+
+========== mts-access-after-reclaim-heap =========
+make test/mts-access-after-reclaim-heap
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mts/access-after-reclaim-heap.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mts-access-after-reclaim-heap 
+
+test/mts-access-after-reclaim-heap 0
+test/mts-access-after-reclaim-heap terminated with signal 4
+Test abnormality: mts-access-after-reclaim-heap failed with unexpected exit value 260
+
+test/mts-access-after-reclaim-heap 1
+test/mts-access-after-reclaim-heap terminated with signal 4
+Test abnormality: mts-access-after-reclaim-heap failed with unexpected exit value 260
+
+test/mts-access-after-reclaim-heap 2
+test/mts-access-after-reclaim-heap terminated with signal 4
+Test abnormality: mts-access-after-reclaim-heap failed with unexpected exit value 260
+Test abnormality: mts-access-after-reclaim-heap failed with unexpected exit value 260
+
+========== mts-access-after-reclaim-stack =========
+make test/mts-access-after-reclaim-stack
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mts/access-after-reclaim-stack.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mts-access-after-reclaim-stack 
+mts/access-after-reclaim-stack.cpp: In function ‘int helper(bool)’:
+mts/access-after-reclaim-stack.cpp:9:17: warning: ‘buffer’ may be used uninitialized [-Wmaybe-uninitialized]
+    9 |     return check(buffer.data, 7,  1, 'd');
+      |            ~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from mts/access-after-reclaim-stack.cpp:2:
+./lib/include/mss.hpp:120:5: note: by argument 1 of type ‘const char*’ to ‘int check(const T*, int, int, T) [with T = char]’ declared here
+  120 | int check(const T *buf, int size, int step, T c) {
+      |     ^~~~~
+mts/access-after-reclaim-stack.cpp:7:14: note: ‘buffer’ declared here
+    7 |   charBuffer buffer;
+      |              ^~~~~~
+
+test/mts-access-after-reclaim-stack
+
+========== acc-copy-stackra-to-heap-explicit-arith =========
+make test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key cfi/jump-func-ra-from-heap-memcpy-explicit-arith.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o -L. -Wl,-rpath,. -o test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith -lcfi 
+cfi/jump-func-ra-from-heap-memcpy-explicit-arith.cpp: In function ‘void helper(void*, void*)’:
+cfi/jump-func-ra-from-heap-memcpy-explicit-arith.cpp:23:53: warning: pointer of type ‘void *’ used in arithmetic [-Wpointer-arith]
+   23 |         if((uintptr_t)ra_pos == *(arch_uint_t*)(addr+i)){
+      |                                                 ~~~~^~
+cfi/jump-func-ra-from-heap-memcpy-explicit-arith.cpp: In function ‘int main(int, char**)’:
+cfi/jump-func-ra-from-heap-memcpy-explicit-arith.cpp:62:35: warning: pointer of type ‘void *’ used in arithmetic [-Wpointer-arith]
+   62 |     memcpy(jmp_target, addr_buffer+ra_index, sizeof(void*));
+      |                        ~~~~~~~~~~~^~~~~~~~~
+
+test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith 2 1
+test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith terminated with signal 4
+Test abnormality: acc-copy-stackra-to-heap-explicit-arith failed with unexpected exit value 260
+Test abnormality: acc-copy-stackra-to-heap-explicit-arith failed with unexpected exit value 260
+
+========== cfi-jump-func-ra-from-heap-memcpy-explicit-arith =========
+make test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith
+make: 'test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith' is up to date.
+
+test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith 2 2
+test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith terminated with signal 4
+Test abnormality: cfi-jump-func-ra-from-heap-memcpy-explicit-arith failed with unexpected exit value 260
+Test abnormality: cfi-jump-func-ra-from-heap-memcpy-explicit-arith failed with unexpected exit value 260
+
+========== mss-spray-cross-object-data =========
+make test/mss-spray-cross-object
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/spray-cross-object.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-spray-cross-object 
+
+test/mss-spray-cross-object 2
+
+========== mss-spray-cross-object-heap =========
+make test/mss-spray-cross-object
+make: 'test/mss-spray-cross-object' is up to date.
+
+test/mss-spray-cross-object 1
+
+========== mss-spray-cross-object-stack =========
+make test/mss-spray-cross-object
+make: 'test/mss-spray-cross-object' is up to date.
+
+test/mss-spray-cross-object 0
+
+========== mss-spray-cross-page-heap =========
+make test/mss-spray-cross-page-in-heap
+g++ -I./lib -O2 -std=c++11 -Wall -march=armv8.8-a+memtag+pauth -mbranch-protection=pac-ret+leaf+b-key mss/spray-cross-page-in-heap.cpp ./lib/common/global_var.o ./lib/common/signal.o ./lib/common/temp_file.o ./lib/aarch64/assembly.o ./lib/common/mss.o -o test/mss-spray-cross-page-in-heap 
+
+test/mss-spray-cross-page-in-heap
+Need to add extra evironment variables
+
+========== acc-check-ASLR =========
+make test/acc-check-ASLR
+make: 'test/acc-check-ASLR' is up to date.
+
+test/acc-check-ASLR
+
+========== acc-check-CET =========
+make test/acc-check-CET
+make: 'test/acc-check-CET' is up to date.
+
+test/acc-check-CET 1
+set runtime variable cet-enabled to 0
+
+========== acc-get-frame-size =========
+make test/acc-get-frame-size
+make: 'test/acc-get-frame-size' is up to date.
+
+test/acc-get-frame-size
+set runtime variable frame-size to 8
+
+========== acc-get-ra-offset-v-p-g0 =========
+make test/acc-get-ra-offset
+make: 'test/acc-get-ra-offset' is up to date.
+
+test/acc-get-ra-offset 1 v-p-g0
+Test abnormality: acc-get-ra-offset-v-p-g0 failed with unexpected exit value 1
+Test abnormality: acc-get-ra-offset-v-p-g0 failed with unexpected exit value 1
+
+========== acc-get-ra-offset-v-p-g1 =========
+make test/acc-get-ra-offset
+make: 'test/acc-get-ra-offset' is up to date.
+
+test/acc-get-ra-offset 1 v-p-g1
+Test abnormality: acc-get-ra-offset-v-p-g1 failed with unexpected exit value 1
+Test abnormality: acc-get-ra-offset-v-p-g1 failed with unexpected exit value 1
+
+========== acc-read-GOT =========
+make test/acc-read-GOT
+make: 'test/acc-read-GOT' is up to date.
+
+test/acc-read-GOT 0
+
+========== acc-read-func =========
+make test/acc-read-func.gen
+make: 'test/acc-read-func.gen' is up to date.
+
+test/acc-read-func.gen ./test/acc-read-func-func-opcode.tmp
+Test abnormality: acc-read-func failed with unexpected exit value 1
+Test abnormality: acc-read-func failed with unexpected exit value 1
+
+========== cfi-call-instruction-in-data =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 1 1
+
+========== cfi-call-instruction-in-heap =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 1 3
+
+========== cfi-call-instruction-in-rodata =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 1 0
+
+========== cfi-call-instruction-in-stack =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 1 2
+
+========== cfi-call-mid-func =========
+make test/cfi-call-mid-func
+make: 'test/cfi-call-mid-func' is up to date.
+
+test/cfi-call-mid-func
+
+========== cfi-call-wrong-func-within-static-analysis =========
+make test/cfi-call-wrong-func-within-static-analysis
+make: 'test/cfi-call-wrong-func-within-static-analysis' is up to date.
+
+test/cfi-call-wrong-func-within-static-analysis 1
+
+========== cfi-call-wrong-num-arg-func =========
+make test/cfi-call-wrong-num-arg-func
+make: 'test/cfi-call-wrong-num-arg-func' is up to date.
+
+test/cfi-call-wrong-num-arg-func
+
+========== cfi-call-wrong-type-arg-dp2fp-func-rodata =========
+make test/cfi-call-wrong-type-arg-dp2fp-func-rodata
+make: 'test/cfi-call-wrong-type-arg-dp2fp-func-rodata' is up to date.
+
+test/cfi-call-wrong-type-arg-dp2fp-func-rodata
+
+========== cfi-call-wrong-type-arg-fp2dp-func =========
+make test/cfi-call-wrong-type-arg-fp2dp-func
+make: 'test/cfi-call-wrong-type-arg-fp2dp-func' is up to date.
+
+test/cfi-call-wrong-type-arg-fp2dp-func
+
+========== cfi-call-wrong-type-arg-int2double-func =========
+make test/cfi-call-wrong-type-arg-int2double-func
+make: 'test/cfi-call-wrong-type-arg-int2double-func' is up to date.
+
+test/cfi-call-wrong-type-arg-int2double-func
+
+========== cfi-call-wrong-type-arg-op2doublep-func =========
+make test/cfi-call-wrong-type-arg-op2doublep-func
+make: 'test/cfi-call-wrong-type-arg-op2doublep-func' is up to date.
+
+test/cfi-call-wrong-type-arg-op2doublep-func 2
+
+========== cfi-call-wrong-type-arg-op2intp-func =========
+make test/cfi-call-wrong-type-arg-op2intp-func
+make: 'test/cfi-call-wrong-type-arg-op2intp-func' is up to date.
+
+test/cfi-call-wrong-type-arg-op2intp-func 2
+
+========== cfi-jump-mid-func =========
+make test/cfi-jump-mid-func
+make: 'test/cfi-jump-mid-func' is up to date.
+
+test/cfi-jump-mid-func 1
+
+========== cfi-return-without-call =========
+make test/cfi-return-without-call
+make: 'test/cfi-return-without-call' is up to date.
+
+test/cfi-return-without-call 1 8
+
+========== cpi-func-pointer-assign =========
+make test/cpi-func-pointer-assign
+make: 'test/cpi-func-pointer-assign' is up to date.
+
+test/cpi-func-pointer-assign
+
+========== cpi-modify-GOT =========
+make test/cpi-modify-GOT
+make: 'test/cpi-modify-GOT' is up to date.
+
+test/cpi-modify-GOT 0
+
+========== cpi-read-data-vtable-pointer =========
+make test/cpi-read-vtable-pointer
+make: 'test/cpi-read-vtable-pointer' is up to date.
+
+test/cpi-read-vtable-pointer 2
+
+========== cpi-read-heap-vtable-pointer =========
+make test/cpi-read-vtable-pointer
+make: 'test/cpi-read-vtable-pointer' is up to date.
+
+test/cpi-read-vtable-pointer 1
+
+========== cpi-read-rodata-vtable-pointer =========
+make test/cpi-read-vtable-pointer
+make: 'test/cpi-read-vtable-pointer' is up to date.
+
+test/cpi-read-vtable-pointer 3
+
+========== cpi-read-stack-vtable-pointer =========
+make test/cpi-read-vtable-pointer
+make: 'test/cpi-read-vtable-pointer' is up to date.
+
+test/cpi-read-vtable-pointer 0
+
+========== cpi-write-data-vtable-pointer =========
+make test/cpi-write-vtable-pointer
+make: 'test/cpi-write-vtable-pointer' is up to date.
+
+test/cpi-write-vtable-pointer 2
+
+========== cpi-write-heap-vtable-pointer =========
+make test/cpi-write-vtable-pointer
+make: 'test/cpi-write-vtable-pointer' is up to date.
+
+test/cpi-write-vtable-pointer 1
+
+========== cpi-write-stack-vtable-pointer =========
+make test/cpi-write-vtable-pointer
+make: 'test/cpi-write-vtable-pointer' is up to date.
+
+test/cpi-write-vtable-pointer 0
+
+========== mss-check-inter-obj-data-redzone =========
+make test/mss-check-inter-nonalloc-redzone
+make: 'test/mss-check-inter-nonalloc-redzone' is up to date.
+
+test/mss-check-inter-nonalloc-redzone 1
+
+========== mss-check-inter-obj-heap-redzone =========
+make test/mss-check-inter-alloc-redzone
+make: 'test/mss-check-inter-alloc-redzone' is up to date.
+
+test/mss-check-inter-alloc-redzone
+test/mss-check-inter-alloc-redzone terminated with signal 4
+Test abnormality: mss-check-inter-obj-heap-redzone failed with unexpected exit value 260
+Test abnormality: mss-check-inter-obj-heap-redzone failed with unexpected exit value 260
+
+========== mss-check-inter-obj-rodata-redzone =========
+make test/mss-check-inter-nonalloc-redzone
+make: 'test/mss-check-inter-nonalloc-redzone' is up to date.
+
+test/mss-check-inter-nonalloc-redzone 2
+
+========== mss-check-inter-obj-stack-redzone =========
+make test/mss-check-inter-nonalloc-redzone
+make: 'test/mss-check-inter-nonalloc-redzone' is up to date.
+
+test/mss-check-inter-nonalloc-redzone 0
+
+========== mss-check-intra-obj-data-redzone =========
+make test/mss-check-intra-redzone
+make: 'test/mss-check-intra-redzone' is up to date.
+
+test/mss-check-intra-redzone 2
+
+========== mss-check-intra-obj-heap-redzone =========
+make test/mss-check-intra-redzone
+make: 'test/mss-check-intra-redzone' is up to date.
+
+test/mss-check-intra-redzone 1
+
+========== mss-check-intra-obj-rodata-redzone =========
+make test/mss-check-intra-redzone
+make: 'test/mss-check-intra-redzone' is up to date.
+
+test/mss-check-intra-redzone 3
+
+========== mss-check-intra-obj-stack-redzone =========
+make test/mss-check-intra-redzone
+make: 'test/mss-check-intra-redzone' is up to date.
+
+test/mss-check-intra-redzone 0
+
+========== mss-overflow-large-read-ptr-data =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 2 0 0
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 0 1
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 0 2
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 0 3
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 0 4
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 0 5
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 0 6
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 0 7
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 0 8
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+Test abnormality: mss-overflow-large-read-ptr-data failed with unexpected exit value 260
+
+========== mss-overflow-large-read-ptr-heap =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 1 0 0
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 0 1
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 0 2
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 0 3
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 0 4
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 0 5
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 0 6
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 0 7
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 0 8
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+Test abnormality: mss-overflow-large-read-ptr-heap failed with unexpected exit value 260
+
+========== mss-overflow-large-read-ptr-rodata =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 3 0 0
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 0 1
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 0 2
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 0 3
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 0 4
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 0 5
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 0 6
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 0 7
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 0 8
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+Test abnormality: mss-overflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+========== mss-overflow-large-read-ptr-stack =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 0 0 0
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 0 1
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 0 2
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 0 3
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 0 4
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 0 5
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 0 6
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 0 7
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 0 8
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+Test abnormality: mss-overflow-large-read-ptr-stack failed with unexpected exit value 260
+
+========== mss-overflow-large-write-ptr-data =========
+make test/mss-write-large-member-inter-object
+make: 'test/mss-write-large-member-inter-object' is up to date.
+
+test/mss-write-large-member-inter-object 2 0 0
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 0 1
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 0 2
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 0 3
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 0 4
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 0 5
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 0 6
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 0 7
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 0 8
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+Test abnormality: mss-overflow-large-write-ptr-data failed with unexpected exit value 260
+
+========== mss-overflow-large-write-ptr-heap =========
+make test/mss-write-large-member-inter-object
+make: 'test/mss-write-large-member-inter-object' is up to date.
+
+test/mss-write-large-member-inter-object 1 0 0
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 0 1
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 0 2
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 0 3
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 0 4
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 0 5
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 0 6
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 0 7
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 0 8
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+Test abnormality: mss-overflow-large-write-ptr-heap failed with unexpected exit value 260
+
+========== mss-overflow-large-write-ptr-stack =========
+make test/mss-write-large-member-inter-object
+make: 'test/mss-write-large-member-inter-object' is up to date.
+
+test/mss-write-large-member-inter-object 0 0 0
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 0 1
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 0 2
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 0 3
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 0 4
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 0 5
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 0 6
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 0 7
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 0 8
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+Test abnormality: mss-overflow-large-write-ptr-stack failed with unexpected exit value 260
+
+========== mss-overflow-read-index-data =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 2 0
+
+========== mss-overflow-read-index-heap =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 1 0
+
+========== mss-overflow-read-index-rodata =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 3 0
+
+========== mss-overflow-read-index-stack =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 0 0
+
+========== mss-overflow-read-ptr-data =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 2 0
+
+========== mss-overflow-read-ptr-heap =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 1 0
+
+========== mss-overflow-read-ptr-rodata =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 3 0
+
+========== mss-overflow-read-ptr-stack =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 0 0
+
+========== mss-overflow-read-scalar-cast-to-array-data =========
+make test/mss-overflow-read-scalar-cast-to-array
+make: 'test/mss-overflow-read-scalar-cast-to-array' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-array 2
+
+========== mss-overflow-read-scalar-cast-to-array-heap =========
+make test/mss-overflow-read-scalar-cast-to-array
+make: 'test/mss-overflow-read-scalar-cast-to-array' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-array 1
+
+========== mss-overflow-read-scalar-cast-to-array-rodata =========
+make test/mss-overflow-read-scalar-cast-to-array
+make: 'test/mss-overflow-read-scalar-cast-to-array' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-array 3
+
+========== mss-overflow-read-scalar-cast-to-array-stack =========
+make test/mss-overflow-read-scalar-cast-to-array
+make: 'test/mss-overflow-read-scalar-cast-to-array' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-array 0
+
+========== mss-overflow-read-scalar-cast-to-scalar-data =========
+make test/mss-overflow-read-scalar-cast-to-scalar
+make: 'test/mss-overflow-read-scalar-cast-to-scalar' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-scalar 2
+dummy print to avoid dead code removal 1
+
+========== mss-overflow-read-scalar-cast-to-scalar-heap =========
+make test/mss-overflow-read-scalar-cast-to-scalar
+make: 'test/mss-overflow-read-scalar-cast-to-scalar' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-scalar 1
+dummy print to avoid dead code removal 1
+
+========== mss-overflow-read-scalar-cast-to-scalar-rodata =========
+make test/mss-overflow-read-scalar-cast-to-scalar
+make: 'test/mss-overflow-read-scalar-cast-to-scalar' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-scalar 3
+dummy print to avoid dead code removal 1
+
+========== mss-overflow-read-scalar-cast-to-scalar-stack =========
+make test/mss-overflow-read-scalar-cast-to-scalar
+make: 'test/mss-overflow-read-scalar-cast-to-scalar' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-scalar 0
+dummy print to avoid dead code removal 1
+
+========== mss-overflow-write-index-data =========
+make test/mss-write-by-index
+make: 'test/mss-write-by-index' is up to date.
+
+test/mss-write-by-index 2 0
+
+========== mss-overflow-write-index-heap =========
+make test/mss-write-by-index
+make: 'test/mss-write-by-index' is up to date.
+
+test/mss-write-by-index 1 0
+
+========== mss-overflow-write-index-stack =========
+make test/mss-write-by-index
+make: 'test/mss-write-by-index' is up to date.
+
+test/mss-write-by-index 0 0
+
+========== mss-overflow-write-ptr-data =========
+make test/mss-write-by-pointer
+make: 'test/mss-write-by-pointer' is up to date.
+
+test/mss-write-by-pointer 2 0
+
+========== mss-overflow-write-ptr-heap =========
+make test/mss-write-by-pointer
+make: 'test/mss-write-by-pointer' is up to date.
+
+test/mss-write-by-pointer 1 0
+
+========== mss-overflow-write-ptr-stack =========
+make test/mss-write-by-pointer
+make: 'test/mss-write-by-pointer' is up to date.
+
+test/mss-write-by-pointer 0 0
+
+========== mss-underflow-large-read-ptr-data =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 2 1 0
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 1 1
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 1 2
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 1 3
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 1 4
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 1 5
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 1 6
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 1 7
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 2 1 8
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+Test abnormality: mss-underflow-large-read-ptr-data failed with unexpected exit value 260
+
+========== mss-underflow-large-read-ptr-heap =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 1 1 0
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 1 1
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 1 2
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 1 3
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 1 4
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 1 5
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 1 6
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 1 7
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 1 1 8
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+Test abnormality: mss-underflow-large-read-ptr-heap failed with unexpected exit value 260
+
+========== mss-underflow-large-read-ptr-rodata =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 3 1 0
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 1 1
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 1 2
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 1 3
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 1 4
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 1 5
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 1 6
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 1 7
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 3 1 8
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+Test abnormality: mss-underflow-large-read-ptr-rodata failed with unexpected exit value 260
+
+========== mss-underflow-large-read-ptr-stack =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 0 1 0
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 1 1
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 1 2
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 1 3
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 1 4
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 1 5
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 1 6
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 1 7
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+test/mss-read-large-member-inter-object 0 1 8
+test/mss-read-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+Test abnormality: mss-underflow-large-read-ptr-stack failed with unexpected exit value 260
+
+========== mss-underflow-large-write-ptr-data =========
+make test/mss-write-large-member-inter-object
+make: 'test/mss-write-large-member-inter-object' is up to date.
+
+test/mss-write-large-member-inter-object 2 1 0
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 1 1
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 1 2
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 1 3
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 1 4
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 1 5
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 1 6
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 1 7
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 2 1 8
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+Test abnormality: mss-underflow-large-write-ptr-data failed with unexpected exit value 260
+
+========== mss-underflow-large-write-ptr-heap =========
+make test/mss-write-large-member-inter-object
+make: 'test/mss-write-large-member-inter-object' is up to date.
+
+test/mss-write-large-member-inter-object 1 1 0
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 1 1
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 1 2
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 1 3
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 1 4
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 1 5
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 1 6
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 1 7
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 1 1 8
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+Test abnormality: mss-underflow-large-write-ptr-heap failed with unexpected exit value 260
+
+========== mss-underflow-large-write-ptr-stack =========
+make test/mss-write-large-member-inter-object
+make: 'test/mss-write-large-member-inter-object' is up to date.
+
+test/mss-write-large-member-inter-object 0 1 0
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 1 1
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 1 2
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 1 3
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 1 4
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 1 5
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 1 6
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 1 7
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+test/mss-write-large-member-inter-object 0 1 8
+test/mss-write-large-member-inter-object terminated with signal 4
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+Test abnormality: mss-underflow-large-write-ptr-stack failed with unexpected exit value 260
+
+========== mss-underflow-read-index-data =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 2 1
+
+========== mss-underflow-read-index-heap =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 1 1
+
+========== mss-underflow-read-index-rodata =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 3 1
+
+========== mss-underflow-read-index-stack =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 0 1
+
+========== mss-underflow-read-ptr-data =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 2 1
+
+========== mss-underflow-read-ptr-heap =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 1 1
+
+========== mss-underflow-read-ptr-rodata =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 3 1
+
+========== mss-underflow-read-ptr-stack =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 0 1
+
+========== mss-underflow-write-index-data =========
+make test/mss-write-by-index
+make: 'test/mss-write-by-index' is up to date.
+
+test/mss-write-by-index 2 1
+
+========== mss-underflow-write-index-heap =========
+make test/mss-write-by-index
+make: 'test/mss-write-by-index' is up to date.
+
+test/mss-write-by-index 1 1
+
+========== mss-underflow-write-index-stack =========
+make test/mss-write-by-index
+make: 'test/mss-write-by-index' is up to date.
+
+test/mss-write-by-index 0 1
+
+========== mss-underflow-write-ptr-data =========
+make test/mss-write-by-pointer
+make: 'test/mss-write-by-pointer' is up to date.
+
+test/mss-write-by-pointer 2 1
+
+========== mss-underflow-write-ptr-heap =========
+make test/mss-write-by-pointer
+make: 'test/mss-write-by-pointer' is up to date.
+
+test/mss-write-by-pointer 1 1
+
+========== mss-underflow-write-ptr-stack =========
+make test/mss-write-by-pointer
+make: 'test/mss-write-by-pointer' is up to date.
+
+test/mss-write-by-pointer 0 1
+
+========== mss-write-cross-frame-index =========
+make test/mss-write-cross-frame-by-index
+make: 'test/mss-write-cross-frame-by-index' is up to date.
+
+test/mss-write-cross-frame-by-index
+
+========== mss-write-cross-frame-ptr =========
+make test/mss-write-cross-frame-by-pointer
+make: 'test/mss-write-cross-frame-by-pointer' is up to date.
+
+test/mss-write-cross-frame-by-pointer
+
+========== mss-write-cross-page-index-stack =========
+make test/mss-write-cross-page-by-index-in-stack
+make: 'test/mss-write-cross-page-by-index-in-stack' is up to date.
+
+test/mss-write-cross-page-by-index-in-stack
+
+========== mss-write-cross-page-ptr-stack =========
+make test/mss-write-cross-page-by-pointer-in-stack
+make: 'test/mss-write-cross-page-by-pointer-in-stack' is up to date.
+
+test/mss-write-cross-page-by-pointer-in-stack
+
+========== mss-write-cross-segment-data-to-heap-index =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 2 1 0
+
+========== mss-write-cross-segment-data-to-heap-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 2 1 1
+
+========== mss-write-cross-segment-data-to-stack-index =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 2 0 0
+
+========== mss-write-cross-segment-data-to-stack-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 2 0 1
+
+========== mss-write-cross-segment-heap-to-data-index =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 1 2 0
+
+========== mss-write-cross-segment-heap-to-data-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 1 2 1
+
+========== mss-write-cross-segment-heap-to-stack-index =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 1 0 0
+
+========== mss-write-cross-segment-heap-to-stack-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 1 0 1
+
+========== mss-write-cross-segment-stack-to-data-index =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 0 2 0
+
+========== mss-write-cross-segment-stack-to-data-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 0 2 1
+
+========== mss-write-cross-segment-stack-to-heap-index =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 0 1 0
+
+========== mss-write-cross-segment-stack-to-heap-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 0 1 1
+
+========== mts-access-after-free-alias-heap =========
+make test/mts-access-after-free-alias-heap
+make: 'test/mts-access-after-free-alias-heap' is up to date.
+
+test/mts-access-after-free-alias-heap 0
+
+test/mts-access-after-free-alias-heap 1
+
+test/mts-access-after-free-alias-heap 2
+
+========== mts-access-after-free-alias-stack =========
+make test/mts-access-after-free-alias-stack
+make: 'test/mts-access-after-free-alias-stack' is up to date.
+
+test/mts-access-after-free-alias-stack
+
+========== mts-access-after-free-org-heap =========
+make test/mts-access-after-free-org-heap
+make: 'test/mts-access-after-free-org-heap' is up to date.
+
+test/mts-access-after-free-org-heap 0
+
+test/mts-access-after-free-org-heap 1
+
+test/mts-access-after-free-org-heap 2
+
+========== mts-double-free =========
+make test/mts-double-free
+make: 'test/mts-double-free' is up to date.
+
+test/mts-double-free 0 0 0 7 0
+test/mts-double-free terminated with signal 4
+Test abnormality: mts-double-free failed with unexpected exit value 260
+
+test/mts-double-free 0 0 1 7 0
+test/mts-double-free terminated with signal 4
+Test abnormality: mts-double-free failed with unexpected exit value 260
+
+test/mts-double-free 0 0 2 7 0
+test/mts-double-free terminated with signal 4
+Test abnormality: mts-double-free failed with unexpected exit value 260
+
+test/mts-double-free 0 0 3 7 0
+test/mts-double-free terminated with signal 4
+Test abnormality: mts-double-free failed with unexpected exit value 260
+
+test/mts-double-free 0 0 4 7 0
+test/mts-double-free terminated with signal 4
+Test abnormality: mts-double-free failed with unexpected exit value 260
+
+test/mts-double-free 0 0 5 7 0
+test/mts-double-free terminated with signal 4
+Test abnormality: mts-double-free failed with unexpected exit value 260
+
+test/mts-double-free 0 0 6 7 0
+test/mts-double-free terminated with signal 4
+Test abnormality: mts-double-free failed with unexpected exit value 260
+
+test/mts-double-free 0 0 7 7 0
+test/mts-double-free terminated with signal 4
+Test abnormality: mts-double-free failed with unexpected exit value 260
+Test abnormality: mts-double-free failed with unexpected exit value 260
+
+========== mts-reallocate-heap =========
+make test/mts-reallocate-heap
+make: 'test/mts-reallocate-heap' is up to date.
+
+test/mts-reallocate-heap
+
+========== mts-reallocate-stack =========
+make test/mts-reallocate-stack
+make: 'test/mts-reallocate-stack' is up to date.
+
+test/mts-reallocate-stack
+
+========== mts-write-after-free-heap =========
+make test/mts-write-after-free-heap
+make: 'test/mts-write-after-free-heap' is up to date.
+
+test/mts-write-after-free-heap
+
+========== mts-write-after-free-stack =========
+make test/mts-write-after-free-stack
+make: 'test/mts-write-after-free-stack' is up to date.
+
+test/mts-write-after-free-stack
+
+========== mts-write-after-reclaim-heap =========
+make test/mts-write-after-reclaim-heap
+make: 'test/mts-write-after-reclaim-heap' is up to date.
+
+test/mts-write-after-reclaim-heap
+test/mts-write-after-reclaim-heap terminated with signal 4
+Test abnormality: mts-write-after-reclaim-heap failed with unexpected exit value 260
+Test abnormality: mts-write-after-reclaim-heap failed with unexpected exit value 260
+
+========== mts-write-after-reclaim-stack =========
+make test/mts-write-after-reclaim-stack
+make: 'test/mts-write-after-reclaim-stack' is up to date.
+
+test/mts-write-after-reclaim-stack c c
+
+========== mts-write-before-reclaim-heap =========
+make test/mts-write-before-reclaim-heap
+make: 'test/mts-write-before-reclaim-heap' is up to date.
+
+test/mts-write-before-reclaim-heap 0
+
+========== mts-write-before-reclaim-stack =========
+make test/mts-write-before-reclaim-stack
+make: 'test/mts-write-before-reclaim-stack' is up to date.
+
+test/mts-write-before-reclaim-stack
+
+========== cfi-call-wrong-func =========
+make test/cfi-call-wrong-func
+make: 'test/cfi-call-wrong-func' is up to date.
+
+test/cfi-call-wrong-func 1
+
+========== cfi-call-wrong-func-heap-vtable-child =========
+make test/cfi-call-wrong-func-vtable-child
+make: 'test/cfi-call-wrong-func-vtable-child' is up to date.
+
+test/cfi-call-wrong-func-vtable-child
+
+========== cfi-call-wrong-func-heap-vtable-offset =========
+make test/cfi-call-wrong-func-vtable-offset
+make: 'test/cfi-call-wrong-func-vtable-offset' is up to date.
+
+test/cfi-call-wrong-func-vtable-offset
+
+========== cfi-call-wrong-func-heap-vtable-parent =========
+make test/cfi-call-wrong-func-vtable-parent
+make: 'test/cfi-call-wrong-func-vtable-parent' is up to date.
+
+test/cfi-call-wrong-func-vtable-parent
+
+========== cfi-call-wrong-func-heap-vtable-sibling =========
+make test/cfi-call-wrong-func-vtable-sibling
+make: 'test/cfi-call-wrong-func-vtable-sibling' is up to date.
+
+test/cfi-call-wrong-func-vtable-sibling
+
+========== cfi-call-wrong-func-vtable =========
+make test/cfi-call-wrong-func-vtable
+make: 'test/cfi-call-wrong-func-vtable' is up to date.
+
+test/cfi-call-wrong-func-vtable
+
+========== cfi-call-wrong-func-vtable-released =========
+make test/cfi-call-wrong-func-vtable-released
+make: 'test/cfi-call-wrong-func-vtable-released' is up to date.
+
+test/cfi-call-wrong-func-vtable-released
+
+========== cfi-call-wrong-num-arg-vtable =========
+make test/cfi-call-wrong-num-arg-vtable
+make: 'test/cfi-call-wrong-num-arg-vtable' is up to date.
+
+test/cfi-call-wrong-num-arg-vtable
+
+========== cfi-call-wrong-num-func-vtable =========
+make test/cfi-call-wrong-num-func-vtable
+make: 'test/cfi-call-wrong-num-func-vtable' is up to date.
+
+test/cfi-call-wrong-num-func-vtable
+
+========== cfi-call-wrong-num-func-vtable-data =========
+make test/cfi-call-wrong-num-func-vtable-data
+make: 'test/cfi-call-wrong-num-func-vtable-data' is up to date.
+
+test/cfi-call-wrong-num-func-vtable-data
+
+========== cfi-call-wrong-num-func-vtable-heap =========
+make test/cfi-call-wrong-num-func-vtable-heap
+make: 'test/cfi-call-wrong-num-func-vtable-heap' is up to date.
+
+test/cfi-call-wrong-num-func-vtable-heap
+
+========== cfi-call-wrong-num-func-vtable-stack =========
+make test/cfi-call-wrong-num-func-vtable-stack
+make: 'test/cfi-call-wrong-num-func-vtable-stack' is up to date.
+
+test/cfi-call-wrong-num-func-vtable-stack
+
+========== cfi-jump-instruction-in-data =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 2 1 0
+
+========== cfi-jump-instruction-in-heap =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 2 3 0
+
+========== cfi-jump-instruction-in-rodata =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 2 0 0
+
+========== cfi-jump-instruction-in-stack =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 2 2 0
+
+========== cfi-return-to-wrong-call-site-within-static-analysis =========
+make test/cfi-return-to-wrong-call-site-within-static-analysis
+make: 'test/cfi-return-to-wrong-call-site-within-static-analysis' is up to date.
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 0
+terminate called after throwing an instance of 'std::logic_error'
+  what():  basic_string: construction from null is not valid
+test/cfi-return-to-wrong-call-site-within-static-analysis terminated with signal 6
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 1
+terminate called after throwing an instance of 'std::logic_error'
+  what():  basic_string: construction from null is not valid
+test/cfi-return-to-wrong-call-site-within-static-analysis terminated with signal 6
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 2
+terminate called after throwing an instance of 'std::logic_error'
+  what():  basic_string: construction from null is not valid
+test/cfi-return-to-wrong-call-site-within-static-analysis terminated with signal 6
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 3
+terminate called after throwing an instance of 'std::logic_error'
+  what():  basic_string: construction from null is not valid
+test/cfi-return-to-wrong-call-site-within-static-analysis terminated with signal 6
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 4
+terminate called after throwing an instance of 'std::logic_error'
+  what():  basic_string: construction from null is not valid
+test/cfi-return-to-wrong-call-site-within-static-analysis terminated with signal 6
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 5
+terminate called after throwing an instance of 'std::logic_error'
+  what():  basic_string: construction from null is not valid
+test/cfi-return-to-wrong-call-site-within-static-analysis terminated with signal 6
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 6
+terminate called after throwing an instance of 'std::logic_error'
+  what():  basic_string: construction from null is not valid
+test/cfi-return-to-wrong-call-site-within-static-analysis terminated with signal 6
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 7
+terminate called after throwing an instance of 'std::logic_error'
+  what():  basic_string: construction from null is not valid
+test/cfi-return-to-wrong-call-site-within-static-analysis terminated with signal 6
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+Test abnormality: cfi-return-to-wrong-call-site-within-static-analysis failed with unexpected exit value 262
+
+========== cpi-func-pointer-arithmetic =========
+make test/cpi-func-pointer-arithmetic
+make: 'test/cpi-func-pointer-arithmetic' is up to date.
+
+test/cpi-func-pointer-arithmetic
+
+========== mss-overflow-write-cross-object-index-data =========
+make test/mss-write-cross-object-by-index
+make: 'test/mss-write-cross-object-by-index' is up to date.
+
+test/mss-write-cross-object-by-index 2 0
+
+========== mss-overflow-write-cross-object-index-heap =========
+make test/mss-write-cross-object-by-index
+make: 'test/mss-write-cross-object-by-index' is up to date.
+
+test/mss-write-cross-object-by-index 1 0
+
+========== mss-overflow-write-cross-object-index-stack =========
+make test/mss-write-cross-object-by-index
+make: 'test/mss-write-cross-object-by-index' is up to date.
+
+test/mss-write-cross-object-by-index 0 0
+
+========== mss-overflow-write-cross-object-ptr-data =========
+make test/mss-write-cross-object-by-pointer
+make: 'test/mss-write-cross-object-by-pointer' is up to date.
+
+test/mss-write-cross-object-by-pointer 2 0
+
+========== mss-overflow-write-cross-object-ptr-heap =========
+make test/mss-write-cross-object-by-pointer
+make: 'test/mss-write-cross-object-by-pointer' is up to date.
+
+test/mss-write-cross-object-by-pointer 1 0
+
+========== mss-overflow-write-cross-object-ptr-stack =========
+make test/mss-write-cross-object-by-pointer
+make: 'test/mss-write-cross-object-by-pointer' is up to date.
+
+test/mss-write-cross-object-by-pointer 0 0
+
+========== mss-read-cross-frame-index =========
+make test/mss-read-cross-frame-by-index
+make: 'test/mss-read-cross-frame-by-index' is up to date.
+
+test/mss-read-cross-frame-by-index
+
+========== mss-read-cross-frame-ptr =========
+make test/mss-read-cross-frame-by-pointer
+make: 'test/mss-read-cross-frame-by-pointer' is up to date.
+
+test/mss-read-cross-frame-by-pointer
+
+========== mss-read-cross-object-index-data =========
+make test/mss-read-cross-object-by-index
+make: 'test/mss-read-cross-object-by-index' is up to date.
+
+test/mss-read-cross-object-by-index 2
+
+========== mss-read-cross-object-index-heap =========
+make test/mss-read-cross-object-by-index
+make: 'test/mss-read-cross-object-by-index' is up to date.
+
+test/mss-read-cross-object-by-index 1
+
+========== mss-read-cross-object-index-rodata =========
+make test/mss-read-cross-object-by-index
+make: 'test/mss-read-cross-object-by-index' is up to date.
+
+test/mss-read-cross-object-by-index 3
+
+========== mss-read-cross-object-index-stack =========
+make test/mss-read-cross-object-by-index
+make: 'test/mss-read-cross-object-by-index' is up to date.
+
+test/mss-read-cross-object-by-index 0
+
+========== mss-read-cross-object-ptr-data =========
+make test/mss-read-cross-object-by-pointer
+make: 'test/mss-read-cross-object-by-pointer' is up to date.
+
+test/mss-read-cross-object-by-pointer 2
+
+========== mss-read-cross-object-ptr-heap =========
+make test/mss-read-cross-object-by-pointer
+make: 'test/mss-read-cross-object-by-pointer' is up to date.
+
+test/mss-read-cross-object-by-pointer 1
+
+========== mss-read-cross-object-ptr-rodata =========
+make test/mss-read-cross-object-by-pointer
+make: 'test/mss-read-cross-object-by-pointer' is up to date.
+
+test/mss-read-cross-object-by-pointer 3
+
+========== mss-read-cross-object-ptr-stack =========
+make test/mss-read-cross-object-by-pointer
+make: 'test/mss-read-cross-object-by-pointer' is up to date.
+
+test/mss-read-cross-object-by-pointer 0
+
+========== mss-read-cross-page-index-stack =========
+make test/mss-read-cross-page-by-index-in-stack
+make: 'test/mss-read-cross-page-by-index-in-stack' is up to date.
+
+test/mss-read-cross-page-by-index-in-stack
+
+========== mss-read-cross-page-ptr-stack =========
+make test/mss-read-cross-page-by-pointer-in-stack
+make: 'test/mss-read-cross-page-by-pointer-in-stack' is up to date.
+
+test/mss-read-cross-page-by-pointer-in-stack
+
+========== mss-read-cross-segment-data-to-heap-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 1 0
+
+========== mss-read-cross-segment-data-to-heap-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 1 1
+
+========== mss-read-cross-segment-data-to-rodata-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 3 0
+
+========== mss-read-cross-segment-data-to-rodata-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 3 1
+
+========== mss-read-cross-segment-data-to-stack-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 0 0
+
+========== mss-read-cross-segment-data-to-stack-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 0 1
+
+========== mss-read-cross-segment-heap-to-data-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 2 0
+
+========== mss-read-cross-segment-heap-to-data-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 2 1
+
+========== mss-read-cross-segment-heap-to-rodata-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 3 0
+
+========== mss-read-cross-segment-heap-to-rodata-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 3 1
+
+========== mss-read-cross-segment-heap-to-stack-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 0 0
+
+========== mss-read-cross-segment-heap-to-stack-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 0 1
+
+========== mss-read-cross-segment-rodata-to-data-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 2 0
+
+========== mss-read-cross-segment-rodata-to-data-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 2 1
+
+========== mss-read-cross-segment-rodata-to-heap-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 1 0
+
+========== mss-read-cross-segment-rodata-to-heap-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 1 1
+
+========== mss-read-cross-segment-rodata-to-stack-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 0 0
+
+========== mss-read-cross-segment-rodata-to-stack-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 0 1
+
+========== mss-read-cross-segment-stack-to-data-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 2 0
+
+========== mss-read-cross-segment-stack-to-data-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 2 1
+
+========== mss-read-cross-segment-stack-to-heap-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 1 0
+
+========== mss-read-cross-segment-stack-to-heap-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 1 1
+
+========== mss-read-cross-segment-stack-to-rodata-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 3 0
+
+========== mss-read-cross-segment-stack-to-rodata-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 3 1
+
+========== mss-spray-cross-frame =========
+make test/mss-spray-cross-frame
+make: 'test/mss-spray-cross-frame' is up to date.
+
+test/mss-spray-cross-frame
+
+========== mss-spray-cross-page-stack =========
+make test/mss-spray-cross-page-in-stack
+make: 'test/mss-spray-cross-page-in-stack' is up to date.
+
+test/mss-spray-cross-page-in-stack
+
+========== mss-underflow-write-cross-object-index-data =========
+make test/mss-write-cross-object-by-index
+make: 'test/mss-write-cross-object-by-index' is up to date.
+
+test/mss-write-cross-object-by-index 2 1
+
+========== mss-underflow-write-cross-object-index-heap =========
+make test/mss-write-cross-object-by-index
+make: 'test/mss-write-cross-object-by-index' is up to date.
+
+test/mss-write-cross-object-by-index 1 1
+
+========== mss-underflow-write-cross-object-index-stack =========
+make test/mss-write-cross-object-by-index
+make: 'test/mss-write-cross-object-by-index' is up to date.
+
+test/mss-write-cross-object-by-index 0 1
+
+========== mss-underflow-write-cross-object-ptr-data =========
+make test/mss-write-cross-object-by-pointer
+make: 'test/mss-write-cross-object-by-pointer' is up to date.
+
+test/mss-write-cross-object-by-pointer 2 1
+
+========== mss-underflow-write-cross-object-ptr-heap =========
+make test/mss-write-cross-object-by-pointer
+make: 'test/mss-write-cross-object-by-pointer' is up to date.
+
+test/mss-write-cross-object-by-pointer 1 1
+
+========== mss-underflow-write-cross-object-ptr-stack =========
+make test/mss-write-cross-object-by-pointer
+make: 'test/mss-write-cross-object-by-pointer' is up to date.
+
+test/mss-write-cross-object-by-pointer 0 1
+
+========== mts-access-after-reclaim-heap =========
+make test/mts-access-after-reclaim-heap
+make: 'test/mts-access-after-reclaim-heap' is up to date.
+
+test/mts-access-after-reclaim-heap 0
+test/mts-access-after-reclaim-heap terminated with signal 4
+Test abnormality: mts-access-after-reclaim-heap failed with unexpected exit value 260
+
+test/mts-access-after-reclaim-heap 1
+test/mts-access-after-reclaim-heap terminated with signal 4
+Test abnormality: mts-access-after-reclaim-heap failed with unexpected exit value 260
+
+test/mts-access-after-reclaim-heap 2
+test/mts-access-after-reclaim-heap terminated with signal 4
+Test abnormality: mts-access-after-reclaim-heap failed with unexpected exit value 260
+Test abnormality: mts-access-after-reclaim-heap failed with unexpected exit value 260
+
+========== mts-access-after-reclaim-stack =========
+make test/mts-access-after-reclaim-stack
+make: 'test/mts-access-after-reclaim-stack' is up to date.
+
+test/mts-access-after-reclaim-stack
+
+========== acc-copy-stackra-to-heap-explicit-arith =========
+make test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith
+make: 'test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith' is up to date.
+
+test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith 2 1
+test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith terminated with signal 4
+Test abnormality: acc-copy-stackra-to-heap-explicit-arith failed with unexpected exit value 260
+Test abnormality: acc-copy-stackra-to-heap-explicit-arith failed with unexpected exit value 260
+
+========== cfi-jump-func-ra-from-heap-memcpy-explicit-arith =========
+make test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith
+make: 'test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith' is up to date.
+
+test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith 2 2
+test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith terminated with signal 4
+Test abnormality: cfi-jump-func-ra-from-heap-memcpy-explicit-arith failed with unexpected exit value 260
+Test abnormality: cfi-jump-func-ra-from-heap-memcpy-explicit-arith failed with unexpected exit value 260
+
+========== mss-spray-cross-object-data =========
+make test/mss-spray-cross-object
+make: 'test/mss-spray-cross-object' is up to date.
+
+test/mss-spray-cross-object 2
+
+========== mss-spray-cross-object-heap =========
+make test/mss-spray-cross-object
+make: 'test/mss-spray-cross-object' is up to date.
+
+test/mss-spray-cross-object 1
+
+========== mss-spray-cross-object-stack =========
+make test/mss-spray-cross-object
+make: 'test/mss-spray-cross-object' is up to date.
+
+test/mss-spray-cross-object 0
+
+========== mss-spray-cross-page-heap =========
+make test/mss-spray-cross-page-in-heap
+make: 'test/mss-spray-cross-page-in-heap' is up to date.
+
+test/mss-spray-cross-page-in-heap
