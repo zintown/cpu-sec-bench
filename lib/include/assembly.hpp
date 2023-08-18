@@ -10,14 +10,13 @@
   #define CSB_X86_64
   typedef unsigned long long arch_uint_t;
   typedef long long arch_int_t;
-#endif
-
-#if defined(COMPILER_MSVC)
-  #include "x86_64/visualcpp_assembly.hpp"
-#elif defined(COMPILER_GCC)
-  #include "x86_64/assembly.hpp"
-#else
-  #include "x86_64/assembly.hpp"
+  #if defined(COMPILER_MSVC)
+    #include "x86_64/visualcpp_assembly.hpp"
+  #elif defined(COMPILER_GCC)
+    #include "x86_64/assembly.hpp"
+  #else
+    #include "x86_64/assembly.hpp"
+  #endif
 #endif
 
 #if defined(__ARM_ARCH) && __ARM_ARCH >= 8 && defined(__aarch64__)
@@ -39,19 +38,6 @@
   typedef unsigned long long arch_uint_t;
   typedef long long arch_int_t;
   #include "cheri_riscv64/assembly.hpp"
-#endif
-
-// detect compiler
-#if defined(__GNUC__)
-  #if defined(__clang__)
-    #define COMPILER_CLANG
-  #else
-    #define COMPILER_GCC
-  #endif
-#endif
-
-#if defined(_MSC_VER)
-  #define COMPILER_MSVC
 #endif
 
 extern void get_got_func(void **gotp, void *label, int cet);
