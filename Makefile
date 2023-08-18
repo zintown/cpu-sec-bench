@@ -54,7 +54,8 @@ ifeq ($(OSType),Windows_NT)
 
   CXXFLAGS_BASE := /std:c11 /nologo /W3 /WX- /Oi /DNDEBUG /D_CONSOLE /D_UNICODE /DUNICODE \
                   /EHsc /MD /Gy /Gd /I./lib
-  CXXFLAGS_RUN  := /O2 $(CXXFLAGS_BASE) /I. /DRUN_PREFIX="\"$(RUN_PREFIX)\""
+  SCHEDULER_CXXFLAGS  := /O2 $(CXXFLAGS_BASE) /I. /DRUN_PREFIX="\"$(RUN_PREFIX)\""
+	OBJECT_CXXFLAGS     := /$(OPT_LEVEL) /Zi $(CXXFLAGS_BASE)
   CXXFLAGS      := /$(OPT_LEVEL) /Zi $(CXXFLAGS_BASE)
   ASMFLAGS      := /nologo /Zi /c
   # If there is a whitespace between windows msvc's output option and output file,
@@ -122,11 +123,12 @@ else
   OBJDUMP       := objdump
 
   CXXFLAGS_BASE := -I./lib -std=c++11 -Wall
-  CXXFLAGS_RUN  := -O2 $(CXXFLAGS_BASE) -I. -DRUN_PREFIX="\"$(RUN_PREFIX)\""
+  SCHEDULER_CXXFLAGS  := -O2 $(CXXFLAGS_BASE) -I. -DRUN_PREFIX="\"$(RUN_PREFIX)\""
+	OBJECT_CXXFLAGS     := -$(OPT_LEVEL) $(CXXFLAGS_BASE)
   CXXFLAGS      := -$(OPT_LEVEL) $(CXXFLAGS_BASE)
   ASMFLAGS      :=
   OUTPUT_EXE_OPTION := -o 
-  OUTPUT_LIB_OPTION := -o 
+  OUTPUT_LIB_OPTION := -c 
   OUTPUT_DYN_OPTION := -shared -fPIC -o 
   MIDFILE_SUFFIX    := .o
   DLL_SUFFIX        := .so
@@ -206,26 +208,31 @@ endif
 # define cases
 mss-path  = mss
 mss-cpps  = $(wildcard $(mss-path)/*.cpp)
+mss-obj   = $(addsuffix $(MIDFILE_SUFFIX),$(addprefix $(test-path)/mss-, $(basename $(notdir $(mss-cpps)))))
 mss-tests = $(addprefix $(test-path)/mss-, $(basename $(notdir $(mss-cpps))))
 mss-cpps-prep = $(addsuffix .prep, $(mss-cpps))
 
 mts-path  = mts
 mts-cpps  = $(wildcard $(mts-path)/*.cpp)
+mts-obj   = $(addsuffix $(MIDFILE_SUFFIX), $(addprefix $(test-path)/mts-, $(basename $(notdir $(mts-cpps)))))
 mts-tests = $(addprefix $(test-path)/mts-, $(basename $(notdir $(mts-cpps))))
 mts-cpps-prep = $(addsuffix .prep, $(mts-cpps))
 
 acc-path  = acc
 acc-cpps  = $(wildcard $(acc-path)/*.cpp)
+acc-obj   = $(addsuffix $(MIDFILE_SUFFIX), $(addprefix $(test-path)/acc-, $(basename $(notdir $(acc-cpps)))))
 acc-tests = $(addprefix $(test-path)/acc-, $(basename $(notdir $(acc-cpps))))
 acc-cpps-prep = $(addsuffix .prep, $(acc-cpps))
 
 cpi-path  = cpi
 cpi-cpps  = $(wildcard $(cpi-path)/*.cpp)
+cpi-obj   = $(addsuffix $(MIDFILE_SUFFIX), $(addprefix $(test-path)/cpi-, $(basename $(notdir $(cpi-cpps)))))
 cpi-tests = $(addprefix $(test-path)/cpi-, $(basename $(notdir $(cpi-cpps))))
 cpi-cpps-prep = $(addsuffix .prep, $(cpi-cpps))
 
 cfi-path  = cfi
 cfi-cpps  = $(wildcard $(cfi-path)/*.cpp)
+cfi-obj   = $(addsuffix $(MIDFILE_SUFFIX), $(addprefix $(test-path)/cfi-, $(basename $(notdir $(cfi-cpps)))))
 cfi-tests = $(addprefix $(test-path)/cfi-, $(basename $(notdir $(cfi-cpps))))
 cfi-cpps-prep = $(addsuffix .prep, $(cfi-cpps))
 
@@ -244,7 +251,7 @@ all: run-test
 .PHONY: all
 
 run-test: scheduler/run-test.cpp lib/common/temp_file.cpp lib/include/temp_file.hpp scheduler/json.hpp $(test-path)/sys_info.txt
-	$(CXX) $(CXXFLAGS_RUN) $< lib/common/temp_file.cpp  $(OUTPUT_EXE_OPTION)$@
+	$(CXX) $(SCHEDULER_CXXFLAGS) $< lib/common/temp_file.cpp  $(OUTPUT_EXE_OPTION)$@
 
 ifeq ($(OSType),Windows_NT)
 
@@ -301,7 +308,10 @@ $(libmss): %$(MIDFILE_SUFFIX) : %.cpp lib/include/mss.hpp
 
 rubbish += $(libmss)
 
-$(mss-tests): $(test-path)/mss-%:$(mss-path)/%.cpp $(extra_objects) $(libmss) $(independent_assembly)
+$(mss-obj): $(test-path)/mss-%$(MIDFILE_SUFFIX):$(mss-path)/%.cpp
+	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$@
+
+$(mss-tests): $(test-path)/mss-%:$(mss-path)/%$(MIDFILE_SUFFIX) $(extra_objects) $(libmss) $(independent_assembly)
 	$(CXX) $(CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(libmss) $(OUTPUT_EXE_OPTION)$@ $(LDFLAGS)
 
 $(mss-cpps-prep): %.prep:%
