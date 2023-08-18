@@ -17,6 +17,7 @@ endif
 OPT_LEVEL       ?= O2
 
 # extra security features (comment them out if not needed)
+
 #disable_stack_nx_protection    = yes
 #disable_stack_protection       = yes
 #enable_aslr_protection         = yes
@@ -26,11 +27,16 @@ OPT_LEVEL       ?= O2
 #enable_control_flow_protection = yes
 #enable_stack_clash_protection  = yes
 #enable_address_sanitizer       = yes
+
 # msvc specific safety feature
+
 #enable_cet_shadow_stack        = yes
 #enable_heap_integrity          = yes
+
 # specific hardware secrutiy features
-#enable_riscv64_cheri       = yes
+
+#enable_riscv64_cheri           = yes
+#enable_aarch64_mte             = yes
 
 # define paths and objects
 ifeq ($(OSType),Windows_NT)
@@ -191,6 +197,10 @@ endif
 ifdef enable_riscv64_cheri
   ARCH := cheri_riscv64
   CXXFLAGS += -cheri -cheri-bounds=very-aggressive
+endif
+
+ifdef enable_aarch64_mte
+  CXXFLAGS += -march=armv8.5-a+memtag -fsanitize=hwaddress
 endif
 
 # define cases
