@@ -84,20 +84,21 @@ int main(int argc, char* argv[])
     addr = (char *)l;
     break;
   }
-
+  begin_catch_exception(addr,2, 99,SIGSEGV);
   begin_catch_exception(addr, SEGV_ACCERR);
 #ifdef CSB_ARMV8_64
   // bus error on Apple M1
   begin_catch_exception(addr, BUS_ADRALN, RT_CODE_ACCERR, SIGBUS);
 #endif
-  begin_catch_exception(addr+4, 0, 0, SIGILL);
-  begin_catch_exception(addr+4, 0, 0, SIGFPE);
+  begin_catch_exception(addr+4, 0, RT_CODE_ACCERR, SIGILL);
+  begin_catch_exception(addr+4, 0, RT_CODE_ACCERR, SIGFPE);
   switch(argv[1][0] - '0') {
   case 0: return_helper(p); break;
   case 1: call_helper(f); break;
   case 2: { GOTO_SAVED_LABEL(l);}   // impossible to happen
   }
 TARGET_LABEL(argc)
+  end_catch_exception();
   end_catch_exception();
   end_catch_exception();
 #ifdef CSB_ARMV8_64
