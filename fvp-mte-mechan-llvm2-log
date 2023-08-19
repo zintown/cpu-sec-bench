@@ -1,0 +1,2646 @@
+Need to add extra evironment variables
+
+========== acc-check-ASLR =========
+make test/acc-check-ASLR
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress -c lib/common/global_var.cpp -o lib/common/global_var.o
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress -c lib/common/temp_file.cpp -o lib/common/temp_file.o
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress -c lib/aarch64/assembly.cpp -o lib/aarch64/assembly.o
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress -c lib/posix/signal.cpp -o lib/posix/signal.o
+lib/posix/signal.cpp: In function ‘void xcpt_handler(int, siginfo_t*, void*)’:
+lib/posix/signal.cpp:22:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   22 |     if((sigact_stack[i].si_signo == sinfo->si_signo) &&
+      |     ^~
+lib/posix/signal.cpp:26:7: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   26 |       exit(sigact_stack[i].rv_code);
+      |       ^~~~
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress acc/check-ASLR.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -o test/acc-check-ASLR 
+
+test/acc-check-ASLR
+
+========== acc-check-IBT =========
+make test/acc-check-IBT
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress acc/check-IBT.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -o test/acc-check-IBT 
+
+test/acc-check-IBT 1
+set runtime variable ibt-enabled to 0
+
+========== acc-get-frame-size =========
+make test/acc-get-frame-size
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress acc/get-frame-size.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -o test/acc-get-frame-size 
+
+test/acc-get-frame-size
+set runtime variable frame-size to 8 by reading test/acc-get-frame-size.tmp
+
+========== acc-get-ra-offset-v-p-g0 =========
+make test/acc-get-ra-offset
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress acc/get-ra-offset.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -o test/acc-get-ra-offset 
+
+test/acc-get-ra-offset 1 v-p-g0
+set runtime variable stack-offset-v-p-g0 to 2
+
+========== acc-get-ra-offset-v-p-g1 =========
+make test/acc-get-ra-offset
+make: 'test/acc-get-ra-offset' is up to date.
+
+test/acc-get-ra-offset 1 v-p-g1
+set runtime variable stack-offset-v-p-g1 to 2
+
+========== acc-read-GOT =========
+make test/acc-read-GOT
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress acc/read-GOT.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -o test/acc-read-GOT 
+
+test/acc-read-GOT 0
+
+========== acc-read-func =========
+make test/acc-read-func.gen
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress acc/read-func.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -o test/acc-read-func 
+script/get_aarch64_func_inst.sh test/acc-read-func helper 8 test/acc-read-func-func-opcode.tmp
+cp test/acc-read-func test/acc-read-func.gen
+
+test/acc-read-func.gen ./test/acc-read-func-func-opcode.tmp
+
+========== cfi-call-instruction-in-data =========
+make test/cfi-code-injection
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress lib/common/cfi.cpp -shared -fPIC -o lib/common/libcfi.so
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/code-injection.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-code-injection 
+
+test/cfi-code-injection 1 1
+
+========== cfi-call-instruction-in-heap =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 1 3
+
+========== cfi-call-instruction-in-rodata =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 1 0
+
+========== cfi-call-instruction-in-stack =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 1 2
+
+========== cfi-call-mid-func =========
+make test/cfi-call-mid-func
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-mid-func.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-mid-func 
+
+test/cfi-call-mid-func
+
+========== cfi-call-wrong-func-within-static-analysis =========
+make test/cfi-call-wrong-func-within-static-analysis
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-func-within-static-analysis.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-func-within-static-analysis 
+
+test/cfi-call-wrong-func-within-static-analysis 1
+
+========== cfi-call-wrong-num-arg-func =========
+make test/cfi-call-wrong-num-arg-func
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-num-arg-func.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-num-arg-func 
+
+test/cfi-call-wrong-num-arg-func
+
+========== cfi-call-wrong-type-arg-fp2dp-func =========
+make test/cfi-call-wrong-type-arg-fp2dp-func
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-type-arg-fp2dp-func.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-type-arg-fp2dp-func 
+
+test/cfi-call-wrong-type-arg-fp2dp-func
+
+========== cfi-call-wrong-type-arg-int2double-func =========
+make test/cfi-call-wrong-type-arg-int2double-func
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-type-arg-int2double-func.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-type-arg-int2double-func 
+
+test/cfi-call-wrong-type-arg-int2double-func
+
+========== cfi-call-wrong-type-arg-op2doublep-func =========
+make test/cfi-call-wrong-type-arg-op2doublep-func
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-type-arg-op2doublep-func.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-type-arg-op2doublep-func 
+
+test/cfi-call-wrong-type-arg-op2doublep-func 2
+
+========== cfi-call-wrong-type-arg-op2intp-func =========
+make test/cfi-call-wrong-type-arg-op2intp-func
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-type-arg-op2intp-func.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-type-arg-op2intp-func 
+
+test/cfi-call-wrong-type-arg-op2intp-func 2
+
+========== cfi-jump-mid-func =========
+make test/cfi-jump-mid-func
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/jump-mid-func.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-jump-mid-func 
+
+test/cfi-jump-mid-func 1
+
+========== cfi-return-to-wrong-call-site-within-static-analysis =========
+make test/cfi-return-to-wrong-call-site-within-static-analysis
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/return-to-wrong-call-site-within-static-analysis.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-return-to-wrong-call-site-within-static-analysis 
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 2 0
+set runtime variable stack-offset-v-p-g1 to 2
+
+========== cfi-return-without-call =========
+make test/cfi-return-without-call
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/return-without-call.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-return-without-call 
+
+test/cfi-return-without-call 1 8
+Hangup
+
+========== cpi-func-pointer-assign =========
+make test/cpi-func-pointer-assign
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cpi/func-pointer-assign.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cpi-func-pointer-assign  
+
+test/cpi-func-pointer-assign
+
+========== cpi-modify-GOT =========
+make test/cpi-modify-GOT
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cpi/modify-GOT.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cpi-modify-GOT  
+
+test/cpi-modify-GOT 0
+Interrupt
+
+========== cpi-read-data-vtable-pointer =========
+make test/cpi-read-vtable-pointer
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cpi/read-vtable-pointer.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cpi-read-vtable-pointer  
+
+test/cpi-read-vtable-pointer 2
+
+========== cpi-read-heap-vtable-pointer =========
+make test/cpi-read-vtable-pointer
+make: 'test/cpi-read-vtable-pointer' is up to date.
+
+test/cpi-read-vtable-pointer 1
+
+========== cpi-read-rodata-vtable-pointer =========
+make test/cpi-read-vtable-pointer
+make: 'test/cpi-read-vtable-pointer' is up to date.
+
+test/cpi-read-vtable-pointer 3
+
+========== cpi-read-stack-vtable-pointer =========
+make test/cpi-read-vtable-pointer
+make: 'test/cpi-read-vtable-pointer' is up to date.
+
+test/cpi-read-vtable-pointer 0
+
+========== cpi-write-data-vtable-pointer =========
+make test/cpi-write-vtable-pointer
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cpi/write-vtable-pointer.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cpi-write-vtable-pointer  
+
+test/cpi-write-vtable-pointer 2
+
+========== cpi-write-heap-vtable-pointer =========
+make test/cpi-write-vtable-pointer
+make: 'test/cpi-write-vtable-pointer' is up to date.
+
+test/cpi-write-vtable-pointer 1
+
+========== cpi-write-stack-vtable-pointer =========
+make test/cpi-write-vtable-pointer
+make: 'test/cpi-write-vtable-pointer' is up to date.
+
+test/cpi-write-vtable-pointer 0
+
+========== mss-check-inter-obj-data-redzone =========
+make test/mss-check-inter-nonalloc-redzone
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress -c lib/common/mss.cpp -o lib/common/mss.o
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/check-inter-nonalloc-redzone.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-check-inter-nonalloc-redzone 
+
+test/mss-check-inter-nonalloc-redzone 1
+
+========== mss-check-inter-obj-heap-redzone =========
+make test/mss-check-inter-alloc-redzone
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/check-inter-alloc-redzone.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-check-inter-alloc-redzone 
+
+test/mss-check-inter-alloc-redzone
+set runtime variable redzone_inter_obj_heap to 18 by reading test/mss-check-inter-alloc-redzone.tmp
+
+========== mss-check-inter-obj-rodata-redzone =========
+make test/mss-check-inter-nonalloc-redzone
+make: 'test/mss-check-inter-nonalloc-redzone' is up to date.
+
+test/mss-check-inter-nonalloc-redzone 2
+
+========== mss-check-inter-obj-stack-redzone =========
+make test/mss-check-inter-nonalloc-redzone
+make: 'test/mss-check-inter-nonalloc-redzone' is up to date.
+
+test/mss-check-inter-nonalloc-redzone 0
+Test abnormality: mss-check-inter-obj-stack-redzone failed with unexpected exit value 1
+Test abnormality: mss-check-inter-obj-stack-redzone failed with unexpected exit value 1
+
+========== mss-check-intra-obj-data-redzone =========
+make test/mss-check-intra-redzone
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/check-intra-redzone.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-check-intra-redzone 
+
+test/mss-check-intra-redzone 2
+
+========== mss-check-intra-obj-heap-redzone =========
+make test/mss-check-intra-redzone
+make: 'test/mss-check-intra-redzone' is up to date.
+
+test/mss-check-intra-redzone 1
+
+========== mss-check-intra-obj-rodata-redzone =========
+make test/mss-check-intra-redzone
+make: 'test/mss-check-intra-redzone' is up to date.
+
+test/mss-check-intra-redzone 3
+
+========== mss-check-intra-obj-stack-redzone =========
+make test/mss-check-intra-redzone
+make: 'test/mss-check-intra-redzone' is up to date.
+
+test/mss-check-intra-redzone 0
+
+========== mss-overflow-large-read-ptr-data =========
+make test/mss-read-large-member-inter-object
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/read-large-member-inter-object.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-large-member-inter-object 
+
+test/mss-read-large-member-inter-object 2 0 0
+
+========== mss-overflow-large-read-ptr-heap =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 1 0 0
+
+========== mss-overflow-large-read-ptr-rodata =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 3 0 0
+
+========== mss-overflow-large-read-ptr-stack =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 0 0 0
+
+========== mss-overflow-large-write-ptr-data =========
+make test/mss-write-large-member-inter-object
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/write-large-member-inter-object.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-large-member-inter-object 
+
+test/mss-write-large-member-inter-object 2 0 0
+
+========== mss-overflow-large-write-ptr-heap =========
+make test/mss-write-large-member-inter-object
+make: 'test/mss-write-large-member-inter-object' is up to date.
+
+test/mss-write-large-member-inter-object 1 0 0
+
+========== mss-overflow-large-write-ptr-stack =========
+make test/mss-write-large-member-inter-object
+make: 'test/mss-write-large-member-inter-object' is up to date.
+
+test/mss-write-large-member-inter-object 0 0 0
+
+========== mss-overflow-read-index-data =========
+make test/mss-read-by-index
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/read-by-index.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-index 
+
+test/mss-read-by-index 2 0
+
+========== mss-overflow-read-index-heap =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 1 0
+
+========== mss-overflow-read-index-rodata =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 3 0
+
+========== mss-overflow-read-index-stack =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 0 0
+
+========== mss-overflow-read-ptr-data =========
+make test/mss-read-by-pointer
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/read-by-pointer.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-pointer 
+
+test/mss-read-by-pointer 2 0
+
+========== mss-overflow-read-ptr-heap =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 1 0
+
+========== mss-overflow-read-ptr-rodata =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 3 0
+
+========== mss-overflow-read-ptr-stack =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 0 0
+
+========== mss-overflow-read-scalar-cast-to-array-data =========
+make test/mss-overflow-read-scalar-cast-to-array
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/overflow-read-scalar-cast-to-array.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-overflow-read-scalar-cast-to-array 
+mss/overflow-read-scalar-cast-to-array.cpp: In function ‘int main(int, char**)’:
+mss/overflow-read-scalar-cast-to-array.cpp:16:7: warning: ‘rv’ may be used uninitialized [-Wmaybe-uninitialized]
+   16 |   int rv;
+      |       ^~
+
+test/mss-overflow-read-scalar-cast-to-array 2
+
+========== mss-overflow-read-scalar-cast-to-array-heap =========
+make test/mss-overflow-read-scalar-cast-to-array
+make: 'test/mss-overflow-read-scalar-cast-to-array' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-array 1
+
+========== mss-overflow-read-scalar-cast-to-array-rodata =========
+make test/mss-overflow-read-scalar-cast-to-array
+make: 'test/mss-overflow-read-scalar-cast-to-array' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-array 3
+
+========== mss-overflow-read-scalar-cast-to-array-stack =========
+make test/mss-overflow-read-scalar-cast-to-array
+make: 'test/mss-overflow-read-scalar-cast-to-array' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-array 0
+
+========== mss-overflow-read-scalar-cast-to-scalar-data =========
+make test/mss-overflow-read-scalar-cast-to-scalar
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/overflow-read-scalar-cast-to-scalar.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-overflow-read-scalar-cast-to-scalar 
+mss/overflow-read-scalar-cast-to-scalar.cpp: In function ‘int main(int, char**)’:
+mss/overflow-read-scalar-cast-to-scalar.cpp:17:7: warning: ‘rv’ may be used uninitialized [-Wmaybe-uninitialized]
+   17 |   int rv;
+      |       ^~
+
+test/mss-overflow-read-scalar-cast-to-scalar 2
+dummy print to avoid dead code removal 1
+
+========== mss-overflow-read-scalar-cast-to-scalar-heap =========
+make test/mss-overflow-read-scalar-cast-to-scalar
+make: 'test/mss-overflow-read-scalar-cast-to-scalar' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-scalar 1
+dummy print to avoid dead code removal 1
+
+========== mss-overflow-read-scalar-cast-to-scalar-rodata =========
+make test/mss-overflow-read-scalar-cast-to-scalar
+make: 'test/mss-overflow-read-scalar-cast-to-scalar' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-scalar 3
+dummy print to avoid dead code removal 1
+
+========== mss-overflow-read-scalar-cast-to-scalar-stack =========
+make test/mss-overflow-read-scalar-cast-to-scalar
+make: 'test/mss-overflow-read-scalar-cast-to-scalar' is up to date.
+
+test/mss-overflow-read-scalar-cast-to-scalar 0
+dummy print to avoid dead code removal 1
+
+========== mss-overflow-write-index-data =========
+make test/mss-write-by-index
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/write-by-index.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-index 
+
+test/mss-write-by-index 2 0
+
+========== mss-overflow-write-index-heap =========
+make test/mss-write-by-index
+make: 'test/mss-write-by-index' is up to date.
+
+test/mss-write-by-index 1 0
+
+========== mss-overflow-write-index-stack =========
+make test/mss-write-by-index
+make: 'test/mss-write-by-index' is up to date.
+
+test/mss-write-by-index 0 0
+
+========== mss-overflow-write-ptr-data =========
+make test/mss-write-by-pointer
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/write-by-pointer.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-pointer 
+
+test/mss-write-by-pointer 2 0
+
+========== mss-overflow-write-ptr-heap =========
+make test/mss-write-by-pointer
+make: 'test/mss-write-by-pointer' is up to date.
+
+test/mss-write-by-pointer 1 0
+
+========== mss-overflow-write-ptr-stack =========
+make test/mss-write-by-pointer
+make: 'test/mss-write-by-pointer' is up to date.
+
+test/mss-write-by-pointer 0 0
+
+========== mss-underflow-large-read-ptr-data =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 2 1 0
+
+========== mss-underflow-large-read-ptr-heap =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 1 1 0
+
+========== mss-underflow-large-read-ptr-rodata =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 3 1 0
+
+========== mss-underflow-large-read-ptr-stack =========
+make test/mss-read-large-member-inter-object
+make: 'test/mss-read-large-member-inter-object' is up to date.
+
+test/mss-read-large-member-inter-object 0 1 0
+
+========== mss-underflow-large-write-ptr-data =========
+make test/mss-write-large-member-inter-object
+make: 'test/mss-write-large-member-inter-object' is up to date.
+
+test/mss-write-large-member-inter-object 2 1 0
+
+========== mss-underflow-large-write-ptr-heap =========
+make test/mss-write-large-member-inter-object
+make: 'test/mss-write-large-member-inter-object' is up to date.
+
+test/mss-write-large-member-inter-object 1 1 0
+
+========== mss-underflow-large-write-ptr-stack =========
+make test/mss-write-large-member-inter-object
+make: 'test/mss-write-large-member-inter-object' is up to date.
+
+test/mss-write-large-member-inter-object 0 1 0
+
+========== mss-underflow-read-index-data =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 2 1
+
+========== mss-underflow-read-index-heap =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 1 1
+
+========== mss-underflow-read-index-rodata =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 3 1
+
+========== mss-underflow-read-index-stack =========
+make test/mss-read-by-index
+make: 'test/mss-read-by-index' is up to date.
+
+test/mss-read-by-index 0 1
+
+========== mss-underflow-read-ptr-data =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 2 1
+
+========== mss-underflow-read-ptr-heap =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 1 1
+
+========== mss-underflow-read-ptr-rodata =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 3 1
+
+========== mss-underflow-read-ptr-stack =========
+make test/mss-read-by-pointer
+make: 'test/mss-read-by-pointer' is up to date.
+
+test/mss-read-by-pointer 0 1
+
+========== mss-underflow-write-index-data =========
+make test/mss-write-by-index
+make: 'test/mss-write-by-index' is up to date.
+
+test/mss-write-by-index 2 1
+
+========== mss-underflow-write-index-heap =========
+make test/mss-write-by-index
+make: 'test/mss-write-by-index' is up to date.
+
+test/mss-write-by-index 1 1
+
+========== mss-underflow-write-index-stack =========
+make test/mss-write-by-index
+make: 'test/mss-write-by-index' is up to date.
+
+test/mss-write-by-index 0 1
+
+========== mss-underflow-write-ptr-data =========
+make test/mss-write-by-pointer
+make: 'test/mss-write-by-pointer' is up to date.
+
+test/mss-write-by-pointer 2 1
+
+========== mss-underflow-write-ptr-heap =========
+make test/mss-write-by-pointer
+make: 'test/mss-write-by-pointer' is up to date.
+
+test/mss-write-by-pointer 1 1
+
+========== mss-underflow-write-ptr-stack =========
+make test/mss-write-by-pointer
+make: 'test/mss-write-by-pointer' is up to date.
+
+test/mss-write-by-pointer 0 1
+
+========== mss-write-cross-frame-index =========
+make test/mss-write-cross-frame-by-index
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/write-cross-frame-by-index.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-frame-by-index 
+
+test/mss-write-cross-frame-by-index
+
+========== mss-write-cross-frame-ptr =========
+make test/mss-write-cross-frame-by-pointer
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/write-cross-frame-by-pointer.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-frame-by-pointer 
+
+test/mss-write-cross-frame-by-pointer
+
+========== mss-write-cross-page-index-stack =========
+make test/mss-write-cross-page-by-index-in-stack
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/write-cross-page-by-index-in-stack.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-page-by-index-in-stack 
+
+test/mss-write-cross-page-by-index-in-stack
+
+========== mss-write-cross-page-ptr-stack =========
+make test/mss-write-cross-page-by-pointer-in-stack
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/write-cross-page-by-pointer-in-stack.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-page-by-pointer-in-stack 
+
+test/mss-write-cross-page-by-pointer-in-stack
+
+========== mss-write-cross-segment-data-to-heap-index =========
+make test/mss-write-cross-segment
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/write-cross-segment.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-segment 
+
+test/mss-write-cross-segment 2 1 0
+
+========== mss-write-cross-segment-data-to-heap-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 2 1 1
+
+========== mss-write-cross-segment-data-to-stack-index =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 2 0 0
+
+========== mss-write-cross-segment-data-to-stack-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 2 0 1
+
+========== mss-write-cross-segment-heap-to-data-index =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 1 2 0
+
+========== mss-write-cross-segment-heap-to-data-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 1 2 1
+
+========== mss-write-cross-segment-heap-to-stack-index =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 1 0 0
+
+========== mss-write-cross-segment-heap-to-stack-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 1 0 1
+
+========== mss-write-cross-segment-stack-to-data-index =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 0 2 0
+
+========== mss-write-cross-segment-stack-to-data-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 0 2 1
+
+========== mss-write-cross-segment-stack-to-heap-index =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 0 1 0
+
+========== mss-write-cross-segment-stack-to-heap-ptr =========
+make test/mss-write-cross-segment
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 0 1 1
+
+========== mts-access-after-free-alias-heap =========
+make test/mts-access-after-free-alias-heap
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mts/access-after-free-alias-heap.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-access-after-free-alias-heap 
+
+test/mts-access-after-free-alias-heap 0
+==7104==ERROR: HWAddressSanitizer: tag-mismatch on address 0xefdeffff0000 at pc 0xffffa2b9dfec
+READ of size 1 at 0xefdeffff0000 tags: ac/d1 (ptr/mem) in thread T0
+    #0 0xffffa2b9dfec in SigTrap<0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28
+    #1 0xffffa2b9dfec in CheckAddress<(__hwasan::ErrorAction)0, (__hwasan::AccessType)0, 0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:108
+    #2 0xffffa2b9dfec in __hwasan_load1 ../../../../src/libsanitizer/hwasan/hwasan.cpp:449
+    #3 0xaaaab73d1f60 in int check<char>(char const*, int, int, char) (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1f60) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+    #4 0xffffa26a6dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #5 0xffffa26a6e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #6 0xaaaab73d1e2c in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1e2c) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+
+[0xefdeffff0000,0xefdeffff0020) is a small unallocated heap chunk; size: 32 offset: 0
+
+Cause: use-after-free
+0xefdeffff0000 is located 0 bytes inside a 24-byte region [0xefdeffff0000,0xefdeffff0018)
+freed by thread T0 here:
+    #0 0xffffa2ba1258 in operator delete(void*) ../../../../src/libsanitizer/hwasan/hwasan_new_delete.cpp:81
+    #1 0xaaaab73d1b3c in main (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1b3c) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+    #2 0xffffa26a6dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffffa26a6e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaab73d1e2c in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1e2c) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+
+previously allocated here:
+    #0 0xffffa2ba0e98 in operator new(unsigned long) ../../../../src/libsanitizer/hwasan/hwasan_new_delete.cpp:64
+    #1 0xaaaab73d1b18 in main (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1b18) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+    #2 0xffffa26a6dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffffa26a6e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaab73d1e2c in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1e2c) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+
+hwasan_dev_note_heap_rb_distance: 1 1023
+hwasan_dev_note_num_matching_addrs: 0
+hwasan_dev_note_num_matching_addrs_4b: 0
+Thread: T0 0xeffe00002000 stack: [0xfffff9275000,0xfffff9a75000) sz: 8388608 tls: [0xffffa31a5020,0xffffa31a5ee0)
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffef800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffef900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefa00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffeff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xefdeffff0000:[d1] d1  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0100: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffeff00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xefdeffff0000:[..] ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+  0xefdeffff0100: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: tag-mismatch ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28 in SigTrap<0>
+Test abnormality: mts-access-after-free-alias-heap failed with unexpected exit value 99
+
+test/mts-access-after-free-alias-heap 1
+==7105==ERROR: HWAddressSanitizer: tag-mismatch on address 0xefdeffff0008 at pc 0xffff9a16dfec
+READ of size 1 at 0xefdeffff0008 tags: 0e/8a (ptr/mem) in thread T0
+    #0 0xffff9a16dfec in SigTrap<0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28
+    #1 0xffff9a16dfec in CheckAddress<(__hwasan::ErrorAction)0, (__hwasan::AccessType)0, 0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:108
+    #2 0xffff9a16dfec in __hwasan_load1 ../../../../src/libsanitizer/hwasan/hwasan.cpp:449
+    #3 0xaaaade011f60 in int check<char>(char const*, int, int, char) (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1f60) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+    #4 0xffff99c76dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #5 0xffff99c76e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #6 0xaaaade011e2c in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1e2c) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+
+[0xefdeffff0000,0xefdeffff0020) is a small unallocated heap chunk; size: 32 offset: 8
+
+Cause: use-after-free
+0xefdeffff0008 is located 8 bytes inside a 24-byte region [0xefdeffff0000,0xefdeffff0018)
+freed by thread T0 here:
+    #0 0xffff9a171258 in operator delete(void*) ../../../../src/libsanitizer/hwasan/hwasan_new_delete.cpp:81
+    #1 0xaaaade011b3c in main (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1b3c) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+    #2 0xffff99c76dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff99c76e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaade011e2c in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1e2c) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+
+previously allocated here:
+    #0 0xffff9a170e98 in operator new(unsigned long) ../../../../src/libsanitizer/hwasan/hwasan_new_delete.cpp:64
+    #1 0xaaaade011b18 in main (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1b18) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+    #2 0xffff99c76dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff99c76e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaade011e2c in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1e2c) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+
+hwasan_dev_note_heap_rb_distance: 1 1023
+hwasan_dev_note_num_matching_addrs: 0
+hwasan_dev_note_num_matching_addrs_4b: 0
+Thread: T0 0xeffe00002000 stack: [0xffffe4b12000,0xffffe5312000) sz: 8388608 tls: [0xffff9a782020,0xffff9a782ee0)
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffef800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffef900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefa00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffeff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xefdeffff0000:[8a] 8a  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0100: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffeff00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xefdeffff0000:[..] ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+  0xefdeffff0100: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: tag-mismatch ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28 in SigTrap<0>
+Test abnormality: mts-access-after-free-alias-heap failed with unexpected exit value 99
+
+test/mts-access-after-free-alias-heap 2
+==7106==ERROR: HWAddressSanitizer: tag-mismatch on address 0xefdeffff0010 at pc 0xffffa2b7dfec
+READ of size 1 at 0xefdeffff0010 tags: 78/6b (ptr/mem) in thread T0
+    #0 0xffffa2b7dfec in SigTrap<0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28
+    #1 0xffffa2b7dfec in CheckAddress<(__hwasan::ErrorAction)0, (__hwasan::AccessType)0, 0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:108
+    #2 0xffffa2b7dfec in __hwasan_load1 ../../../../src/libsanitizer/hwasan/hwasan.cpp:449
+    #3 0xaaaadd271f60 in int check<char>(char const*, int, int, char) (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1f60) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+    #4 0xffffa2686dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #5 0xffffa2686e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #6 0xaaaadd271e2c in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1e2c) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+
+[0xefdeffff0000,0xefdeffff0020) is a small unallocated heap chunk; size: 32 offset: 16
+
+Cause: use-after-free
+0xefdeffff0010 is located 16 bytes inside a 24-byte region [0xefdeffff0000,0xefdeffff0018)
+freed by thread T0 here:
+    #0 0xffffa2b81258 in operator delete(void*) ../../../../src/libsanitizer/hwasan/hwasan_new_delete.cpp:81
+    #1 0xaaaadd271b3c in main (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1b3c) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+    #2 0xffffa2686dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffffa2686e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaadd271e2c in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1e2c) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+
+previously allocated here:
+    #0 0xffffa2b80e98 in operator new(unsigned long) ../../../../src/libsanitizer/hwasan/hwasan_new_delete.cpp:64
+    #1 0xaaaadd271b18 in main (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1b18) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+    #2 0xffffa2686dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffffa2686e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaadd271e2c in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-alias-heap+0x1e2c) (BuildId: 6957feb060cffbae4f8e56aa2a5a43d0fbfd35f5)
+
+hwasan_dev_note_heap_rb_distance: 1 1023
+hwasan_dev_note_num_matching_addrs: 0
+hwasan_dev_note_num_matching_addrs_4b: 0
+Thread: T0 0xeffe00002000 stack: [0xfffffc23d000,0xfffffca3d000) sz: 8388608 tls: [0xffffa3186020,0xffffa3186ee0)
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffef800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffef900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefa00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffeff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xefdeffff0000: 6b [6b] 00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0100: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffeff00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xefdeffff0000: .. [..] ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+  0xefdeffff0100: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: tag-mismatch ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28 in SigTrap<0>
+Test abnormality: mts-access-after-free-alias-heap failed with unexpected exit value 99
+Test abnormality: mts-access-after-free-alias-heap failed with unexpected exit value 99
+
+========== mts-access-after-free-alias-stack =========
+make test/mts-access-after-free-alias-stack
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mts/access-after-free-alias-stack.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-access-after-free-alias-stack 
+
+test/mts-access-after-free-alias-stack
+Test abnormality: mts-access-after-free-alias-stack failed with unexpected exit value 1
+Test abnormality: mts-access-after-free-alias-stack failed with unexpected exit value 1
+
+========== mts-access-after-free-org-heap =========
+make test/mts-access-after-free-org-heap
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mts/access-after-free-org-heap.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-access-after-free-org-heap 
+mts/access-after-free-org-heap.cpp: In function ‘int main(int, char**)’:
+mts/access-after-free-org-heap.cpp:11:26: warning: pointer may be used after ‘void operator delete(void*)’ [-Wuse-after-free]
+   11 |     return check(buffer->underflow, 7,  1, 'u');
+      |                  ~~~~~~~~^~~~~~~~~
+mts/access-after-free-org-heap.cpp:5:10: note: call to ‘void operator delete(void*)’ here
+    5 |   delete buffer;
+      |          ^~~~~~
+mts/access-after-free-org-heap.cpp:14:26: warning: pointer may be used after ‘void operator delete(void*)’ [-Wuse-after-free]
+   14 |     return check(buffer->data, 7,  1, 'd');
+      |                  ~~~~~~~~^~~~
+mts/access-after-free-org-heap.cpp:5:10: note: call to ‘void operator delete(void*)’ here
+    5 |   delete buffer;
+      |          ^~~~~~
+mts/access-after-free-org-heap.cpp:17:26: warning: pointer may be used after ‘void operator delete(void*)’ [-Wuse-after-free]
+   17 |     return check(buffer->overflow, 7,  1, 'o');
+      |                  ~~~~~~~~^~~~~~~~
+mts/access-after-free-org-heap.cpp:5:10: note: call to ‘void operator delete(void*)’ here
+    5 |   delete buffer;
+      |          ^~~~~~
+
+test/mts-access-after-free-org-heap 0
+==7132==ERROR: HWAddressSanitizer: tag-mismatch on address 0xefdeffff0000 at pc 0xffffb1f6dfec
+READ of size 1 at 0xefdeffff0000 tags: b2/d8 (ptr/mem) in thread T0
+    #0 0xffffb1f6dfec in SigTrap<0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28
+    #1 0xffffb1f6dfec in CheckAddress<(__hwasan::ErrorAction)0, (__hwasan::AccessType)0, 0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:108
+    #2 0xffffb1f6dfec in __hwasan_load1 ../../../../src/libsanitizer/hwasan/hwasan.cpp:449
+    #3 0xaaaae36c1f20 in int check<char>(char const*, int, int, char) (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1f20) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+    #4 0xffffb1a76dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #5 0xffffb1a76e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #6 0xaaaae36c1dec in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1dec) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+
+[0xefdeffff0000,0xefdeffff0020) is a small unallocated heap chunk; size: 32 offset: 0
+
+Cause: use-after-free
+0xefdeffff0000 is located 0 bytes inside a 24-byte region [0xefdeffff0000,0xefdeffff0018)
+freed by thread T0 here:
+    #0 0xffffb1f71258 in operator delete(void*) ../../../../src/libsanitizer/hwasan/hwasan_new_delete.cpp:81
+    #1 0xaaaae36c1b30 in main (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1b30) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+    #2 0xffffb1a76dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffffb1a76e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaae36c1dec in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1dec) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+
+previously allocated here:
+    #0 0xffffb1f70e98 in operator new(unsigned long) ../../../../src/libsanitizer/hwasan/hwasan_new_delete.cpp:64
+    #1 0xaaaae36c1b14 in main (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1b14) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+    #2 0xffffb1a76dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffffb1a76e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaae36c1dec in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1dec) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+
+hwasan_dev_note_heap_rb_distance: 1 1023
+hwasan_dev_note_num_matching_addrs: 0
+hwasan_dev_note_num_matching_addrs_4b: 0
+Thread: T0 0xeffe00002000 stack: [0xffffd492a000,0xffffd512a000) sz: 8388608 tls: [0xffffb257f020,0xffffb257fee0)
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffef800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffef900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefa00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffeff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xefdeffff0000:[d8] d8  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0100: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffeff00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xefdeffff0000:[..] ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+  0xefdeffff0100: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: tag-mismatch ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28 in SigTrap<0>
+Test abnormality: mts-access-after-free-org-heap failed with unexpected exit value 99
+
+test/mts-access-after-free-org-heap 1
+==7133==ERROR: HWAddressSanitizer: tag-mismatch on address 0xefdeffff0008 at pc 0xffffbbbfdfec
+READ of size 1 at 0xefdeffff0008 tags: ce/12 (ptr/mem) in thread T0
+    #0 0xffffbbbfdfec in SigTrap<0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28
+    #1 0xffffbbbfdfec in CheckAddress<(__hwasan::ErrorAction)0, (__hwasan::AccessType)0, 0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:108
+    #2 0xffffbbbfdfec in __hwasan_load1 ../../../../src/libsanitizer/hwasan/hwasan.cpp:449
+    #3 0xaaaaacd01f20 in int check<char>(char const*, int, int, char) (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1f20) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+    #4 0xffffbb706dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #5 0xffffbb706e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #6 0xaaaaacd01dec in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1dec) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+
+[0xefdeffff0000,0xefdeffff0020) is a small unallocated heap chunk; size: 32 offset: 8
+
+Cause: use-after-free
+0xefdeffff0008 is located 8 bytes inside a 24-byte region [0xefdeffff0000,0xefdeffff0018)
+freed by thread T0 here:
+    #0 0xffffbbc01258 in operator delete(void*) ../../../../src/libsanitizer/hwasan/hwasan_new_delete.cpp:81
+    #1 0xaaaaacd01b30 in main (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1b30) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+    #2 0xffffbb706dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffffbb706e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaaacd01dec in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1dec) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+
+previously allocated here:
+    #0 0xffffbbc00e98 in operator new(unsigned long) ../../../../src/libsanitizer/hwasan/hwasan_new_delete.cpp:64
+    #1 0xaaaaacd01b14 in main (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1b14) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+    #2 0xffffbb706dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffffbb706e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaaacd01dec in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1dec) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+
+hwasan_dev_note_heap_rb_distance: 1 1023
+hwasan_dev_note_num_matching_addrs: 0
+hwasan_dev_note_num_matching_addrs_4b: 0
+Thread: T0 0xeffe00002000 stack: [0xfffff25e1000,0xfffff2de1000) sz: 8388608 tls: [0xffffbc205020,0xffffbc205ee0)
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffef800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffef900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefa00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffeff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xefdeffff0000:[12] 12  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0100: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffeff00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xefdeffff0000:[..] ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+  0xefdeffff0100: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: tag-mismatch ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28 in SigTrap<0>
+Test abnormality: mts-access-after-free-org-heap failed with unexpected exit value 99
+
+test/mts-access-after-free-org-heap 2
+==7134==ERROR: HWAddressSanitizer: tag-mismatch on address 0xefdeffff0010 at pc 0xffff97fadfec
+READ of size 1 at 0xefdeffff0010 tags: ce/34 (ptr/mem) in thread T0
+    #0 0xffff97fadfec in SigTrap<0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28
+    #1 0xffff97fadfec in CheckAddress<(__hwasan::ErrorAction)0, (__hwasan::AccessType)0, 0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:108
+    #2 0xffff97fadfec in __hwasan_load1 ../../../../src/libsanitizer/hwasan/hwasan.cpp:449
+    #3 0xaaaab7b61f20 in int check<char>(char const*, int, int, char) (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1f20) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+    #4 0xffff97ab6dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #5 0xffff97ab6e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #6 0xaaaab7b61dec in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1dec) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+
+[0xefdeffff0000,0xefdeffff0020) is a small unallocated heap chunk; size: 32 offset: 16
+
+Cause: use-after-free
+0xefdeffff0010 is located 16 bytes inside a 24-byte region [0xefdeffff0000,0xefdeffff0018)
+freed by thread T0 here:
+    #0 0xffff97fb1258 in operator delete(void*) ../../../../src/libsanitizer/hwasan/hwasan_new_delete.cpp:81
+    #1 0xaaaab7b61b30 in main (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1b30) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+    #2 0xffff97ab6dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff97ab6e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaab7b61dec in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1dec) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+
+previously allocated here:
+    #0 0xffff97fb0e98 in operator new(unsigned long) ../../../../src/libsanitizer/hwasan/hwasan_new_delete.cpp:64
+    #1 0xaaaab7b61b14 in main (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1b14) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+    #2 0xffff97ab6dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff97ab6e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaab7b61dec in _start (/home/ciyan/cpu-sec-bench/test/mts-access-after-free-org-heap+0x1dec) (BuildId: ec7070cf5ecda08996f5deef534d328b7dd60b8e)
+
+hwasan_dev_note_heap_rb_distance: 1 1023
+hwasan_dev_note_num_matching_addrs: 0
+hwasan_dev_note_num_matching_addrs_4b: 0
+Thread: T0 0xeffe00002000 stack: [0xfffff0d5b000,0xfffff155b000) sz: 8388608 tls: [0xffff985b5020,0xffff985b5ee0)
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffef800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffef900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefa00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffeff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xefdeffff0000: 34 [34] 00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0100: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffeff00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xefdeffff0000: .. [..] ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+  0xefdeffff0100: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: tag-mismatch ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28 in SigTrap<0>
+Test abnormality: mts-access-after-free-org-heap failed with unexpected exit value 99
+Test abnormality: mts-access-after-free-org-heap failed with unexpected exit value 99
+
+========== mts-double-free =========
+make test/mts-double-free
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mts/double-free.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-double-free 
+
+test/mts-double-free 0 0 0 7 0
+==7147==ERROR: HWAddressSanitizer: invalid-free on address 0xefdeffff00e0 at pc 0xffff9d1f82f4 on thread T0
+tags: 68/60 (ptr/mem)
+    #0 0xffff9d1f82f4 in __sanitizer_free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78
+    #1 0xaaaaab102404 in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2404) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff9cd06dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff9cd06e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaaab102dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+[0xefdeffff00e0,0xefdeffff0100) is a small unallocated heap chunk; size: 32 offset: 0
+
+Cause: use-after-free
+0xefdeffff00e0 is located 0 bytes inside a 8-byte region [0xefdeffff00e0,0xefdeffff00e8)
+freed by thread T0 here:
+    #0 0xffff9d1f82f4 in __sanitizer_free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78
+    #1 0xaaaaab1027e4 in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x27e4) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff9cd06dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff9cd06e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaaab102dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+previously allocated here:
+    #0 0xffff9d1f91b0 in __sanitizer_malloc ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:140
+    #1 0xaaaaab10235c in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x235c) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff9cd06dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff9cd06e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaaab102dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+hwasan_dev_note_heap_rb_distance: 2 1023
+hwasan_dev_note_num_matching_addrs: 0
+hwasan_dev_note_num_matching_addrs_4b: 0
+Thread: T0 0xeffe00002000 stack: [0xffffc8f45000,0xffffc9745000) sz: 8388608 tls: [0xffff9d803020,0xffff9d803ee0)
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffef800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffef900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefa00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffeff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xefdeffff0000: b7  00  b1  00  45  00  8e  00  40  00  ac  00  a1  00 [60] 00 
+  0xefdeffff0100: 86  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffeff00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xefdeffff0000: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. [..] .. 
+  0xefdeffff0100: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: invalid-free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78 in __sanitizer_free
+Test abnormality: mts-double-free failed with unexpected exit value 99
+
+test/mts-double-free 0 0 1 7 0
+==7148==ERROR: HWAddressSanitizer: invalid-free on address 0xefdeffff00e0 at pc 0xffffb4a282f4 on thread T0
+tags: 43/9a (ptr/mem)
+    #0 0xffffb4a282f4 in __sanitizer_free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78
+    #1 0xaaaad6412404 in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2404) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffffb4536dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffffb4536e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaad6412dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+[0xefdeffff00e0,0xefdeffff0100) is a small unallocated heap chunk; size: 32 offset: 0
+
+Cause: use-after-free
+0xefdeffff00e0 is located 0 bytes inside a 10-byte region [0xefdeffff00e0,0xefdeffff00ea)
+freed by thread T0 here:
+    #0 0xffffb4a282f4 in __sanitizer_free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78
+    #1 0xaaaad64127e4 in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x27e4) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffffb4536dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffffb4536e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaad6412dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+previously allocated here:
+    #0 0xffffb4a291b0 in __sanitizer_malloc ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:140
+    #1 0xaaaad641235c in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x235c) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffffb4536dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffffb4536e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaad6412dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+hwasan_dev_note_heap_rb_distance: 2 1023
+hwasan_dev_note_num_matching_addrs: 0
+hwasan_dev_note_num_matching_addrs_4b: 0
+Thread: T0 0xeffe00002000 stack: [0xffffca38b000,0xffffcab8b000) sz: 8388608 tls: [0xffffb5036020,0xffffb5036ee0)
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffef800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffef900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefa00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffeff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xefdeffff0000: 27  00  bc  00  23  00  39  00  f4  00  15  00  48  00 [9a] 00 
+  0xefdeffff0100: 6f  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffeff00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xefdeffff0000: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. [..] .. 
+  0xefdeffff0100: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: invalid-free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78 in __sanitizer_free
+Test abnormality: mts-double-free failed with unexpected exit value 99
+
+test/mts-double-free 0 0 2 7 0
+==7149==ERROR: HWAddressSanitizer: invalid-free on address 0xefdeffff00e0 at pc 0xffff923882f4 on thread T0
+tags: 02/29 (ptr/mem)
+    #0 0xffff923882f4 in __sanitizer_free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78
+    #1 0xaaaad7a82404 in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2404) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff91e96dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff91e96e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaad7a82dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+[0xefdeffff00e0,0xefdeffff0100) is a small unallocated heap chunk; size: 32 offset: 0
+
+Cause: use-after-free
+0xefdeffff00e0 is located 0 bytes inside a 12-byte region [0xefdeffff00e0,0xefdeffff00ec)
+freed by thread T0 here:
+    #0 0xffff923882f4 in __sanitizer_free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78
+    #1 0xaaaad7a827e4 in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x27e4) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff91e96dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff91e96e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaad7a82dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+previously allocated here:
+    #0 0xffff923891b0 in __sanitizer_malloc ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:140
+    #1 0xaaaad7a8235c in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x235c) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff91e96dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff91e96e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaad7a82dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+hwasan_dev_note_heap_rb_distance: 2 1023
+hwasan_dev_note_num_matching_addrs: 0
+hwasan_dev_note_num_matching_addrs_4b: 0
+Thread: T0 0xeffe00002000 stack: [0xffffc517f000,0xffffc597f000) sz: 8388608 tls: [0xffff92995020,0xffff92995ee0)
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffef800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffef900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefa00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffeff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xefdeffff0000: 73  00  bb  00  60  00  d0  00  1d  00  58  00  26  00 [29] 00 
+  0xefdeffff0100: 3e  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffeff00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xefdeffff0000: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. [..] .. 
+  0xefdeffff0100: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: invalid-free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78 in __sanitizer_free
+Test abnormality: mts-double-free failed with unexpected exit value 99
+
+test/mts-double-free 0 0 3 7 0
+==7150==ERROR: HWAddressSanitizer: invalid-free on address 0xefdeffff00e0 at pc 0xffff815282f4 on thread T0
+tags: 19/2f (ptr/mem)
+    #0 0xffff815282f4 in __sanitizer_free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78
+    #1 0xaaaad30e2404 in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2404) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff81036dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff81036e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaad30e2dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+[0xefdeffff00e0,0xefdeffff0100) is a small unallocated heap chunk; size: 32 offset: 0
+
+Cause: use-after-free
+0xefdeffff00e0 is located 0 bytes inside a 14-byte region [0xefdeffff00e0,0xefdeffff00ee)
+freed by thread T0 here:
+    #0 0xffff815282f4 in __sanitizer_free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78
+    #1 0xaaaad30e27e4 in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x27e4) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff81036dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff81036e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaad30e2dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+previously allocated here:
+    #0 0xffff815291b0 in __sanitizer_malloc ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:140
+    #1 0xaaaad30e235c in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x235c) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff81036dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff81036e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaad30e2dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+hwasan_dev_note_heap_rb_distance: 2 1023
+hwasan_dev_note_num_matching_addrs: 0
+hwasan_dev_note_num_matching_addrs_4b: 0
+Thread: T0 0xeffe00002000 stack: [0xffffe1c7f000,0xffffe247f000) sz: 8388608 tls: [0xffff81b41020,0xffff81b41ee0)
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffef800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffef900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefa00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffeff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xefdeffff0000: 2c  00  cc  00  a2  00  5f  00  77  00  cb  00  7d  00 [2f] 00 
+  0xefdeffff0100: 47  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffeff00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xefdeffff0000: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. [..] .. 
+  0xefdeffff0100: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: invalid-free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78 in __sanitizer_free
+Test abnormality: mts-double-free failed with unexpected exit value 99
+
+test/mts-double-free 0 0 4 7 0
+==7151==ERROR: HWAddressSanitizer: invalid-free on address 0xefdeffff00e0 at pc 0xffffbb0582f4 on thread T0
+tags: fb/43 (ptr/mem)
+    #0 0xffffbb0582f4 in __sanitizer_free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78
+    #1 0xaaaadb632404 in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2404) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffffbab66dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffffbab66e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaadb632dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+[0xefdeffff00e0,0xefdeffff0100) is a small unallocated heap chunk; size: 32 offset: 0
+
+Cause: use-after-free
+0xefdeffff00e0 is located 0 bytes inside a 16-byte region [0xefdeffff00e0,0xefdeffff00f0)
+freed by thread T0 here:
+    #0 0xffffbb0582f4 in __sanitizer_free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78
+    #1 0xaaaadb6327e4 in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x27e4) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffffbab66dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffffbab66e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaadb632dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+previously allocated here:
+    #0 0xffffbb0591b0 in __sanitizer_malloc ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:140
+    #1 0xaaaadb63235c in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x235c) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffffbab66dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffffbab66e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaadb632dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+hwasan_dev_note_heap_rb_distance: 2 1023
+hwasan_dev_note_num_matching_addrs: 0
+hwasan_dev_note_num_matching_addrs_4b: 0
+Thread: T0 0xeffe00002000 stack: [0xffffdbf25000,0xffffdc725000) sz: 8388608 tls: [0xffffbb66c020,0xffffbb66cee0)
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffef800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffef900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefa00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffeff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xefdeffff0000: f0  00  54  00  60  00  d6  00  6f  00  6b  00  39  00 [43] 00 
+  0xefdeffff0100: e5  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffeff00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xefdeffff0000: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. [..] .. 
+  0xefdeffff0100: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: invalid-free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78 in __sanitizer_free
+Test abnormality: mts-double-free failed with unexpected exit value 99
+
+test/mts-double-free 0 0 5 7 0
+==7152==ERROR: HWAddressSanitizer: invalid-free on address 0xefdeffff00e0 at pc 0xffff925d82f4 on thread T0
+tags: 0a/f2 (ptr/mem)
+    #0 0xffff925d82f4 in __sanitizer_free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78
+    #1 0xaaaab4642404 in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2404) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff920e6dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff920e6e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaab4642dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+[0xefdeffff00e0,0xefdeffff0100) is a small unallocated heap chunk; size: 32 offset: 0
+
+Cause: use-after-free
+0xefdeffff00e0 is located 0 bytes inside a 18-byte region [0xefdeffff00e0,0xefdeffff00f2)
+freed by thread T0 here:
+    #0 0xffff925d82f4 in __sanitizer_free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78
+    #1 0xaaaab46427e4 in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x27e4) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff920e6dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff920e6e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaab4642dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+previously allocated here:
+    #0 0xffff925d91b0 in __sanitizer_malloc ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:140
+    #1 0xaaaab464235c in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x235c) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff920e6dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff920e6e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaab4642dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+hwasan_dev_note_heap_rb_distance: 2 1023
+hwasan_dev_note_num_matching_addrs: 0
+hwasan_dev_note_num_matching_addrs_4b: 0
+Thread: T0 0xeffe00002000 stack: [0xffffed824000,0xffffee024000) sz: 8388608 tls: [0xffff92bf1020,0xffff92bf1ee0)
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffef800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffef900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefa00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffeff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xefdeffff0000: 4a  4a  c4  c4  2b  2b  5e  5e  7b  7b  74  74  f0  f0 [f2] f2 
+  0xefdeffff0100: c4  c4  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffeff00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xefdeffff0000: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. [..] .. 
+  0xefdeffff0100: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: invalid-free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78 in __sanitizer_free
+Test abnormality: mts-double-free failed with unexpected exit value 99
+
+test/mts-double-free 0 0 6 7 0
+==7153==ERROR: HWAddressSanitizer: invalid-free on address 0xefdeffff00e0 at pc 0xffff98ee82f4 on thread T0
+tags: 3e/a5 (ptr/mem)
+    #0 0xffff98ee82f4 in __sanitizer_free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78
+    #1 0xaaaad9dd2404 in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2404) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff989f6dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff989f6e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaad9dd2dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+[0xefdeffff00e0,0xefdeffff0100) is a small unallocated heap chunk; size: 32 offset: 0
+
+Cause: use-after-free
+0xefdeffff00e0 is located 0 bytes inside a 20-byte region [0xefdeffff00e0,0xefdeffff00f4)
+freed by thread T0 here:
+    #0 0xffff98ee82f4 in __sanitizer_free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78
+    #1 0xaaaad9dd27e4 in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x27e4) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff989f6dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff989f6e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaad9dd2dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+previously allocated here:
+    #0 0xffff98ee91b0 in __sanitizer_malloc ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:140
+    #1 0xaaaad9dd235c in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x235c) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff989f6dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff989f6e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaad9dd2dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+hwasan_dev_note_heap_rb_distance: 2 1023
+hwasan_dev_note_num_matching_addrs: 0
+hwasan_dev_note_num_matching_addrs_4b: 0
+Thread: T0 0xeffe00002000 stack: [0xffffe5b85000,0xffffe6385000) sz: 8388608 tls: [0xffff994ff020,0xffff994ffee0)
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffef800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffef900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefa00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffeff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xefdeffff0000: 5d  5d  50  50  f0  f0  f0  f0  20  20  29  29  8a  8a [a5] a5 
+  0xefdeffff0100: 97  97  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffeff00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xefdeffff0000: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. [..] .. 
+  0xefdeffff0100: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: invalid-free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78 in __sanitizer_free
+Test abnormality: mts-double-free failed with unexpected exit value 99
+
+test/mts-double-free 0 0 7 7 0
+==7155==ERROR: HWAddressSanitizer: invalid-free on address 0xefdeffff00e0 at pc 0xffff94ad82f4 on thread T0
+tags: 32/48 (ptr/mem)
+    #0 0xffff94ad82f4 in __sanitizer_free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78
+    #1 0xaaaae4e32404 in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2404) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff945e6dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff945e6e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaae4e32dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+[0xefdeffff00e0,0xefdeffff0100) is a small unallocated heap chunk; size: 32 offset: 0
+
+Cause: use-after-free
+0xefdeffff00e0 is located 0 bytes inside a 22-byte region [0xefdeffff00e0,0xefdeffff00f6)
+freed by thread T0 here:
+    #0 0xffff94ad82f4 in __sanitizer_free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78
+    #1 0xaaaae4e327e4 in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x27e4) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff945e6dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff945e6e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaae4e32dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+previously allocated here:
+    #0 0xffff94ad91b0 in __sanitizer_malloc ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:140
+    #1 0xaaaae4e3235c in main (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x235c) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+    #2 0xffff945e6dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffff945e6e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaae4e32dec in _start (/home/ciyan/cpu-sec-bench/test/mts-double-free+0x2dec) (BuildId: 52892a2cb726d36e6e134e461aad52bc44b2a10a)
+
+hwasan_dev_note_heap_rb_distance: 2 1023
+hwasan_dev_note_num_matching_addrs: 0
+hwasan_dev_note_num_matching_addrs_4b: 0
+Thread: T0 0xeffe00002000 stack: [0xffffd24e4000,0xffffd2ce4000) sz: 8388608 tls: [0xffff950f0020,0xffff950f0ee0)
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffef800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffef900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefa00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffeff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xefdeffff0000: 69  69  5e  5e  23  23  40  40  71  71  38  38  a8  a8 [48] 48 
+  0xefdeffff0100: 6b  6b  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffeff00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xefdeffff0000: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. [..] .. 
+  0xefdeffff0100: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: invalid-free ../../../../src/libsanitizer/hwasan/hwasan_allocation_functions.cpp:78 in __sanitizer_free
+Test abnormality: mts-double-free failed with unexpected exit value 99
+Test abnormality: mts-double-free failed with unexpected exit value 99
+
+========== mts-reallocate-heap =========
+make test/mts-reallocate-heap
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mts/reallocate-heap.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-reallocate-heap 
+
+test/mts-reallocate-heap
+
+========== mts-reallocate-stack =========
+make test/mts-reallocate-stack
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mts/reallocate-stack.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-reallocate-stack 
+
+test/mts-reallocate-stack
+
+========== mts-write-after-free-heap =========
+make test/mts-write-after-free-heap
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mts/write-after-free-heap.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-write-after-free-heap 
+
+test/mts-write-after-free-heap
+==7194==ERROR: HWAddressSanitizer: tag-mismatch on address 0xefdeffff0008 at pc 0xffffbe05e42c
+WRITE of size 1 at 0xefdeffff0008 tags: 9e/a0 (ptr/mem) in thread T0
+    #0 0xffffbe05e42c in SigTrap<16> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28
+    #1 0xffffbe05e42c in CheckAddress<(__hwasan::ErrorAction)0, (__hwasan::AccessType)1, 0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:108
+    #2 0xffffbe05e42c in __hwasan_store1 ../../../../src/libsanitizer/hwasan/hwasan.cpp:487
+    #3 0xaaaabaad39a8 in update_by_pointer(char*, long long, long long, int, char) (/home/ciyan/cpu-sec-bench/test/mts-write-after-free-heap+0x39a8) (BuildId: 5aa2cc7cf6909c3bc88ae16b9295189e0aec1033)
+    #4 0xaaaabaad1b50 in main (/home/ciyan/cpu-sec-bench/test/mts-write-after-free-heap+0x1b50) (BuildId: 5aa2cc7cf6909c3bc88ae16b9295189e0aec1033)
+    #5 0xffffbdb66dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #6 0xffffbdb66e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #7 0xaaaabaad1dac in _start (/home/ciyan/cpu-sec-bench/test/mts-write-after-free-heap+0x1dac) (BuildId: 5aa2cc7cf6909c3bc88ae16b9295189e0aec1033)
+
+[0xefdeffff0000,0xefdeffff0020) is a small unallocated heap chunk; size: 32 offset: 8
+
+Cause: use-after-free
+0xefdeffff0008 is located 8 bytes inside a 24-byte region [0xefdeffff0000,0xefdeffff0018)
+freed by thread T0 here:
+    #0 0xffffbe061258 in operator delete(void*) ../../../../src/libsanitizer/hwasan/hwasan_new_delete.cpp:81
+    #1 0xaaaabaad1b34 in main (/home/ciyan/cpu-sec-bench/test/mts-write-after-free-heap+0x1b34) (BuildId: 5aa2cc7cf6909c3bc88ae16b9295189e0aec1033)
+    #2 0xffffbdb66dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffffbdb66e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaabaad1dac in _start (/home/ciyan/cpu-sec-bench/test/mts-write-after-free-heap+0x1dac) (BuildId: 5aa2cc7cf6909c3bc88ae16b9295189e0aec1033)
+
+previously allocated here:
+    #0 0xffffbe060e98 in operator new(unsigned long) ../../../../src/libsanitizer/hwasan/hwasan_new_delete.cpp:64
+    #1 0xaaaabaad1b10 in main (/home/ciyan/cpu-sec-bench/test/mts-write-after-free-heap+0x1b10) (BuildId: 5aa2cc7cf6909c3bc88ae16b9295189e0aec1033)
+    #2 0xffffbdb66dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffffbdb66e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaabaad1dac in _start (/home/ciyan/cpu-sec-bench/test/mts-write-after-free-heap+0x1dac) (BuildId: 5aa2cc7cf6909c3bc88ae16b9295189e0aec1033)
+
+hwasan_dev_note_heap_rb_distance: 1 1023
+hwasan_dev_note_num_matching_addrs: 0
+hwasan_dev_note_num_matching_addrs_4b: 0
+Thread: T0 0xeffe00002000 stack: [0xffffec36e000,0xffffecb6e000) sz: 8388608 tls: [0xffffbe670020,0xffffbe670ee0)
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffef800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffef900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefa00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffeff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xefdeffff0000:[a0] a0  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0100: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffeff00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xefdeffff0000:[..] ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+  0xefdeffff0100: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: tag-mismatch ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28 in SigTrap<16>
+Test abnormality: mts-write-after-free-heap failed with unexpected exit value 99
+Test abnormality: mts-write-after-free-heap failed with unexpected exit value 99
+
+========== mts-write-after-free-stack =========
+make test/mts-write-after-free-stack
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mts/write-after-free-stack.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-write-after-free-stack 
+
+test/mts-write-after-free-stack
+==7207==ERROR: HWAddressSanitizer: tag-mismatch on address 0xffffd6f3c4b8 at pc 0xffffa3fce42c
+WRITE of size 1 at 0xffffd6f3c4b8 tags: a6/00 (ptr/mem) in thread T0
+    #0 0xffffa3fce42c in SigTrap<16> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28
+    #1 0xffffa3fce42c in CheckAddress<(__hwasan::ErrorAction)0, (__hwasan::AccessType)1, 0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:108
+    #2 0xffffa3fce42c in __hwasan_store1 ../../../../src/libsanitizer/hwasan/hwasan.cpp:487
+    #3 0xaaaad2ab3a58 in update_by_pointer(char*, long long, long long, int, char) (/home/ciyan/cpu-sec-bench/test/mts-write-after-free-stack+0x3a58) (BuildId: 9f1ef17a62bf03fd1b8480cef760c73756315f7d)
+    #4 0xaaaad2ab1b2c in main (/home/ciyan/cpu-sec-bench/test/mts-write-after-free-stack+0x1b2c) (BuildId: 9f1ef17a62bf03fd1b8480cef760c73756315f7d)
+    #5 0xffffa3ad6dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #6 0xffffa3ad6e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #7 0xaaaad2ab1d6c in _start (/home/ciyan/cpu-sec-bench/test/mts-write-after-free-stack+0x1d6c) (BuildId: 9f1ef17a62bf03fd1b8480cef760c73756315f7d)
+
+
+Cause: stack tag-mismatch
+Address 0xffffd6f3c4b8 is located in stack of thread T0
+Thread: T0 0xeffe00002000 stack: [0xffffd673d000,0xffffd6f3d000) sz: 8388608 tls: [0xffffa45e0020,0xffffa45e0ee0)
+Previously allocated frames:
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xffffd6f3bc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd6f3bd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd6f3be00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd6f3bf00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd6f3c000: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd6f3c100: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd6f3c200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd6f3c300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xffffd6f3c400: 00  00  00  00  00  00  00  00  00  00  00 [00] 00  00  00  00 
+  0xffffd6f3c500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd6f3c600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd6f3c700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd6f3c800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd6f3c900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd6f3ca00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd6f3cb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd6f3cc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xffffd6f3c300: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xffffd6f3c400: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. [..] ..  ..  ..  .. 
+  0xffffd6f3c500: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: tag-mismatch ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28 in SigTrap<16>
+Test abnormality: mts-write-after-free-stack failed with unexpected exit value 99
+Test abnormality: mts-write-after-free-stack failed with unexpected exit value 99
+
+========== mts-write-after-reclaim-stack =========
+make test/mts-write-after-reclaim-stack
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mts/write-after-reclaim-stack.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-write-after-reclaim-stack 
+
+test/mts-write-after-reclaim-stack c c
+==7220==ERROR: HWAddressSanitizer: tag-mismatch on address 0xffffd3207a68 at pc 0xffff8a46e42c
+WRITE of size 1 at 0xffffd3207a68 tags: 3c/ae (ptr/mem) in thread T0
+    #0 0xffff8a46e42c in SigTrap<16> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28
+    #1 0xffff8a46e42c in CheckAddress<(__hwasan::ErrorAction)0, (__hwasan::AccessType)1, 0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:108
+    #2 0xffff8a46e42c in __hwasan_store1 ../../../../src/libsanitizer/hwasan/hwasan.cpp:487
+    #3 0xaaaad6c03ad8 in update_by_pointer(char*, long long, long long, int, char) (/home/ciyan/cpu-sec-bench/test/mts-write-after-reclaim-stack+0x3ad8) (BuildId: f6ae6d7caa31b0335cef99dace722ab06e04189e)
+    #4 0xaaaad6c01f48 in helper(bool, char, char) (/home/ciyan/cpu-sec-bench/test/mts-write-after-reclaim-stack+0x1f48) (BuildId: f6ae6d7caa31b0335cef99dace722ab06e04189e)
+    #5 0xaaaad6c01b70 in main (/home/ciyan/cpu-sec-bench/test/mts-write-after-reclaim-stack+0x1b70) (BuildId: f6ae6d7caa31b0335cef99dace722ab06e04189e)
+    #6 0xffff89f76dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #7 0xffff89f76e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #8 0xaaaad6c01dac in _start (/home/ciyan/cpu-sec-bench/test/mts-write-after-reclaim-stack+0x1dac) (BuildId: f6ae6d7caa31b0335cef99dace722ab06e04189e)
+
+
+Cause: stack tag-mismatch
+Address 0xffffd3207a68 is located in stack of thread T0
+Thread: T0 0xeffe00002000 stack: [0xffffd2a09000,0xffffd3209000) sz: 8388608 tls: [0xffff8aa7c020,0xffff8aa7cee0)
+Previously allocated frames:
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xffffd3207200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd3207300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd3207400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd3207500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd3207600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd3207700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd3207800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd3207900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xffffd3207a00: 00  00  00  00  00  00 [ae] ae  ad  00  00  00  00  00  00  00 
+  0xffffd3207b00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd3207c00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd3207d00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd3207e00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd3207f00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd3208000: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd3208100: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffd3208200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xffffd3207900: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xffffd3207a00: ..  ..  ..  ..  ..  .. [..] ..  ..  ..  ..  ..  ..  ..  ..  .. 
+  0xffffd3207b00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: tag-mismatch ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28 in SigTrap<16>
+Test abnormality: mts-write-after-reclaim-stack failed with unexpected exit value 99
+Test abnormality: mts-write-after-reclaim-stack failed with unexpected exit value 99
+
+========== acc-copy-stackra-to-heap-implicit-arith =========
+make test/cfi-jump-func-ra-from-heap-memcpy-implicit-arith
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/jump-func-ra-from-heap-memcpy-implicit-arith.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-jump-func-ra-from-heap-memcpy-implicit-arith 
+cfi/jump-func-ra-from-heap-memcpy-implicit-arith.cpp: In function ‘int main(int, char**)’:
+cfi/jump-func-ra-from-heap-memcpy-implicit-arith.cpp:65:13: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   65 |             if(*(uintptr_t*)addr_buffer == (uintptr_t)global_ra_pos)
+      |             ^~
+cfi/jump-func-ra-from-heap-memcpy-implicit-arith.cpp:67:17: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   67 |                 return 0;
+      |                 ^~~~~~
+
+test/cfi-jump-func-ra-from-heap-memcpy-implicit-arith 2 0 1
+
+========== cfi-call-wrong-func =========
+make test/cfi-call-wrong-func
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-func.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-func 
+
+test/cfi-call-wrong-func 1
+
+========== cfi-call-wrong-func-heap-vtable-child =========
+make test/cfi-call-wrong-func-vtable-child
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-func-vtable-child.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-func-vtable-child 
+
+test/cfi-call-wrong-func-vtable-child
+
+========== cfi-call-wrong-func-heap-vtable-offset =========
+make test/cfi-call-wrong-func-vtable-offset
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-func-vtable-offset.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-func-vtable-offset 
+
+test/cfi-call-wrong-func-vtable-offset 0
+
+========== cfi-call-wrong-func-heap-vtable-parent =========
+make test/cfi-call-wrong-func-vtable-parent
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-func-vtable-parent.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-func-vtable-parent 
+
+test/cfi-call-wrong-func-vtable-parent
+
+========== cfi-call-wrong-func-heap-vtable-sibling =========
+make test/cfi-call-wrong-func-vtable-sibling
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-func-vtable-sibling.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-func-vtable-sibling 
+
+test/cfi-call-wrong-func-vtable-sibling
+
+========== cfi-call-wrong-func-vtable =========
+make test/cfi-call-wrong-func-vtable
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-func-vtable.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-func-vtable 
+
+test/cfi-call-wrong-func-vtable
+
+========== cfi-call-wrong-func-vtable-released =========
+make test/cfi-call-wrong-func-vtable-released
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-func-vtable-released.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-func-vtable-released 
+
+test/cfi-call-wrong-func-vtable-released
+
+========== cfi-call-wrong-num-arg-vtable =========
+make test/cfi-call-wrong-num-arg-vtable
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-num-arg-vtable.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-num-arg-vtable 
+
+test/cfi-call-wrong-num-arg-vtable
+
+========== cfi-call-wrong-num-func-vtable =========
+make test/cfi-call-wrong-num-func-vtable
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-num-func-vtable.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-num-func-vtable 
+
+test/cfi-call-wrong-num-func-vtable
+
+========== cfi-call-wrong-num-func-vtable-data =========
+make test/cfi-call-wrong-num-func-vtable-data
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-num-func-vtable-data.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-num-func-vtable-data 
+
+test/cfi-call-wrong-num-func-vtable-data
+
+========== cfi-call-wrong-num-func-vtable-heap =========
+make test/cfi-call-wrong-num-func-vtable-heap
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-num-func-vtable-heap.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-num-func-vtable-heap 
+
+test/cfi-call-wrong-num-func-vtable-heap
+
+========== cfi-call-wrong-num-func-vtable-stack =========
+make test/cfi-call-wrong-num-func-vtable-stack
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/call-wrong-num-func-vtable-stack.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-num-func-vtable-stack 
+
+test/cfi-call-wrong-num-func-vtable-stack
+
+========== cfi-jump-func-ra-from-heap-memcpy-implicit-arith =========
+make test/cfi-jump-func-ra-from-heap-memcpy-implicit-arith
+make: 'test/cfi-jump-func-ra-from-heap-memcpy-implicit-arith' is up to date.
+
+test/cfi-jump-func-ra-from-heap-memcpy-implicit-arith 2 0 2
+HWAddressSanitizer:DEADLYSIGNAL
+==7397==ERROR: HWAddressSanitizer: SEGV on unknown address 0x000000000032 (pc 0xaaaac8ea2304 bp 0xffffebbc7e70 sp 0xffffebbc7e70 T7397)
+==7397==The signal is caused by a READ memory access.
+==7397==Hint: address points to the zero page.
+    #0 0xaaaac8ea2304 in ra_target_func(void*, int) (/home/ciyan/cpu-sec-bench/test/cfi-jump-func-ra-from-heap-memcpy-implicit-arith+0x2304) (BuildId: 384dd577957aeeff41b8de2ff1139ac13d452df7)
+    #1 0xffffa9516dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #2 0xaaaac8ea1bbc  (/home/ciyan/cpu-sec-bench/test/cfi-jump-func-ra-from-heap-memcpy-implicit-arith+0x1bbc) (BuildId: 384dd577957aeeff41b8de2ff1139ac13d452df7)
+
+HWAddressSanitizer can not provide additional info.
+SUMMARY: HWAddressSanitizer: SEGV (/home/ciyan/cpu-sec-bench/test/cfi-jump-func-ra-from-heap-memcpy-implicit-arith+0x2304) (BuildId: 384dd577957aeeff41b8de2ff1139ac13d452df7) in ra_target_func(void*, int)
+==7397==ABORTING
+Test abnormality: cfi-jump-func-ra-from-heap-memcpy-implicit-arith failed with unexpected exit value 99
+Test abnormality: cfi-jump-func-ra-from-heap-memcpy-implicit-arith failed with unexpected exit value 99
+
+========== cfi-jump-instruction-in-data =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 2 1 0
+
+========== cfi-jump-instruction-in-heap =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 2 3 0
+
+========== cfi-jump-instruction-in-rodata =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 2 0 0
+
+========== cfi-jump-instruction-in-stack =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 2 2 0
+
+========== cfi-return-to-wrong-call-site =========
+make test/cfi-return-to-wrong-call-site
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/return-to-wrong-call-site.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-return-to-wrong-call-site 
+
+test/cfi-return-to-wrong-call-site 2
+
+========== cpi-func-pointer-arithmetic =========
+make test/cpi-func-pointer-arithmetic
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cpi/func-pointer-arithmetic.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cpi-func-pointer-arithmetic  
+
+test/cpi-func-pointer-arithmetic
+
+========== mss-overflow-write-cross-object-index-data =========
+make test/mss-write-cross-object-by-index
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/write-cross-object-by-index.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-object-by-index 
+
+test/mss-write-cross-object-by-index 2 0
+
+========== mss-overflow-write-cross-object-index-heap =========
+make test/mss-write-cross-object-by-index
+make: 'test/mss-write-cross-object-by-index' is up to date.
+
+test/mss-write-cross-object-by-index 1 0
+
+========== mss-overflow-write-cross-object-index-stack =========
+make test/mss-write-cross-object-by-index
+make: 'test/mss-write-cross-object-by-index' is up to date.
+
+test/mss-write-cross-object-by-index 0 0
+
+========== mss-overflow-write-cross-object-ptr-data =========
+make test/mss-write-cross-object-by-pointer
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/write-cross-object-by-pointer.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-object-by-pointer 
+
+test/mss-write-cross-object-by-pointer 2 0
+
+========== mss-overflow-write-cross-object-ptr-heap =========
+make test/mss-write-cross-object-by-pointer
+make: 'test/mss-write-cross-object-by-pointer' is up to date.
+
+test/mss-write-cross-object-by-pointer 1 0
+
+========== mss-overflow-write-cross-object-ptr-stack =========
+make test/mss-write-cross-object-by-pointer
+make: 'test/mss-write-cross-object-by-pointer' is up to date.
+
+test/mss-write-cross-object-by-pointer 0 0
+
+========== mss-read-cross-frame-index =========
+make test/mss-read-cross-frame-by-index
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/read-cross-frame-by-index.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-frame-by-index 
+mss/read-cross-frame-by-index.cpp: In function ‘int helper(const char*)’:
+mss/read-cross-frame-by-index.cpp:10:23: warning: ‘dummy’ may be used uninitialized [-Wmaybe-uninitialized]
+   10 |   return read_by_index(dummy, delta, 7, 1, 'd');
+      |          ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from mss/read-cross-frame-by-index.cpp:1:
+./lib/include/mss.hpp:109:12: note: by argument 1 of type ‘const charBuffer&’ to ‘int read_by_index(const charBuffer&, long long int, long long int, int, char)’ declared here
+  109 | extern int read_by_index(const charBuffer& cb, long long offset, long long size, int step, char c);
+      |            ^~~~~~~~~~~~~
+mss/read-cross-frame-by-index.cpp:8:14: note: ‘dummy’ declared here
+    8 |   charBuffer dummy;
+      |              ^~~~~
+
+test/mss-read-cross-frame-by-index
+
+========== mss-read-cross-frame-ptr =========
+make test/mss-read-cross-frame-by-pointer
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/read-cross-frame-by-pointer.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-frame-by-pointer 
+mss/read-cross-frame-by-pointer.cpp: In function ‘int helper(const char*)’:
+mss/read-cross-frame-by-pointer.cpp:10:25: warning: ‘dummy’ may be used uninitialized [-Wmaybe-uninitialized]
+   10 |   return read_by_pointer(dummy.data, delta, 7, 1, 'd');
+      |          ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from mss/read-cross-frame-by-pointer.cpp:1:
+./lib/include/mss.hpp:112:5: note: by argument 1 of type ‘const char*’ to ‘int read_by_pointer(const T*, long long int, long long int, int, T) [with T = char]’ declared here
+  112 | int read_by_pointer(const T *buf, long long offset, long long size, int step, T c) {
+      |     ^~~~~~~~~~~~~~~
+mss/read-cross-frame-by-pointer.cpp:8:14: note: ‘dummy’ declared here
+    8 |   charBuffer dummy;
+      |              ^~~~~
+
+test/mss-read-cross-frame-by-pointer
+
+========== mss-read-cross-object-index-data =========
+make test/mss-read-cross-object-by-index
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/read-cross-object-by-index.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-object-by-index 
+
+test/mss-read-cross-object-by-index 2
+
+========== mss-read-cross-object-index-heap =========
+make test/mss-read-cross-object-by-index
+make: 'test/mss-read-cross-object-by-index' is up to date.
+
+test/mss-read-cross-object-by-index 1
+
+========== mss-read-cross-object-index-rodata =========
+make test/mss-read-cross-object-by-index
+make: 'test/mss-read-cross-object-by-index' is up to date.
+
+test/mss-read-cross-object-by-index 3
+
+========== mss-read-cross-object-index-stack =========
+make test/mss-read-cross-object-by-index
+make: 'test/mss-read-cross-object-by-index' is up to date.
+
+test/mss-read-cross-object-by-index 0
+
+========== mss-read-cross-object-ptr-data =========
+make test/mss-read-cross-object-by-pointer
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/read-cross-object-by-pointer.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-object-by-pointer 
+
+test/mss-read-cross-object-by-pointer 2
+
+========== mss-read-cross-object-ptr-heap =========
+make test/mss-read-cross-object-by-pointer
+make: 'test/mss-read-cross-object-by-pointer' is up to date.
+
+test/mss-read-cross-object-by-pointer 1
+
+========== mss-read-cross-object-ptr-rodata =========
+make test/mss-read-cross-object-by-pointer
+make: 'test/mss-read-cross-object-by-pointer' is up to date.
+
+test/mss-read-cross-object-by-pointer 3
+
+========== mss-read-cross-object-ptr-stack =========
+make test/mss-read-cross-object-by-pointer
+make: 'test/mss-read-cross-object-by-pointer' is up to date.
+
+test/mss-read-cross-object-by-pointer 0
+
+========== mss-read-cross-page-index-stack =========
+make test/mss-read-cross-page-by-index-in-stack
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/read-cross-page-by-index-in-stack.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-page-by-index-in-stack 
+mss/read-cross-page-by-index-in-stack.cpp: In function ‘int helper(const char*, int)’:
+mss/read-cross-page-by-index-in-stack.cpp:11:25: warning: ‘dummy’ may be used uninitialized [-Wmaybe-uninitialized]
+   11 |     return read_by_index(dummy, delta, 7, 1, 'm');
+      |            ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from mss/read-cross-page-by-index-in-stack.cpp:1:
+./lib/include/mss.hpp:109:12: note: by argument 1 of type ‘const charBuffer&’ to ‘int read_by_index(const charBuffer&, long long int, long long int, int, char)’ declared here
+  109 | extern int read_by_index(const charBuffer& cb, long long offset, long long size, int step, char c);
+      |            ^~~~~~~~~~~~~
+mss/read-cross-page-by-index-in-stack.cpp:6:14: note: ‘dummy’ declared here
+    6 |   charBuffer dummy;
+      |              ^~~~~
+
+test/mss-read-cross-page-by-index-in-stack
+
+========== mss-read-cross-page-ptr-stack =========
+make test/mss-read-cross-page-by-pointer-in-stack
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/read-cross-page-by-pointer-in-stack.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-page-by-pointer-in-stack 
+mss/read-cross-page-by-pointer-in-stack.cpp: In function ‘int helper(const char*, int)’:
+mss/read-cross-page-by-pointer-in-stack.cpp:11:27: warning: ‘dummy’ may be used uninitialized [-Wmaybe-uninitialized]
+   11 |     return read_by_pointer(dummy.data, delta, 7, 1, 'm');
+      |            ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from mss/read-cross-page-by-pointer-in-stack.cpp:1:
+./lib/include/mss.hpp:112:5: note: by argument 1 of type ‘const char*’ to ‘int read_by_pointer(const T*, long long int, long long int, int, T) [with T = char]’ declared here
+  112 | int read_by_pointer(const T *buf, long long offset, long long size, int step, T c) {
+      |     ^~~~~~~~~~~~~~~
+mss/read-cross-page-by-pointer-in-stack.cpp:6:14: note: ‘dummy’ declared here
+    6 |   charBuffer dummy;
+      |              ^~~~~
+
+test/mss-read-cross-page-by-pointer-in-stack
+
+========== mss-read-cross-segment-data-to-heap-index =========
+make test/mss-read-cross-segment
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/read-cross-segment.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-segment 
+mss/read-cross-segment.cpp: In function ‘int main(int, char**)’:
+mss/read-cross-segment.cpp:41:7: warning: ‘rv’ may be used uninitialized [-Wmaybe-uninitialized]
+   41 |   int rv;
+      |       ^~
+mss/read-cross-segment.cpp:51:25: warning: ‘tc’ may be used uninitialized [-Wmaybe-uninitialized]
+   51 |     rv = read_by_pointer(psrc, distance, 7, 1, tc);
+      |          ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+mss/read-cross-segment.cpp:23:8: note: ‘tc’ was declared here
+   23 |   char tc;
+      |        ^~
+
+test/mss-read-cross-segment 2 1 0
+
+========== mss-read-cross-segment-data-to-heap-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 1 1
+
+========== mss-read-cross-segment-data-to-rodata-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 3 0
+
+========== mss-read-cross-segment-data-to-rodata-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 3 1
+
+========== mss-read-cross-segment-data-to-stack-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 0 0
+
+========== mss-read-cross-segment-data-to-stack-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 0 1
+
+========== mss-read-cross-segment-heap-to-data-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 2 0
+
+========== mss-read-cross-segment-heap-to-data-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 2 1
+
+========== mss-read-cross-segment-heap-to-rodata-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 3 0
+
+========== mss-read-cross-segment-heap-to-rodata-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 3 1
+
+========== mss-read-cross-segment-heap-to-stack-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 0 0
+
+========== mss-read-cross-segment-heap-to-stack-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 0 1
+
+========== mss-read-cross-segment-rodata-to-data-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 2 0
+
+========== mss-read-cross-segment-rodata-to-data-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 2 1
+
+========== mss-read-cross-segment-rodata-to-heap-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 1 0
+
+========== mss-read-cross-segment-rodata-to-heap-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 1 1
+
+========== mss-read-cross-segment-rodata-to-stack-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 0 0
+
+========== mss-read-cross-segment-rodata-to-stack-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 0 1
+
+========== mss-read-cross-segment-stack-to-data-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 2 0
+
+========== mss-read-cross-segment-stack-to-data-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 2 1
+
+========== mss-read-cross-segment-stack-to-heap-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 1 0
+
+========== mss-read-cross-segment-stack-to-heap-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 1 1
+
+========== mss-read-cross-segment-stack-to-rodata-index =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 3 0
+
+========== mss-read-cross-segment-stack-to-rodata-ptr =========
+make test/mss-read-cross-segment
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 3 1
+
+========== mss-spray-cross-frame =========
+make test/mss-spray-cross-frame
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/spray-cross-frame.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-spray-cross-frame 
+
+test/mss-spray-cross-frame
+==7849==ERROR: HWAddressSanitizer: tag-mismatch on address 0xffffeab63540 at pc 0xffffb942e42c
+WRITE of size 1 at 0xffffeab63540 tags: 4d/4c (ptr/mem) in thread T0
+    #0 0xffffb942e42c in SigTrap<16> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28
+    #1 0xffffb942e42c in CheckAddress<(__hwasan::ErrorAction)0, (__hwasan::AccessType)1, 0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:108
+    #2 0xffffb942e42c in __hwasan_store1 ../../../../src/libsanitizer/hwasan/hwasan.cpp:487
+    #3 0xaaaae40d39dc in update_by_index(charBuffer&, long long, long long, int, char) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-frame+0x39dc) (BuildId: 854d7e2b081d638e645477080326a453cf96a285)
+    #4 0xaaaae40d1f20 in helper(char const*) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-frame+0x1f20) (BuildId: 854d7e2b081d638e645477080326a453cf96a285)
+    #5 0xaaaae40d1b74 in main (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-frame+0x1b74) (BuildId: 854d7e2b081d638e645477080326a453cf96a285)
+    #6 0xffffb8f36dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #7 0xffffb8f36e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #8 0xaaaae40d1dac in _start (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-frame+0x1dac) (BuildId: 854d7e2b081d638e645477080326a453cf96a285)
+
+
+Cause: stack tag-mismatch
+Address 0xffffeab63540 is located in stack of thread T0
+Thread: T0 0xeffe00002000 stack: [0xffffea364000,0xffffeab64000) sz: 8388608 tls: [0xffffb9a41020,0xffffb9a41ee0)
+Previously allocated frames:
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xffffeab62d00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffeab62e00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffeab62f00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffeab63000: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffeab63100: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffeab63200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffeab63300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffeab63400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xffffeab63500: 00  00  4d  4d [4c] 00  00  e3  e3  e2  00  00  00  00  00  00 
+  0xffffeab63600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffeab63700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffeab63800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffeab63900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffeab63a00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffeab63b00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffeab63c00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffeab63d00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xffffeab63400: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xffffeab63500: ..  ..  ..  .. [..] ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+  0xffffeab63600: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: tag-mismatch ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28 in SigTrap<16>
+Test abnormality: mss-spray-cross-frame failed with unexpected exit value 99
+Test abnormality: mss-spray-cross-frame failed with unexpected exit value 99
+
+========== mss-spray-cross-page-stack =========
+make test/mss-spray-cross-page-in-stack
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/spray-cross-page-in-stack.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-spray-cross-page-in-stack 
+mss/spray-cross-page-in-stack.cpp: In function ‘void helper(const char*, int)’:
+mss/spray-cross-page-in-stack.cpp:5:21: warning: infinite recursion detected [-Winfinite-recursion]
+    5 | void FORCE_NOINLINE helper(const char* b, int level) {
+      |                     ^~~~~~
+mss/spray-cross-page-in-stack.cpp:9:11: note: recursive call
+    9 |     helper(b, level-1);
+      |     ~~~~~~^~~~~~~~~~~~
+
+test/mss-spray-cross-page-in-stack
+==7862==ERROR: HWAddressSanitizer: tag-mismatch on address 0xfffff5435be0 at pc 0xffff82d7e42c
+WRITE of size 1 at 0xfffff5435be0 tags: ef/ee (ptr/mem) in thread T0
+    #0 0xffff82d7e42c in SigTrap<16> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28
+    #1 0xffff82d7e42c in CheckAddress<(__hwasan::ErrorAction)0, (__hwasan::AccessType)1, 0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:108
+    #2 0xffff82d7e42c in __hwasan_store1 ../../../../src/libsanitizer/hwasan/hwasan.cpp:487
+    #3 0xaaaabf023b68 in update_by_pointer(char*, long long, long long, int, char) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x3b68) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #4 0xaaaabf022038 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x2038) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #5 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #6 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #7 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #8 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #9 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #10 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #11 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #12 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #13 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #14 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #15 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #16 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #17 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #18 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #19 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #20 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #21 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #22 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #23 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #24 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #25 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #26 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #27 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #28 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #29 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #30 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #31 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #32 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #33 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #34 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #35 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #36 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #37 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #38 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #39 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #40 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #41 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #42 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #43 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #44 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #45 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #46 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #47 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #48 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #49 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #50 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #51 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #52 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #53 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #54 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #55 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #56 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #57 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #58 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #59 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #60 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #61 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #62 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #63 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #64 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #65 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #66 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #67 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #68 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #69 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #70 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #71 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #72 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #73 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #74 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #75 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #76 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #77 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #78 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #79 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #80 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #81 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #82 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #83 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #84 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #85 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #86 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #87 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #88 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #89 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #90 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #91 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #92 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #93 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #94 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #95 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #96 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #97 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #98 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #99 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #100 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #101 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #102 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #103 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #104 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #105 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #106 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #107 0xaaaabf021fd0 in helper(char const*, int) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1fd0) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #108 0xaaaabf021bdc in main (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1bdc) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+    #109 0xffff82886dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #110 0xffff82886e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #111 0xaaaabf021e6c in _start (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-page-in-stack+0x1e6c) (BuildId: e92485ec169d19908ed3e26021b6b40d56673c16)
+
+
+Cause: stack tag-mismatch
+Address 0xfffff5435be0 is located in stack of thread T0
+Thread: T0 0xeffe00002000 stack: [0xfffff4c3a000,0xfffff543a000) sz: 8388608 tls: [0xffff8338d020,0xffff8338dee0)
+Previously allocated frames:
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xfffff5435300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff5435400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff5435500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff5435600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff5435700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff5435800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff5435900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff5435a00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xfffff5435b00: 00  00  00  00  00  00  00  00  00  00  00  00  ef  ef [ee] 00 
+  0xfffff5435c00: 00  00  00  ed  ed  ec  00  00  00  00  ae  ae  ad  00  00  00 
+  0xfffff5435d00: 00  79  79  78  00  00  00  00  f8  f8  f7  00  00  00  00  14 
+  0xfffff5435e00: 14  13  00  00  00  00  b7  b7  b6  00  00  00  00  13  13  12 
+  0xfffff5435f00: 00  00  00  00  e3  e3  e2  00  00  00  00  60  60  5f  00  00 
+  0xfffff5436000: 00  00  5d  5d  5c  00  00  00  00  0a  0a  09  00  00  00  00 
+  0xfffff5436100: 96  96  95  00  00  00  00  1a  1a  19  00  00  00  00  b2  b2 
+  0xfffff5436200: b1  00  00  00  00  57  57  56  00  00  00  00  86  86  85  00 
+  0xfffff5436300: 00  00  00  38  38  37  00  00  00  00  ab  ab  aa  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xfffff5435a00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xfffff5435b00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. [..] .. 
+  0xfffff5435c00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: tag-mismatch ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28 in SigTrap<16>
+Test abnormality: mss-spray-cross-page-stack failed with unexpected exit value 99
+Test abnormality: mss-spray-cross-page-stack failed with unexpected exit value 99
+
+========== mss-underflow-write-cross-object-index-data =========
+make test/mss-write-cross-object-by-index
+make: 'test/mss-write-cross-object-by-index' is up to date.
+
+test/mss-write-cross-object-by-index 2 1
+
+========== mss-underflow-write-cross-object-index-heap =========
+make test/mss-write-cross-object-by-index
+make: 'test/mss-write-cross-object-by-index' is up to date.
+
+test/mss-write-cross-object-by-index 1 1
+
+========== mss-underflow-write-cross-object-index-stack =========
+make test/mss-write-cross-object-by-index
+make: 'test/mss-write-cross-object-by-index' is up to date.
+
+test/mss-write-cross-object-by-index 0 1
+
+========== mss-underflow-write-cross-object-ptr-data =========
+make test/mss-write-cross-object-by-pointer
+make: 'test/mss-write-cross-object-by-pointer' is up to date.
+
+test/mss-write-cross-object-by-pointer 2 1
+
+========== mss-underflow-write-cross-object-ptr-heap =========
+make test/mss-write-cross-object-by-pointer
+make: 'test/mss-write-cross-object-by-pointer' is up to date.
+
+test/mss-write-cross-object-by-pointer 1 1
+
+========== mss-underflow-write-cross-object-ptr-stack =========
+make test/mss-write-cross-object-by-pointer
+make: 'test/mss-write-cross-object-by-pointer' is up to date.
+
+test/mss-write-cross-object-by-pointer 0 1
+
+========== mts-access-after-reclaim-stack =========
+make test/mts-access-after-reclaim-stack
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mts/access-after-reclaim-stack.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-access-after-reclaim-stack 
+mts/access-after-reclaim-stack.cpp: In function ‘int helper(bool)’:
+mts/access-after-reclaim-stack.cpp:9:17: warning: ‘buffer’ may be used uninitialized [-Wmaybe-uninitialized]
+    9 |     return check(buffer.data, 7,  1, 'd');
+      |            ~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from mts/access-after-reclaim-stack.cpp:2:
+./lib/include/mss.hpp:120:5: note: by argument 1 of type ‘const char*’ to ‘int check(const T*, int, int, T) [with T = char]’ declared here
+  120 | int check(const T *buf, int size, int step, T c) {
+      |     ^~~~~
+mts/access-after-reclaim-stack.cpp:7:14: note: ‘buffer’ declared here
+    7 |   charBuffer buffer;
+      |              ^~~~~~
+
+test/mts-access-after-reclaim-stack
+
+========== acc-copy-stackra-to-heap-explicit-arith =========
+make test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/jump-func-ra-from-heap-memcpy-explicit-arith.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith 
+
+test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith 2 1
+==7936==ERROR: HWAddressSanitizer: tag-mismatch on address 0xffffe4272d50 at pc 0xffff82a6df54
+READ of size 128 at 0xffffe4272d50 tags: c3/c2 (ptr/mem) in thread T0
+Invalid access starting at offset 16
+    #0 0xffff82a6df54 in SigTrap<15> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:61
+    #1 0xffff82a6df54 in CheckAddressSized<(__hwasan::ErrorAction)0, (__hwasan::AccessType)0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:136
+    #2 0xffff82a6df54 in __hwasan_loadN ../../../../src/libsanitizer/hwasan/hwasan.cpp:446
+    #3 0xaaaaea3c2038 in helper(void*, void*) (/home/ciyan/cpu-sec-bench/test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith+0x2038) (BuildId: 50d6dbc42c09b0e61f30862a745bdc1da4908274)
+    #4 0xaaaaea3c213c in ra_target_func(void*, int) (/home/ciyan/cpu-sec-bench/test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith+0x213c) (BuildId: 50d6dbc42c09b0e61f30862a745bdc1da4908274)
+    #5 0xaaaaea3c1bec in main (/home/ciyan/cpu-sec-bench/test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith+0x1bec) (BuildId: 50d6dbc42c09b0e61f30862a745bdc1da4908274)
+    #6 0xffff82546dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #7 0xffff82546e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #8 0xaaaaea3c1eac in _start (/home/ciyan/cpu-sec-bench/test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith+0x1eac) (BuildId: 50d6dbc42c09b0e61f30862a745bdc1da4908274)
+
+
+Cause: stack tag-mismatch
+Address 0xffffe4272d50 is located in stack of thread T0
+Thread: T0 0xeffe00002000 stack: [0xffffe3a74000,0xffffe4274000) sz: 8388608 tls: [0xffff83075020,0xffff83075ee0)
+Previously allocated frames:
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xffffe4272500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffe4272600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffe4272700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffe4272800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffe4272900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffe4272a00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffe4272b00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffe4272c00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xffffe4272d00: 00  00  00  00  00  c3 [c2] 00  00  00  00  00  00  00  00  00 
+  0xffffe4272e00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffe4272f00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffe4273000: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffe4273100: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffe4273200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffe4273300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffe4273400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffe4273500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xffffe4272c00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xffffe4272d00: ..  ..  ..  ..  ..  .. [..] ..  ..  ..  ..  ..  ..  ..  ..  .. 
+  0xffffe4272e00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: tag-mismatch ../../../../src/libsanitizer/hwasan/hwasan_checks.h:61 in SigTrap<15>
+Test abnormality: acc-copy-stackra-to-heap-explicit-arith failed with unexpected exit value 99
+Test abnormality: acc-copy-stackra-to-heap-explicit-arith failed with unexpected exit value 99
+
+========== cfi-jump-func-ra-from-heap-memcpy-explicit-arith =========
+make test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith
+make: 'test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith' is up to date.
+
+test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith 2 2
+==7944==ERROR: HWAddressSanitizer: tag-mismatch on address 0xfffff21c0540 at pc 0xffff9f85df54
+READ of size 128 at 0xfffff21c0540 tags: 74/73 (ptr/mem) in thread T0
+Invalid access starting at offset 16
+    #0 0xffff9f85df54 in SigTrap<15> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:61
+    #1 0xffff9f85df54 in CheckAddressSized<(__hwasan::ErrorAction)0, (__hwasan::AccessType)0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:136
+    #2 0xffff9f85df54 in __hwasan_loadN ../../../../src/libsanitizer/hwasan/hwasan.cpp:446
+    #3 0xaaaacf3d2038 in helper(void*, void*) (/home/ciyan/cpu-sec-bench/test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith+0x2038) (BuildId: 50d6dbc42c09b0e61f30862a745bdc1da4908274)
+    #4 0xaaaacf3d213c in ra_target_func(void*, int) (/home/ciyan/cpu-sec-bench/test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith+0x213c) (BuildId: 50d6dbc42c09b0e61f30862a745bdc1da4908274)
+    #5 0xaaaacf3d1bec in main (/home/ciyan/cpu-sec-bench/test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith+0x1bec) (BuildId: 50d6dbc42c09b0e61f30862a745bdc1da4908274)
+    #6 0xffff9f336dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #7 0xffff9f336e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #8 0xaaaacf3d1eac in _start (/home/ciyan/cpu-sec-bench/test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith+0x1eac) (BuildId: 50d6dbc42c09b0e61f30862a745bdc1da4908274)
+
+
+Cause: stack tag-mismatch
+Address 0xfffff21c0540 is located in stack of thread T0
+Thread: T0 0xeffe00002000 stack: [0xfffff19c1000,0xfffff21c1000) sz: 8388608 tls: [0xffff9fe6b020,0xffff9fe6bee0)
+Previously allocated frames:
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xfffff21bfd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff21bfe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff21bff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff21c0000: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff21c0100: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff21c0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff21c0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff21c0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xfffff21c0500: 00  00  00  00  74 [73] 00  00  00  00  00  00  00  00  00  00 
+  0xfffff21c0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff21c0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff21c0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff21c0900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff21c0a00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff21c0b00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff21c0c00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xfffff21c0d00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xfffff21c0400: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xfffff21c0500: ..  ..  ..  ..  .. [..] ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+  0xfffff21c0600: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: tag-mismatch ../../../../src/libsanitizer/hwasan/hwasan_checks.h:61 in SigTrap<15>
+Test abnormality: cfi-jump-func-ra-from-heap-memcpy-explicit-arith failed with unexpected exit value 99
+Test abnormality: cfi-jump-func-ra-from-heap-memcpy-explicit-arith failed with unexpected exit value 99
+
+========== cfi-return-to-func =========
+make test/cfi-return-to-func
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/return-to-func.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-return-to-func 
+
+test/cfi-return-to-func 2
+
+========== cfi-return-to-non-call-site =========
+make test/cfi-return-to-non-call-site
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/return-to-non-call-site.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-return-to-non-call-site 
+
+test/cfi-return-to-non-call-site 2
+
+========== mss-spray-cross-object-data =========
+make test/mss-spray-cross-object
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress mss/spray-cross-object.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-spray-cross-object 
+
+test/mss-spray-cross-object 2
+
+========== mss-spray-cross-object-heap =========
+make test/mss-spray-cross-object
+make: 'test/mss-spray-cross-object' is up to date.
+
+test/mss-spray-cross-object 1
+==7991==ERROR: HWAddressSanitizer: tag-mismatch on address 0xefdeffff0018 at pc 0xffffb525e42c
+WRITE of size 1 at 0xefdeffff0018 tags: b9/08(b9) (ptr/mem) in thread T0
+    #0 0xffffb525e42c in SigTrap<16> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28
+    #1 0xffffb525e42c in CheckAddress<(__hwasan::ErrorAction)0, (__hwasan::AccessType)1, 0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:108
+    #2 0xffffb525e42c in __hwasan_store1 ../../../../src/libsanitizer/hwasan/hwasan.cpp:487
+    #3 0xaaaab7b13be8 in update_by_pointer(char*, long long, long long, int, char) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-object+0x3be8) (BuildId: f6589dfb57c5e7039c2390d6f7899f2913981da1)
+    #4 0xaaaab7b11c3c in main (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-object+0x1c3c) (BuildId: f6589dfb57c5e7039c2390d6f7899f2913981da1)
+    #5 0xffffb4d66dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #6 0xffffb4d66e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #7 0xaaaab7b11fec in _start (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-object+0x1fec) (BuildId: f6589dfb57c5e7039c2390d6f7899f2913981da1)
+
+[0xefdeffff0000,0xefdeffff0020) is a small allocated heap chunk; size: 32 offset: 24
+
+Cause: heap-buffer-overflow
+0xefdeffff0018 is located 0 bytes after a 24-byte region [0xefdeffff0000,0xefdeffff0018)
+allocated here:
+    #0 0xffffb5260e98 in operator new(unsigned long) ../../../../src/libsanitizer/hwasan/hwasan_new_delete.cpp:64
+    #1 0xaaaab7b11ba4 in main (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-object+0x1ba4) (BuildId: f6589dfb57c5e7039c2390d6f7899f2913981da1)
+    #2 0xffffb4d66dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #3 0xffffb4d66e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0xaaaab7b11fec in _start (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-object+0x1fec) (BuildId: f6589dfb57c5e7039c2390d6f7899f2913981da1)
+
+Thread: T0 0xeffe00002000 stack: [0xffffe9be6000,0xffffea3e6000) sz: 8388608 tls: [0xffffb5871020,0xffffb5871ee0)
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffef800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffef900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefa00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffefe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdefffeff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xefdeffff0000: b9 [08] d7  08  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0100: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xefdeffff0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xefdefffeff00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xefdeffff0000: .. [b9] ..  d7  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+  0xefdeffff0100: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: tag-mismatch ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28 in SigTrap<16>
+Test abnormality: mss-spray-cross-object-heap failed with unexpected exit value 99
+Test abnormality: mss-spray-cross-object-heap failed with unexpected exit value 99
+
+========== mss-spray-cross-object-stack =========
+make test/mss-spray-cross-object
+make: 'test/mss-spray-cross-object' is up to date.
+
+test/mss-spray-cross-object 0
+==8000==ERROR: HWAddressSanitizer: tag-mismatch on address 0xffffc476bac0 at pc 0xffff9f4be42c
+WRITE of size 1 at 0xffffc476bac0 tags: 83/82 (ptr/mem) in thread T0
+    #0 0xffff9f4be42c in SigTrap<16> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28
+    #1 0xffff9f4be42c in CheckAddress<(__hwasan::ErrorAction)0, (__hwasan::AccessType)1, 0> ../../../../src/libsanitizer/hwasan/hwasan_checks.h:108
+    #2 0xffff9f4be42c in __hwasan_store1 ../../../../src/libsanitizer/hwasan/hwasan.cpp:487
+    #3 0xaaaab00d3be8 in update_by_pointer(char*, long long, long long, int, char) (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-object+0x3be8) (BuildId: f6589dfb57c5e7039c2390d6f7899f2913981da1)
+    #4 0xaaaab00d1ce8 in main (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-object+0x1ce8) (BuildId: f6589dfb57c5e7039c2390d6f7899f2913981da1)
+    #5 0xffff9efc6dbc in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58
+    #6 0xffff9efc6e94 in __libc_start_main_impl ../csu/libc-start.c:360
+    #7 0xaaaab00d1fec in _start (/home/ciyan/cpu-sec-bench/test/mss-spray-cross-object+0x1fec) (BuildId: f6589dfb57c5e7039c2390d6f7899f2913981da1)
+
+
+Cause: stack tag-mismatch
+Address 0xffffc476bac0 is located in stack of thread T0
+Thread: T0 0xeffe00002000 stack: [0xffffc3f6d000,0xffffc476d000) sz: 8388608 tls: [0xffff9fac3020,0xffff9fac3ee0)
+Previously allocated frames:
+Memory tags around the buggy address (one tag corresponds to 16 bytes):
+  0xffffc476b200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffc476b300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffc476b400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffc476b500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffc476b600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffc476b700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffc476b800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffc476b900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+=>0xffffc476ba00: 00  00  00  00  00  00  00  00  84  84  83  83 [82] 00  00  00 
+  0xffffc476bb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffc476bc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffc476bd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffc476be00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffc476bf00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffc476c000: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffc476c100: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+  0xffffc476c200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 
+Tags for short granules around the buggy address (one tag corresponds to 16 bytes):
+  0xffffc476b900: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+=>0xffffc476ba00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. [..] ..  ..  .. 
+  0xffffc476bb00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. 
+See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags
+SUMMARY: HWAddressSanitizer: tag-mismatch ../../../../src/libsanitizer/hwasan/hwasan_checks.h:28 in SigTrap<16>
+Test abnormality: mss-spray-cross-object-stack failed with unexpected exit value 99
+Test abnormality: mss-spray-cross-object-stack failed with unexpected exit value 99
+
+========== cfi-return-to-instruction-in-data =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 0 1 2
+
+========== cfi-return-to-instruction-in-heap =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 0 3 2
+
+========== cfi-return-to-instruction-in-rodata =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 0 0 2
+
+========== cfi-return-to-instruction-in-stack =========
+make test/cfi-code-injection
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 0 2 2
+
+========== cfi-return-to-libc =========
+make test/cfi-return-to-libc
+g++ -O2 -I./lib -std=c++11 -Wall -march=armv8.5-a+memtag -fsanitize=hwaddress cfi/return-to-libc.cpp lib/common/global_var.o lib/common/temp_file.o lib/aarch64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-return-to-libc 
+
+test/cfi-return-to-libc 2
