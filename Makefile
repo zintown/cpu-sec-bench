@@ -14,7 +14,7 @@ else
 endif
 
 # set variables
-OPT_LEVEL       ?= O2
+OPT_LEVEL       ?= Od
 
 # extra security features (comment them out if not needed)
 
@@ -27,20 +27,22 @@ OPT_LEVEL       ?= O2
 #enable_aslr_protection         = yes
 #disable_aslr_protection        = yes
 #enable_cet_shadow_stack        = yes
+#enable_address_sanitizer       = yes
+enable_control_flow_protection = yes
+#disable_control_flow_protection= yes
 
 # common option in Linux
 #enable_got_protection          = yes
 #disable_got_protection         = yes
 #enable_vtable_verify           = yes
 #disable_vtable_verify          = yes
-#enable_control_flow_protection = yes
-#disable_control_flow_protection= yes
 #enable_stack_clash_protection  = yes
-#enable_address_sanitizer       = yes
 
 # common option in Windows, msvc specific safety feature
-#enable_extra_stack_protection  = yes
-#enable_heap_integrity          = yes
+enable_extra_stack_protection  = yes
+enable_heap_integrity          = yes
+#enable_fuzzer_sanitizer        = yes
+#enable_use_after_return_sanitizer = yes
 
 # specific hardware secrutiy features
 
@@ -83,6 +85,7 @@ ifeq ($(OSType),Windows_NT)
     CXXFLAGS_BASE += /DTRACE_RUN=$(TRACE_RUN)
   endif
   SCHEDULER_CXXFLAGS  := /O2 $(CXXFLAGS_BASE) /I. /DRUN_PREFIX="\"$(RUN_PREFIX)\""
+  DYN_CXXFLAGS        = /$(OPT_LEVEL) /Zi $(CXXFLAGS_BASE)
   OBJECT_CXXFLAGS     = /$(OPT_LEVEL) /Zi $(CXXFLAGS_BASE)
   CXXFLAGS      = /$(OPT_LEVEL) /Zi $(CXXFLAGS_BASE)
   ASMFLAGS      := /nologo /Zi /c
@@ -150,7 +153,7 @@ ifeq ($(OSType),Windows_NT)
   endif
 
   ifdef enable_heap_integrity
-    CXXFLAGS_BASE += /sdl /GS
+    CXXFLAGS_BASE += /sdl
   endif
 
   ifdef enable_extra_stack_protection
@@ -160,6 +163,15 @@ ifeq ($(OSType),Windows_NT)
   ifdef enable_address_sanitizer
     CXXFLAGS_BASE += /fsanitize=address
   endif
+
+ ifdef enable_fuzzer_sanitizer
+    CXXFLAGS += /fsanitize=fuzzer
+    OBJECT_CXXFLAGS += /fsanitize=fuzzer
+ endif
+
+ ifdef enable_use_after_return_sanitizer
+    CXXFLAGS_BASE += /fsanitize-address-use-after-return
+ endif
 
 else
 
@@ -200,6 +212,7 @@ else
     CXXFLAGS_BASE += -DTRACE_RUN=$(TRACE_RUN)
   endif
   SCHEDULER_CXXFLAGS  := -O2 $(CXXFLAGS_BASE) -I. -DRUN_PREFIX="\"$(RUN_PREFIX)\""
+  DYN_CXXFLAGS        = -$(OPT_LEVEL) $(CXXFLAGS_BASE)
   OBJECT_CXXFLAGS     = -$(OPT_LEVEL) $(CXXFLAGS_BASE)
   CXXFLAGS      = $(CXXFLAGS_BASE)
   ASMFLAGS      :=
@@ -412,7 +425,7 @@ endif
 
 
 $(dynlibcfi): lib/common/cfi.cpp  lib/include/cfi.hpp
-	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_DYN_OPTION)$@ $(LIB_LDFLAGS)
+	$(CXX) $(DYN_CXXFLAGS) $< $(OUTPUT_DYN_OPTION)$@ $(LIB_LDFLAGS)
 
 cfi_base := $(basename $(dynlibcfi))
 rubbish += $(cfi_base).so $(cfi_base).dll $(cfi_base).pdb $(cfi_base).obj $(cfi_base).lib $(cfi_base).ilk $(cfi_base).exp lib/common/cfi.obj

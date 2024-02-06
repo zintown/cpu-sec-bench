@@ -87,6 +87,8 @@ TRACE_GLOBAR_VAR_PRE long long ra_addr;
       return (long int) si.dwPageSize;
   }
   #define LOG_PATH ".\\trace-log\\"
+  #define strncat(dest, src, n) strncat_s(dest, sizeof(dest), src, n)
+
 #endif
 
 #if defined(__GNUC__) || !defined(_MSC_VER)
