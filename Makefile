@@ -83,8 +83,8 @@ ifeq ($(OSType),Windows_NT)
     CXXFLAGS_BASE += /DTRACE_RUN=$(TRACE_RUN)
   endif
   SCHEDULER_CXXFLAGS  := /O2 $(CXXFLAGS_BASE) /I. /DRUN_PREFIX="\"$(RUN_PREFIX)\""
-  OBJECT_CXXFLAGS     := /$(OPT_LEVEL) /Zi $(CXXFLAGS_BASE)
-  CXXFLAGS      := /$(OPT_LEVEL) /Zi $(CXXFLAGS_BASE)
+  OBJECT_CXXFLAGS     = /$(OPT_LEVEL) /Zi $(CXXFLAGS_BASE)
+  CXXFLAGS      = /$(OPT_LEVEL) /Zi $(CXXFLAGS_BASE)
   ASMFLAGS      := /nologo /Zi /c
   # If there is a whitespace between windows msvc's output option and output file,
   # will raise error
@@ -103,23 +103,23 @@ ifeq ($(OSType),Windows_NT)
 
   # define compiling flags
   ifdef enable_stack_nx_protection
-    CXXFLAGS += /NXCOMPAT
+    CXXFLAGS_BASE += /NXCOMPAT
     LDFLAGS += /NXCOMPAT
     LIB_LDFLAGS += /NXCOMPAT
   endif
 
   ifdef disable_stack_nx_protection
-    CXXFLAGS += /NXCOMPAT:NO
+    CXXFLAGS_BASE += /NXCOMPAT:NO
     LDFLAGS += /NXCOMPAT:NO
     LIB_LDFLAGS += /NXCOMPAT:NO
   endif
 
   ifdef enable_stack_protection
-    CXXFLAGS += /GS
+    CXXFLAGS_BASE += /GS
   endif
 
   ifdef disable_stack_protection
-    CXXFLAGS += /GS-
+    CXXFLAGS_BASE += /GS-
   endif
 
   ifdef enable_aslr_protection
@@ -133,29 +133,32 @@ ifeq ($(OSType),Windows_NT)
   endif
 
   ifdef enable_control_flow_protection
-    CXXFLAGS += /guard:cf
-    LDFLAGS  += /GUARD:CF
+    CXXFLAGS_BASE    += /guard:cf
+    LDFLAGS     += /GUARD:CF
+    LIB_LDFLAGS += /GUARD:CF
   endif
 
   ifdef disable_control_flow_protection
-    CXXFLAGS += /guard:cf-
+    CXXFLAGS_BASE += /guard:cf-
     LDFLAGS  += /GUARD:NO
+    LIB_LDFLAGS  += /GUARD:NO
   endif
 
   ifdef enable_cet_shadow_stack
-    LDFLAGS += /CETCOMPAT 
+    LDFLAGS += /CETCOMPAT
+    LIB_LDFLAGS += /CETCOMPAT
   endif
 
   ifdef enable_heap_integrity
-    CXXFLAGS += /sdl /GS
+    CXXFLAGS_BASE += /sdl /GS
   endif
 
   ifdef enable_extra_stack_protection
-    CXXFLAGS += /RTCs
+    CXXFLAGS_BASE += /RTCs
   endif
 
   ifdef enable_address_sanitizer
-    CXXFLAGS += /fsanitize=address
+    CXXFLAGS_BASE += /fsanitize=address
   endif
 
 else
@@ -180,7 +183,7 @@ else
   CLIBAPI       := posix
   OBJDUMP       := objdump
 
-  CXXFLAGS_BASE = ${CXXFLAGS} -I./lib -std=c++11 -Wall
+  CXXFLAGS_BASE := ${CXXFLAGS} -I./lib -std=c++11 -Wall
   ifdef BUFFER_SIZE
 		CXXFLAGS_BASE += -DBUFFER_SIZE=$(BUFFER_SIZE)
   endif
@@ -197,8 +200,8 @@ else
     CXXFLAGS_BASE += -DTRACE_RUN=$(TRACE_RUN)
   endif
   SCHEDULER_CXXFLAGS  := -O2 $(CXXFLAGS_BASE) -I. -DRUN_PREFIX="\"$(RUN_PREFIX)\""
-  OBJECT_CXXFLAGS     := -$(OPT_LEVEL) $(CXXFLAGS_BASE)
-  CXXFLAGS      := $(CXXFLAGS_BASE)
+  OBJECT_CXXFLAGS     = -$(OPT_LEVEL) $(CXXFLAGS_BASE)
+  CXXFLAGS      = $(CXXFLAGS_BASE)
   ASMFLAGS      :=
   OUTPUT_EXE_OPTION := -o 
   OUTPUT_LIB_OPTION := -c -o 
@@ -219,108 +222,106 @@ else
   independent_assembly := 
 
   # define compiling flags
-  ifdef disable_stack_nx_protection
-    CXXFLAGS += -z execstack
+  ifdef enable_stack_nx_protection
+    CXXFLAGS_BASE += -z execstack
   endif
 
   ifdef disable_stack_nx_protection
-    CXXFLAGS += -z noexecstack
+    CXXFLAGS_BASE += -z noexecstack
   endif
 
   ifdef enable_stack_protection
-    CXXFLAGS += -Wstack-protector -fstack-protector-all
+    CXXFLAGS_BASE += -Wstack-protector -fstack-protector-all
   ifeq ($(ARCH),x86_64)
-    CXXFLAGS += -mstack-protector-guard=guard
+    CXXFLAGS_BASE += -mstack-protector-guard=tls
   endif
   endif
 
   ifdef disable_stack_protection
-    CXXFLAGS += -fno-stack-protector
+    CXXFLAGS_BASE += -fno-stack-protector
   endif
 
   ifdef enable_aslr_protection
-    CXXFLAGS += pie -fPIE
-    LDFLAGS  += -Wl, pie
+    CXXFLAGS_BASE += -pie -fPIE
+    LDFLAGS  += -Wl,-pie
   endif
 
   ifdef disable_aslr_protection
-    CXXFLAGS += -no-pie
+    CXXFLAGS_BASE += -no-pie
     LDFLAGS  += -Wl,-no-pie
   endif
 
   ifdef enable_got_protection
-    LDFLAGS  += -Wl,-z,relro,-z,now
+    LDFLAGS  += -Wl,-z,relro -Wl,-z,now
   endif
 
   ifdef disable_got_protection
-    LDFLAGS  += -Wl,-z, norelro,-z,lazy
+    LDFLAGS  += -Wl,-z,norelro -Wl,-z,lazy
   endif
 
   ifdef enable_vtable_verify
-    CXXFLAGS += -fvtable-verify=std
+    CXXFLAGS_BASE += -fvtable-verify=std
   endif
 
   ifdef disable_vtable_verify
-    CXXFLAGS += -fvtable-verify=none
+    CXXFLAGS_BASE += -fvtable-verify=none
   endif
 
   ifdef enable_control_flow_protection
   ifeq ($(ARCH),x86_64)
-    CXXFLAGS += -fcf-protection=full
+    CXXFLAGS_BASE += -fcf-protection=full
   endif
   endif
 
   ifdef enable_cet_shadow_stack
-    CXXFLAGS += -fcf-protection=return
+    CXXFLAGS_BASE += -fcf-protection=return
   endif
 
   ifdef disable_control_flow_protection
   ifeq ($(ARCH),x86_64)
-    CXXFLAGS += -fcf-protection=none
+    CXXFLAGS_BASE += -fcf-protection=none
   endif
   endif
 
   ifdef enable_stack_clash_protection
-    CXXFLAGS += -fstack-clash-protection
+    CXXFLAGS_BASE += -fstack-clash-protection
   endif
 
   ifdef enable_address_sanitizer
-    CXXFLAGS += -fsanitize=address
-    RUN_PREFIX += ASAN_OPTIONS=detect_leaks=0
+    CXXFLAGS_BASE += -fsanitize=address
+    ASAN_OPTIONS=detect_leaks=0:detect_odr_violation=0
     ifeq ($(CXX),$(filter $(CXX),clang++ c++))
-      LDFLAGS  += -static-libsan
     else
-      LDFLAGS  += -static-libasan
-      CXXFLAGS += --param=asan-stack=1
+      CXXFLAGS_BASE += --param=asan-stack=1
     endif
   endif
 endif
 
 ifdef enable_riscv64_cheri
   ARCH := cheri_riscv64
-  CXXFLAGS += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d -cheri-bounds=very-aggressive
-  SCHEDULER_CXXFLAGS += -mno-relax
-  OBJECT_CXXFLAGS += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d -cheri-bounds=very-aggressive
+  CXXFLAGS_BASE += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d -cheri-bounds=very-aggressive
+  SCHEDULER_CXXFLAGS_BASE += -mno-relax
+  OBJECT_CXXFLAGS_BASE += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d -cheri-bounds=very-aggressive
 endif
 
 ifdef enable_aarch64_morello
-  CXXFLAGS += -cheri -cheri-bounds=very-aggressive
-  OBJECT_CXXFLAGS += -cheri -cheri-bounds=very-aggressive
+  CXXFLAGS_BASE += -cheri -cheri-bounds=very-aggressive
+  OBJECT_CXXFLAGS_BASE += -cheri -cheri-bounds=very-aggressive
 endif
 
 ifdef enable_aarch64_mte
-  CXXFLAGS := -fuse-ld=lld $(CXXFLAGS) -march=armv8.5-a+memtag -fsanitize=hwaddress
-  OBJECT_CXXFLAGS += -march=armv8.5-a+memtag -fsanitize=hwaddress
+  CXXFLAGS_BASE := -fuse-ld=lld $(CXXFLAGS_BASE) -march=armv8.5-a+memtag -fsanitize=hwaddress
+  OBJECT_CXXFLAGS_BASE += -march=armv8.5-a+memtag -fsanitize=hwaddress
 endif
 
 ifdef enable_aarch64_pa
-  CXXFLAGS := -fuse-ld=lld $(CXXFLAGS) -march=armv8.3-a+pauth -mbranch-protection=pac-ret
-  OBJECT_CXXFLAGS += -march=armv8.3-a+pauth -mbranch-protection=pac-ret
+  CXXFLAGS_BASE := -fuse-ld=lld $(CXXFLAGS_BASE) -march=armv8.3-a+pauth -mbranch-protection=pac-ret
+  OBJECT_CXXFLAGS_BASE += -march=armv8.3-a+pauth -mbranch-protection=pac-ret
 endif
 
 ifdef enable_aarch64_bti
-  CXXFLAGS := -fuse-ld=lld $(CXXFLAGS) -march=armv8.5-a -mbranch-protection=bti
-  OBJECT_CXXFLAGS += -march=armv8.5-a -mbranch-protection=bti
+  CXXFLAGS_BASE := -fuse-ld=lld $(CXXFLAGS_BASE) -march=armv8.5-a -mbranch-protection=bti
+  OBJECT_CXXFLAGS_BASE += -march=armv8.5-a -mbranch-protection=bti
 endif
 
 # define cases
