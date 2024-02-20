@@ -14,7 +14,7 @@ else
 endif
 
 # set variables
-OPT_LEVEL       ?= Od
+OPT_LEVEL       ?= O2
 
 # extra security features (comment them out if not needed)
 
@@ -84,7 +84,7 @@ ifeq ($(OSType),Windows_NT)
   ifdef TRACE_RUN
     CXXFLAGS_BASE += /DTRACE_RUN=$(TRACE_RUN)
   endif
-  SCHEDULER_CXXFLAGS  := /O2 $(CXXFLAGS_BASE) /I. /DRUN_PREFIX="\"$(RUN_PREFIX)\""
+  SCHEDULER_CXXFLAGS  = /O2 $(CXXFLAGS_BASE) /I. /DRUN_PREFIX="\"$(RUN_PREFIX)\""
   DYN_CXXFLAGS        = /$(OPT_LEVEL) /Zi $(CXXFLAGS_BASE)
   OBJECT_CXXFLAGS     = /$(OPT_LEVEL) /Zi $(CXXFLAGS_BASE)
   CXXFLAGS      = /$(OPT_LEVEL) /Zi $(CXXFLAGS_BASE)
@@ -211,7 +211,7 @@ else
   ifdef TRACE_RUN
     CXXFLAGS_BASE += -DTRACE_RUN=$(TRACE_RUN)
   endif
-  SCHEDULER_CXXFLAGS  := -O2 $(CXXFLAGS_BASE) -I. -DRUN_PREFIX="\"$(RUN_PREFIX)\""
+  SCHEDULER_CXXFLAGS  = -O2 $(CXXFLAGS_BASE) -I. -DRUN_PREFIX="\"$(RUN_PREFIX)\""
   DYN_CXXFLAGS        = -$(OPT_LEVEL) $(CXXFLAGS_BASE)
   OBJECT_CXXFLAGS     = -$(OPT_LEVEL) $(CXXFLAGS_BASE)
   CXXFLAGS      = $(CXXFLAGS_BASE)
@@ -313,7 +313,6 @@ endif
 ifdef enable_riscv64_cheri
   ARCH := cheri_riscv64
   CXXFLAGS_BASE += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d -cheri-bounds=very-aggressive
-  SCHEDULER_CXXFLAGS_BASE += -mno-relax
   OBJECT_CXXFLAGS_BASE += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d -cheri-bounds=very-aggressive
 endif
 
