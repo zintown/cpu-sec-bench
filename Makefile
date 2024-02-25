@@ -47,7 +47,7 @@ OPT_LEVEL       ?= O2
 #enable_riscv64_cheri           = yes
 #enable_aarch64_morello         = yes
 #enable_aarch64_mte             = yes
-#enable_aarch64_pa              = yes
+enable_aarch64_pa              = yes
 #enable_aarch64_bti             = yes
 
 # define paths and objects
