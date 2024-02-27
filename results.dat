@@ -1,0 +1,272 @@
+# CPU: 
+# System : 
+# FreeBSD 14.0-CURRENT riscv64c
+# Compiler : 
+# clang version 14.0.0 (https://github.com/CTSRD-CHERI/llvm-project.git ed9d9964fb200af225739a89bfb988cbe8d8f69e)
+# Target: riscv64-unknown-freebsd13
+# Thread model: posix
+# InstalledDir: /usr/bin
+# LIBC : 
+# LLVM (http://llvm.org/):
+#   LLVM version 14.0.0git
+#   Optimized build with assertions.
+#   Default target: riscv64-unknown-freebsd13
+#   Host CPU: generic-rv64
+# 
+#   Registered Targets:
+#     aarch64    - AArch64 (little endian)
+#     aarch64_32 - AArch64 (little endian ILP32)
+#     aarch64_be - AArch64 (big endian)
+#     arm        - ARM
+#     arm64      - ARM64 (little endian)
+#     arm64_32   - ARM64 (little endian ILP32)
+#     armeb      - ARM (big endian)
+#     mips       - MIPS (32-bit big endian)
+#     mips64     - MIPS (64-bit big endian)
+#     mips64el   - MIPS (64-bit little endian)
+#     mipsel     - MIPS (32-bit little endian)
+#     riscv32    - 32-bit RISC-V
+#     riscv64    - 64-bit RISC-V
+#     thumb      - Thumb
+#     thumbeb    - Thumb (big endian)
+#     x86        - 32-bit X86: Pentium-Pro and above
+#     x86-64     - 64-bit X86: EM64T and AMD64
+# Flags : 
+# OBJECT_CXXFLAGS =  -O2 -I./lib -std=c++11 -Wall -mno-relax -march=rv64gcxcheri -mabi=l64pc128d
+# CXXFLAGS =  -I./lib -std=c++11 -Wall -fuse-ld=lld -mno-relax -march=rv64gcxcheri -mabi=l64pc128d
+# LDFLAGS = 
+# 
+acc-check-IBT                                                          result: 0               make time: 93592759 run-time: 165225 microsecondsfile_size:83160 bytes
+acc-check-data-pointer-arithmetic-data                                 result: 0               make time: 93032852 run-time: 114548 microsecondsfile_size:84048 bytes
+acc-check-data-pointer-arithmetic-heap                                 result: 0               make time: 91482768 run-time: 106052 microsecondsfile_size:84352 bytes
+acc-check-data-pointer-arithmetic-rodata                               result: 0               make time: 91582259 run-time: 110254 microsecondsfile_size:84056 bytes
+acc-check-data-pointer-arithmetic-stack                                result: 0               make time: 91751532 run-time: 104681 microsecondsfile_size:83904 bytes
+acc-check-inter-obj-data-redzone                                       result: 0               make time: 129358486 run-time: 341506 microsecondsfile_size:85856 bytes
+acc-check-inter-obj-heap-redzone                                       result: 0               make time: 139310880 run-time: 117106 microsecondsfile_size:85216 bytes
+acc-check-inter-obj-rodata-redzone                                     result: 0               make time: 129753071 run-time: 112750 microsecondsfile_size:86480 bytes
+acc-check-inter-obj-stack-redzone                                      result: 0               make time: 132491541 run-time: 137094 microsecondsfile_size:84552 bytes
+acc-check-intra-obj-data-redzone                                       result: 0               make time: 133178926 run-time: 244014 microsecondsfile_size:84120 bytes
+acc-check-intra-obj-heap-redzone                                       result: 0               make time: 141050813 run-time: 110712 microsecondsfile_size:84232 bytes
+acc-check-intra-obj-rodata-redzone                                     result: 0               make time: 130543565 run-time: 119345 microsecondsfile_size:83968 bytes
+acc-check-intra-obj-stack-redzone                                      result: 0               make time: 131233146 run-time: 111549 microsecondsfile_size:83896 bytes
+acc-check-prog-ASLR                                                    result: 0               make time: 61469443 run-time: 495092 microsecondsfile_size:100928 bytes
+acc-check-stack-region-ASLR                                            result: 0               make time: 468615 run-time: 296536 microsecondsfile_size:100928 bytes
+acc-copy-stackra-to-heap-explicit-arith                                result: 290             make time: 42443274 run-time: 550141 microsecondsfile_size:85128 bytes
+acc-copy-stackra-to-heap-implicit-arith                                result: 0               make time: 3438572 run-time: 125240 microsecondsfile_size:85056 bytes
+acc-get-frame-size                                                     result: -1              make time: 38568244 run-time: 0 microsecondsfile_size:null bytes
+acc-get-ra-offset-v-p-g0                                               result: 0               make time: 33953137 run-time: 141641 microsecondsfile_size:85392 bytes
+acc-get-ra-offset-v-p-g1                                               result: 0               make time: 482572 run-time: 106537 microsecondsfile_size:85392 bytes
+acc-read-GOT                                                           result: 266             make time: 2948802 run-time: 867212 microsecondsfile_size:83272 bytes
+acc-read-func                                                          result: -1              make time: 52805030 run-time: 0 microsecondsfile_size:null bytes
+cfi-call-fake-vtable                                                   result: 0               make time: 2895463 run-time: 147665 microsecondsfile_size:84208 bytes
+cfi-call-fake-vtable-arg-num                                           result: 0               make time: 2922832 run-time: 120558 microsecondsfile_size:84544 bytes
+cfi-call-fake-vtable-arg-type                                          result: 0               make time: 33765945 run-time: 115564 microsecondsfile_size:84624 bytes
+cfi-call-fake-vtable-arg-type-modified                                 result: 0               make time: 32162312 run-time: 122254 microsecondsfile_size:84600 bytes
+cfi-call-fake-vtable-with-func-data                                    result: 0               make time: 3028169 run-time: 118447 microsecondsfile_size:84672 bytes
+cfi-call-fake-vtable-with-func-heap                                    result: 0               make time: 465194 run-time: 114442 microsecondsfile_size:84672 bytes
+cfi-call-fake-vtable-with-func-stack                                   result: 0               make time: 473616 run-time: 112945 microsecondsfile_size:84672 bytes
+cfi-call-instruction-in-data                                           result: 290             make time: 32875448 run-time: 909998 microsecondsfile_size:86376 bytes
+cfi-call-instruction-in-heap                                           result: 290             make time: 463177 run-time: 830529 microsecondsfile_size:86376 bytes
+cfi-call-instruction-in-rodata                                         result: 290             make time: 469015 run-time: 839854 microsecondsfile_size:86376 bytes
+cfi-call-instruction-in-stack                                          result: 290             make time: 474234 run-time: 823285 microsecondsfile_size:86376 bytes
+cfi-call-mid-func                                                      result: 0               make time: 2863317 run-time: 116588 microsecondsfile_size:83552 bytes
+cfi-call-wrong-func                                                    result: 0               make time: 2563299 run-time: 115726 microsecondsfile_size:84016 bytes
+cfi-call-wrong-func-within-static-analysis                             result: 0               make time: 3992462 run-time: 217698 microsecondsfile_size:83840 bytes
+cfi-call-wrong-num-arg-func                                            result: 0               make time: 5178661 run-time: 109628 microsecondsfile_size:83552 bytes
+cfi-call-wrong-type-arg-dp2fp-func-data                                result: 290             make time: 23779297 run-time: 500308 microsecondsfile_size:84080 bytes
+cfi-call-wrong-type-arg-dp2fp-func-heap                                result: 290             make time: 22473378 run-time: 455015 microsecondsfile_size:84016 bytes
+cfi-call-wrong-type-arg-dp2fp-func-rodata                              result: 290             make time: 21906131 run-time: 452113 microsecondsfile_size:83840 bytes
+cfi-call-wrong-type-arg-dp2fp-func-stack                               result: 290             make time: 21906566 run-time: 3335558 microsecondsfile_size:83968 bytes
+cfi-call-wrong-type-arg-fp2dp-func                                     result: 290             make time: 2637805 run-time: 437583 microsecondsfile_size:83696 bytes
+cfi-call-wrong-type-arg-int2double-func                                result: 0               make time: 2737788 run-time: 119385 microsecondsfile_size:83624 bytes
+cfi-call-wrong-type-arg-op2doublep-func                                result: 0               make time: 2839929 run-time: 116657 microsecondsfile_size:83800 bytes
+cfi-call-wrong-type-arg-op2intp-func                                   result: 0               make time: 3086003 run-time: 138191 microsecondsfile_size:83720 bytes
+cfi-call-wrong-vtable                                                  result: 0               make time: 3035944 run-time: 161508 microsecondsfile_size:84864 bytes
+cfi-call-wrong-vtable-arg-num                                          result: 0               make time: 2947357 run-time: 114200 microsecondsfile_size:85000 bytes
+cfi-call-wrong-vtable-arg-type                                         result: 0               make time: 2598555 run-time: 132051 microsecondsfile_size:84136 bytes
+cfi-call-wrong-vtable-arg-type-modified                                result: 0               make time: 2628074 run-time: 120720 microsecondsfile_size:84176 bytes
+cfi-call-wrong-vtable-child                                            result: 0               make time: 2670536 run-time: 110498 microsecondsfile_size:84168 bytes
+cfi-call-wrong-vtable-func-num                                         result: 0               make time: 3181622 run-time: 115105 microsecondsfile_size:85352 bytes
+cfi-call-wrong-vtable-offset                                           result: 0               make time: 3419051 run-time: 119705 microsecondsfile_size:84024 bytes
+cfi-call-wrong-vtable-parent                                           result: 0               make time: 2543761 run-time: 112987 microsecondsfile_size:84168 bytes
+cfi-call-wrong-vtable-released                                         result: 0               make time: 22413050 run-time: 122151 microsecondsfile_size:84920 bytes
+cfi-call-wrong-vtable-sibling                                          result: 0               make time: 2518512 run-time: 111482 microsecondsfile_size:84176 bytes
+cfi-jump-func-ra-from-heap-memcpy-explicit-arith                       result: 290             make time: 520248 run-time: 640437 microsecondsfile_size:85128 bytes
+cfi-jump-func-ra-from-heap-memcpy-implicit-arith                       result: 0               make time: 625513 run-time: 113385 microsecondsfile_size:85056 bytes
+cfi-jump-instruction-in-data                                           result: 290             make time: 737423 run-time: 444310 microsecondsfile_size:86376 bytes
+cfi-jump-instruction-in-heap                                           result: 290             make time: 472318 run-time: 438488 microsecondsfile_size:86376 bytes
+cfi-jump-instruction-in-rodata                                         result: 290             make time: 472965 run-time: 414509 microsecondsfile_size:86376 bytes
+cfi-jump-instruction-in-stack                                          result: 290             make time: 459757 run-time: 426910 microsecondsfile_size:86376 bytes
+cfi-jump-mid-func                                                      result: 0               make time: 3000328 run-time: 117066 microsecondsfile_size:83568 bytes
+cfi-return-to-func                                                     result: 0               make time: 32796110 run-time: 2896038 microsecondsfile_size:84936 bytes
+cfi-return-to-instruction-in-data                                      result: 290             make time: 421425 run-time: 2141514 microsecondsfile_size:86376 bytes
+cfi-return-to-instruction-in-heap                                      result: 290             make time: 433211 run-time: 2181870 microsecondsfile_size:86376 bytes
+cfi-return-to-instruction-in-rodata                                    result: 290             make time: 425879 run-time: 2146057 microsecondsfile_size:86376 bytes
+cfi-return-to-instruction-in-stack                                     result: 290             make time: 430615 run-time: 2103237 microsecondsfile_size:86376 bytes
+cfi-return-to-libc                                                     result: 0               make time: 33494461 run-time: 2909738 microsecondsfile_size:84720 bytes
+cfi-return-to-non-call-site                                            result: 0               make time: 33193287 run-time: 3035111 microsecondsfile_size:84568 bytes
+cfi-return-to-wrong-call-site                                          result: 0               make time: 33923454 run-time: 2908694 microsecondsfile_size:84672 bytes
+cfi-return-to-wrong-call-site-within-static-analysis                   result: 0               make time: 34116462 run-time: 114081 microsecondsfile_size:85296 bytes
+cfi-return-without-call                                                result: 16              make time: 22570069 run-time: 1834297 microsecondsfile_size:83648 bytes
+cpi-func-pointer-arithmetic                                            result: 290             make time: 3341435 run-time: 583728 microsecondsfile_size:83984 bytes
+cpi-func-pointer-assign                                                result: 0               make time: 5253661 run-time: 114693 microsecondsfile_size:83856 bytes
+cpi-modify-GOT                                                         result: 290             make time: 24075005 run-time: 879989 microsecondsfile_size:83664 bytes
+cpi-read-data-vtable-pointer                                           result: 0               make time: 3326092 run-time: 111382 microsecondsfile_size:84352 bytes
+cpi-read-heap-vtable-pointer                                           result: 0               make time: 438457 run-time: 111385 microsecondsfile_size:84352 bytes
+cpi-read-rodata-vtable-pointer                                         result: 0               make time: 467045 run-time: 123407 microsecondsfile_size:84352 bytes
+cpi-read-stack-vtable-pointer                                          result: 0               make time: 458595 run-time: 115073 microsecondsfile_size:84352 bytes
+cpi-write-data-vtable-pointer                                          result: 0               make time: 3268957 run-time: 163767 microsecondsfile_size:84952 bytes
+cpi-write-heap-vtable-pointer                                          result: 0               make time: 450700 run-time: 110999 microsecondsfile_size:84952 bytes
+cpi-write-stack-vtable-pointer                                         result: 0               make time: 494676 run-time: 110400 microsecondsfile_size:84952 bytes
+mss-read-by-bare-array-pointer-overflow-data                           result: 290             make time: 174736801 run-time: 1005117 microsecondsfile_size:86688 bytes
+mss-read-by-bare-array-pointer-overflow-heap                           result: 290             make time: 172952995 run-time: 658975 microsecondsfile_size:86752 bytes
+mss-read-by-bare-array-pointer-overflow-rodata                         result: 290             make time: 170724836 run-time: 961733 microsecondsfile_size:86688 bytes
+mss-read-by-bare-array-pointer-overflow-stack                          result: 290             make time: 172582947 run-time: 1335006 microsecondsfile_size:86384 bytes
+mss-read-by-bare-array-pointer-underflow-data                          result: 290             make time: 172066496 run-time: 975741 microsecondsfile_size:86688 bytes
+mss-read-by-bare-array-pointer-underflow-heap                          result: 290             make time: 173157533 run-time: 959596 microsecondsfile_size:86752 bytes
+mss-read-by-bare-array-pointer-underflow-rodata                        result: 290             make time: 174321817 run-time: 968447 microsecondsfile_size:86688 bytes
+mss-read-by-bare-array-pointer-underflow-stack                         result: 290             make time: 177256670 run-time: 1354218 microsecondsfile_size:86384 bytes
+mss-read-by-enclosing-array-index-overflow-data                        result: 0               make time: 174455244 run-time: 111052 microsecondsfile_size:86616 bytes
+mss-read-by-enclosing-array-index-overflow-heap                        result: 0               make time: 170486733 run-time: 108102 microsecondsfile_size:86584 bytes
+mss-read-by-enclosing-array-index-overflow-rodata                      result: 0               make time: 169794034 run-time: 103783 microsecondsfile_size:86472 bytes
+mss-read-by-enclosing-array-index-overflow-stack                       result: 0               make time: 170881803 run-time: 113552 microsecondsfile_size:86280 bytes
+mss-read-by-enclosing-array-index-underflow-data                       result: 0               make time: 170484780 run-time: 105678 microsecondsfile_size:86616 bytes
+mss-read-by-enclosing-array-index-underflow-heap                       result: 0               make time: 170531920 run-time: 106955 microsecondsfile_size:86584 bytes
+mss-read-by-enclosing-array-index-underflow-rodata                     result: 0               make time: 170957624 run-time: 104441 microsecondsfile_size:86472 bytes
+mss-read-by-enclosing-array-index-underflow-stack                      result: 0               make time: 172677749 run-time: 103631 microsecondsfile_size:86280 bytes
+mss-read-by-enclosing-array-pointer-large-count-overflow-data          result: 0               make time: 177213981 run-time: 191713 microsecondsfile_size:111336 bytes
+mss-read-by-enclosing-array-pointer-large-count-overflow-heap          result: 0               make time: 185433561 run-time: 184264 microsecondsfile_size:109424 bytes
+mss-read-by-enclosing-array-pointer-large-count-overflow-rodata        result: 0               make time: 176318634 run-time: 121928 microsecondsfile_size:111400 bytes
+mss-read-by-enclosing-array-pointer-large-count-overflow-stack         result: 0               make time: 174118524 run-time: 118832 microsecondsfile_size:109952 bytes
+mss-read-by-enclosing-array-pointer-large-count-underflow-data         result: 0               make time: 172782663 run-time: 122533 microsecondsfile_size:111336 bytes
+mss-read-by-enclosing-array-pointer-large-count-underflow-heap         result: 0               make time: 173080987 run-time: 146449 microsecondsfile_size:109424 bytes
+mss-read-by-enclosing-array-pointer-large-count-underflow-rodata       result: 0               make time: 176398428 run-time: 126121 microsecondsfile_size:111400 bytes
+mss-read-by-enclosing-array-pointer-large-count-underflow-stack        result: 0               make time: 173195498 run-time: 135947 microsecondsfile_size:109952 bytes
+mss-read-by-enclosing-array-pointer-overflow-data                      result: 0               make time: 170192678 run-time: 189858 microsecondsfile_size:86592 bytes
+mss-read-by-enclosing-array-pointer-overflow-heap                      result: 0               make time: 172546304 run-time: 106264 microsecondsfile_size:86576 bytes
+mss-read-by-enclosing-array-pointer-overflow-rodata                    result: 0               make time: 173090208 run-time: 104713 microsecondsfile_size:86440 bytes
+mss-read-by-enclosing-array-pointer-overflow-stack                     result: 0               make time: 181574647 run-time: 175015 microsecondsfile_size:86240 bytes
+mss-read-by-enclosing-array-pointer-underflow-data                     result: 0               make time: 171254803 run-time: 117828 microsecondsfile_size:86592 bytes
+mss-read-by-enclosing-array-pointer-underflow-heap                     result: 0               make time: 171022849 run-time: 112223 microsecondsfile_size:86576 bytes
+mss-read-by-enclosing-array-pointer-underflow-rodata                   result: 0               make time: 169717212 run-time: 114527 microsecondsfile_size:86440 bytes
+mss-read-by-enclosing-array-pointer-underflow-stack                    result: 0               make time: 170561726 run-time: 137727 microsecondsfile_size:86240 bytes
+mss-read-cross-frame-index                                             result: 290             make time: 42315169 run-time: 524622 microsecondsfile_size:86352 bytes
+mss-read-cross-frame-ptr                                               result: 290             make time: 42621001 run-time: 437826 microsecondsfile_size:86320 bytes
+mss-read-cross-object-index-data                                       result: 290             make time: 170231905 run-time: 434800 microsecondsfile_size:86624 bytes
+mss-read-cross-object-index-heap                                       result: 290             make time: 168854460 run-time: 465992 microsecondsfile_size:86504 bytes
+mss-read-cross-object-index-rodata                                     result: 290             make time: 170995200 run-time: 402561 microsecondsfile_size:86648 bytes
+mss-read-cross-object-index-stack                                      result: 290             make time: 172218982 run-time: 409108 microsecondsfile_size:86424 bytes
+mss-read-cross-object-ptr-data                                         result: 290             make time: 179253899 run-time: 564938 microsecondsfile_size:86616 bytes
+mss-read-cross-object-ptr-heap                                         result: 290             make time: 169910030 run-time: 460194 microsecondsfile_size:86496 bytes
+mss-read-cross-object-ptr-rodata                                       result: 290             make time: 169155075 run-time: 415383 microsecondsfile_size:86632 bytes
+mss-read-cross-object-ptr-stack                                        result: 290             make time: 168489621 run-time: 463450 microsecondsfile_size:86400 bytes
+mss-read-cross-page-index-stack                                        result: 290             make time: 42840217 run-time: 462425 microsecondsfile_size:86616 bytes
+mss-read-cross-page-ptr-stack                                          result: 290             make time: 42835701 run-time: 403524 microsecondsfile_size:86600 bytes
+mss-read-cross-segment-data-to-heap-index                              result: 290             make time: 42807901 run-time: 434128 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-data-to-heap-ptr                                result: 290             make time: 471093 run-time: 420961 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-data-to-rodata-index                            result: 290             make time: 466425 run-time: 415804 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-data-to-rodata-ptr                              result: 290             make time: 464904 run-time: 390703 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-data-to-stack-index                             result: 290             make time: 462577 run-time: 404503 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-data-to-stack-ptr                               result: 290             make time: 468770 run-time: 394138 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-heap-to-data-index                              result: 290             make time: 473134 run-time: 384855 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-heap-to-data-ptr                                result: 290             make time: 467363 run-time: 388374 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-heap-to-rodata-index                            result: 290             make time: 470503 run-time: 406506 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-heap-to-rodata-ptr                              result: 290             make time: 653346 run-time: 372523 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-heap-to-stack-index                             result: 290             make time: 989551 run-time: 402037 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-heap-to-stack-ptr                               result: 290             make time: 476525 run-time: 388264 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-rodata-to-data-index                            result: 290             make time: 468959 run-time: 437407 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-rodata-to-data-ptr                              result: 290             make time: 483117 run-time: 399018 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-rodata-to-heap-index                            result: 290             make time: 483513 run-time: 405273 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-rodata-to-heap-ptr                              result: 290             make time: 471096 run-time: 419044 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-rodata-to-stack-index                           result: 290             make time: 467605 run-time: 394770 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-rodata-to-stack-ptr                             result: 290             make time: 460261 run-time: 391185 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-stack-to-data-index                             result: 290             make time: 474009 run-time: 416276 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-stack-to-data-ptr                               result: 290             make time: 487436 run-time: 435120 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-stack-to-heap-index                             result: 290             make time: 487498 run-time: 414141 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-stack-to-heap-ptr                               result: 290             make time: 471838 run-time: 385265 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-stack-to-rodata-index                           result: 290             make time: 475027 run-time: 416669 microsecondsfile_size:88136 bytes
+mss-read-cross-segment-stack-to-rodata-ptr                             result: 290             make time: 479623 run-time: 391357 microsecondsfile_size:88136 bytes
+mss-read-scalar-cast-to-array-overflow-data                            result: 0               make time: 42831673 run-time: 112589 microsecondsfile_size:86976 bytes
+mss-read-scalar-cast-to-array-overflow-heap                            result: 0               make time: 448587 run-time: 108797 microsecondsfile_size:86976 bytes
+mss-read-scalar-cast-to-array-overflow-rodata                          result: 0               make time: 454642 run-time: 103907 microsecondsfile_size:86976 bytes
+mss-read-scalar-cast-to-array-overflow-stack                           result: 0               make time: 473218 run-time: 105828 microsecondsfile_size:86976 bytes
+mss-read-scalar-cast-to-scalar-overflow-data                           result: 0               make time: 43579526 run-time: 120682 microsecondsfile_size:87512 bytes
+mss-read-scalar-cast-to-scalar-overflow-heap                           result: 0               make time: 464345 run-time: 109580 microsecondsfile_size:87512 bytes
+mss-read-scalar-cast-to-scalar-overflow-rodata                         result: 0               make time: 469508 run-time: 105506 microsecondsfile_size:87512 bytes
+mss-read-scalar-cast-to-scalar-overflow-stack                          result: 0               make time: 558220 run-time: 104017 microsecondsfile_size:87512 bytes
+mss-write-by-bare-array-pointer-overflow-data                          result: 290             make time: 172169660 run-time: 432171 microsecondsfile_size:86920 bytes
+mss-write-by-bare-array-pointer-overflow-heap                          result: 290             make time: 175574824 run-time: 572677 microsecondsfile_size:86792 bytes
+mss-write-by-bare-array-pointer-overflow-stack                         result: 290             make time: 178647287 run-time: 422473 microsecondsfile_size:86440 bytes
+mss-write-by-bare-array-pointer-underflow-data                         result: 290             make time: 170585056 run-time: 433675 microsecondsfile_size:86920 bytes
+mss-write-by-bare-array-pointer-underflow-heap                         result: 290             make time: 173621142 run-time: 425331 microsecondsfile_size:86792 bytes
+mss-write-by-bare-array-pointer-underflow-stack                        result: 290             make time: 172594528 run-time: 439770 microsecondsfile_size:86440 bytes
+mss-write-by-enclosing-array-index-overflow-data                       result: 0               make time: 173418602 run-time: 112057 microsecondsfile_size:87800 bytes
+mss-write-by-enclosing-array-index-overflow-heap                       result: 0               make time: 173444317 run-time: 107873 microsecondsfile_size:87704 bytes
+mss-write-by-enclosing-array-index-overflow-stack                      result: 0               make time: 171917641 run-time: 117298 microsecondsfile_size:87384 bytes
+mss-write-by-enclosing-array-index-underflow-data                      result: 0               make time: 174887842 run-time: 112337 microsecondsfile_size:87800 bytes
+mss-write-by-enclosing-array-index-underflow-heap                      result: 0               make time: 174017843 run-time: 108308 microsecondsfile_size:87704 bytes
+mss-write-by-enclosing-array-index-underflow-stack                     result: 0               make time: 180521564 run-time: 169756 microsecondsfile_size:87384 bytes
+mss-write-by-enclosing-array-pointer-large-count-overflow-data         result: 0               make time: 175935749 run-time: 155188 microsecondsfile_size:112456 bytes
+mss-write-by-enclosing-array-pointer-large-count-overflow-heap         result: 0               make time: 174684134 run-time: 124705 microsecondsfile_size:110560 bytes
+mss-write-by-enclosing-array-pointer-large-count-overflow-stack        result: 0               make time: 174041972 run-time: 115929 microsecondsfile_size:111008 bytes
+mss-write-by-enclosing-array-pointer-large-count-underflow-data        result: 0               make time: 174880360 run-time: 115171 microsecondsfile_size:112456 bytes
+mss-write-by-enclosing-array-pointer-large-count-underflow-heap        result: 0               make time: 174335705 run-time: 116683 microsecondsfile_size:110560 bytes
+mss-write-by-enclosing-array-pointer-large-count-underflow-stack       result: 0               make time: 175793440 run-time: 118149 microsecondsfile_size:111008 bytes
+mss-write-by-enclosing-array-pointer-overflow-data                     result: 0               make time: 170483974 run-time: 127749 microsecondsfile_size:86744 bytes
+mss-write-by-enclosing-array-pointer-overflow-heap                     result: 0               make time: 173076960 run-time: 107607 microsecondsfile_size:86616 bytes
+mss-write-by-enclosing-array-pointer-overflow-stack                    result: 0               make time: 171555671 run-time: 107426 microsecondsfile_size:86312 bytes
+mss-write-by-enclosing-array-pointer-underflow-data                    result: 0               make time: 180327414 run-time: 172939 microsecondsfile_size:86744 bytes
+mss-write-by-enclosing-array-pointer-underflow-heap                    result: 0               make time: 169202149 run-time: 110505 microsecondsfile_size:86616 bytes
+mss-write-by-enclosing-array-pointer-underflow-stack                   result: 0               make time: 168508908 run-time: 111447 microsecondsfile_size:86312 bytes
+mss-write-cross-frame-index                                            result: 290             make time: 43377282 run-time: 901818 microsecondsfile_size:87424 bytes
+mss-write-cross-frame-ptr                                              result: 290             make time: 42542091 run-time: 443759 microsecondsfile_size:86344 bytes
+mss-write-cross-object-index-overflow-data                             result: 290             make time: 170315548 run-time: 425911 microsecondsfile_size:87696 bytes
+mss-write-cross-object-index-overflow-heap                             result: 290             make time: 166809979 run-time: 445669 microsecondsfile_size:87592 bytes
+mss-write-cross-object-index-overflow-stack                            result: 290             make time: 168909875 run-time: 453465 microsecondsfile_size:87496 bytes
+mss-write-cross-object-index-underflow-data                            result: 290             make time: 170872296 run-time: 457456 microsecondsfile_size:87696 bytes
+mss-write-cross-object-index-underflow-heap                            result: 290             make time: 172269563 run-time: 464980 microsecondsfile_size:87592 bytes
+mss-write-cross-object-index-underflow-stack                           result: 290             make time: 171975857 run-time: 418165 microsecondsfile_size:87496 bytes
+mss-write-cross-object-ptr-overflow-data                               result: 290             make time: 178982225 run-time: 596849 microsecondsfile_size:86608 bytes
+mss-write-cross-object-ptr-overflow-heap                               result: 290             make time: 170046799 run-time: 448803 microsecondsfile_size:86520 bytes
+mss-write-cross-object-ptr-overflow-stack                              result: 290             make time: 168851797 run-time: 459153 microsecondsfile_size:86408 bytes
+mss-write-cross-object-ptr-underflow-data                              result: 290             make time: 170699654 run-time: 429366 microsecondsfile_size:86608 bytes
+mss-write-cross-object-ptr-underflow-heap                              result: 290             make time: 170381606 run-time: 521338 microsecondsfile_size:86520 bytes
+mss-write-cross-object-ptr-underflow-stack                             result: 290             make time: 169309214 run-time: 413199 microsecondsfile_size:86408 bytes
+mss-write-cross-page-index-stack                                       result: 290             make time: 43207673 run-time: 433090 microsecondsfile_size:87672 bytes
+mss-write-cross-page-ptr-stack                                         result: 290             make time: 41978839 run-time: 433539 microsecondsfile_size:86592 bytes
+mss-write-cross-segment-data-to-heap-index                             result: 290             make time: 43383259 run-time: 855442 microsecondsfile_size:87800 bytes
+mss-write-cross-segment-data-to-heap-ptr                               result: 290             make time: 475114 run-time: 808192 microsecondsfile_size:87800 bytes
+mss-write-cross-segment-data-to-stack-index                            result: 290             make time: 468392 run-time: 818368 microsecondsfile_size:87800 bytes
+mss-write-cross-segment-data-to-stack-ptr                              result: 290             make time: 468488 run-time: 760389 microsecondsfile_size:87800 bytes
+mss-write-cross-segment-heap-to-data-index                             result: 290             make time: 466726 run-time: 779262 microsecondsfile_size:87800 bytes
+mss-write-cross-segment-heap-to-data-ptr                               result: 290             make time: 470600 run-time: 794799 microsecondsfile_size:87800 bytes
+mss-write-cross-segment-heap-to-stack-index                            result: 290             make time: 647143 run-time: 791242 microsecondsfile_size:87800 bytes
+mss-write-cross-segment-heap-to-stack-ptr                              result: 290             make time: 456192 run-time: 817091 microsecondsfile_size:87800 bytes
+mss-write-cross-segment-stack-to-data-index                            result: 290             make time: 453828 run-time: 406571 microsecondsfile_size:87800 bytes
+mss-write-cross-segment-stack-to-data-ptr                              result: 290             make time: 481777 run-time: 389083 microsecondsfile_size:87800 bytes
+mss-write-cross-segment-stack-to-heap-index                            result: 290             make time: 460237 run-time: 401074 microsecondsfile_size:87800 bytes
+mss-write-cross-segment-stack-to-heap-ptr                              result: 290             make time: 477229 run-time: 414258 microsecondsfile_size:87800 bytes
+mss-write-spray-cross-frame                                            result: 290             make time: 43146788 run-time: 427382 microsecondsfile_size:87416 bytes
+mss-write-spray-cross-object-data                                      result: 290             make time: 176385520 run-time: 456933 microsecondsfile_size:86536 bytes
+mss-write-spray-cross-object-heap                                      result: 290             make time: 178625559 run-time: 556912 microsecondsfile_size:86448 bytes
+mss-write-spray-cross-object-stack                                     result: 290             make time: 172971950 run-time: 449967 microsecondsfile_size:86320 bytes
+mss-write-spray-cross-page-in-heap                                     result: 290             make time: 48326400 run-time: 432285 microsecondsfile_size:88208 bytes
+mss-write-spray-cross-page-in-stack                                    result: 290             make time: 43047279 run-time: 425444 microsecondsfile_size:86592 bytes
+mts-access-after-free-alias-heap                                       result: 0               make time: 43559170 run-time: 123527 microsecondsfile_size:86784 bytes
+mts-access-after-free-alias-stack                                      result: 0               make time: 42368730 run-time: 105482 microsecondsfile_size:86488 bytes
+mts-access-after-free-org-heap                                         result: 0               make time: 42961840 run-time: 108816 microsecondsfile_size:86640 bytes
+mts-access-after-reclaim-heap                                          result: 2               make time: 52634303 run-time: 387057 microsecondsfile_size:88064 bytes
+mts-access-after-reclaim-stack                                         result: 0               make time: 43602866 run-time: 107293 microsecondsfile_size:86776 bytes
+mts-access-by-double-free-reallocate                                   result: 1               make time: 55230514 run-time: 101079956 microsecondsfile_size:90840 bytes
+mts-double-free                                                        result: 1               make time: 710598 run-time: 6893756 microsecondsfile_size:90840 bytes
+mts-reallocate-heap                                                    result: 1               make time: 48982778 run-time: 113244 microsecondsfile_size:85600 bytes
+mts-reallocate-stack                                                   result: 0               make time: 39231783 run-time: 186632 microsecondsfile_size:84224 bytes
+mts-write-after-free-heap                                              result: 0               make time: 40903128 run-time: 99258 microsecondsfile_size:86272 bytes
+mts-write-after-free-stack                                             result: 0               make time: 35487974 run-time: 93448 microsecondsfile_size:86664 bytes
+mts-write-after-reclaim-heap                                           result: 2               make time: 44584411 run-time: 118682 microsecondsfile_size:88560 bytes
+mts-write-after-reclaim-stack                                          result: 0               make time: 38100468 run-time: 101303 microsecondsfile_size:86592 bytes
+mts-write-before-reclaim-heap                                          result: 2               make time: 42678993 run-time: 350130 microsecondsfile_size:88744 bytes
+mts-write-before-reclaim-stack                                         result: 0               make time: 35444930 run-time: 92544 microsecondsfile_size:86424 bytes
+mts-write-by-double-free-reallocate                                    result: 1               make time: 433799 run-time: 91289925 microsecondsfile_size:90840 bytes
+Compilation time: 17221366482 microseconds
+Run time: 295383748 microseconds

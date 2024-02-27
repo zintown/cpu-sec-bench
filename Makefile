@@ -1,4 +1,4 @@
-SHELL := /bin/bash
+SHELL := /bin/sh
 
 # check whether it is a windows env
 OSType          ?= $(shell echo %OS%)
@@ -44,7 +44,7 @@ OPT_LEVEL       ?= O2
 
 # specific hardware secrutiy features
 
-#enable_riscv64_cheri           = yes
+enable_riscv64_cheri           = yes
 #enable_aarch64_morello         = yes
 #enable_aarch64_mte             = yes
 #enable_aarch64_pa              = yes
@@ -174,7 +174,7 @@ else
   ifeq ($(OSType),Darwin)
     CXX         := clang++
   else
-    CXX         := g++
+    CXX         := clang++
   endif
   ASM           := as
   CLIBAPI       := posix
@@ -302,9 +302,9 @@ endif
 
 ifdef enable_riscv64_cheri
   ARCH := cheri_riscv64
-  CXXFLAGS += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d -cheri-bounds=very-aggressive
+  CXXFLAGS += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d 
   SCHEDULER_CXXFLAGS += -mno-relax
-  OBJECT_CXXFLAGS += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d -cheri-bounds=very-aggressive
+  OBJECT_CXXFLAGS += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d 
 endif
 
 ifdef enable_aarch64_morello
