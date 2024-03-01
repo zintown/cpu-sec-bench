@@ -309,8 +309,8 @@ endif
 
 ifdef enable_aarch64_morello
   ARCH        := aarch64
-  CXXFLAGS += -march=morello -mabi=purecap -cheri-bounds=very-aggressive
-  OBJECT_CXXFLAGS += -march=morello -mabi=purecap -cheri-bounds=very-aggressive
+  CXXFLAGS += -march=morello -mabi=purecap -cheri-bounds=aggressive
+  OBJECT_CXXFLAGS += -march=morello -mabi=purecap -cheri-bounds=aggressive
 endif
 
 ifdef enable_aarch64_mte
