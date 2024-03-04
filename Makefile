@@ -1,4 +1,4 @@
-SHELL := /bin/bash
+SHELL := /bin/sh
 
 # check whether it is a windows env
 OSType          ?= $(shell echo %OS%)
@@ -45,7 +45,7 @@ OPT_LEVEL       ?= O2
 # specific hardware secrutiy features
 
 #enable_riscv64_cheri           = yes
-#enable_aarch64_morello         = yes
+enable_aarch64_morello         = yes
 #enable_aarch64_mte             = yes
 #enable_aarch64_pa              = yes
 #enable_aarch64_bti             = yes
@@ -174,7 +174,7 @@ else
   ifeq ($(OSType),Darwin)
     CXX         := clang++
   else
-    CXX         := g++
+    CXX         := clang++
   endif
   ASM           := as
   CLIBAPI       := posix
