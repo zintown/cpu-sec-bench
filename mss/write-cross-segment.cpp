@@ -33,6 +33,8 @@ int main(int argc, char* argv[])
   }
 
   GET_DISTANCE(distance, (long long)pdes, (long long)psrc);
+  #include <iostream>
+  std::cout << "distance is " << distance << std::endl;
 
   if(acc_type == 0) {
     switch(src_type) {
