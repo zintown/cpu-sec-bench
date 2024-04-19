@@ -292,8 +292,8 @@ else
 	endif
 
 	ifdef enable_cet_shadow_stack
-		CXXFLAGS += -Wl,--rpath=../glibc-2.39/build -Wl,--dynamic-linker=../glibc/build/elf/ld-linux-x86-64.so.2 -fcf-protection=full
-		OBJECT_CXXFLAGS += -Wl,--rpath=../glibc-2.39/build -Wl,--dynamic-linker=../glibc/build/elf/ld-linux-x86-64.so.2 -fcf-protection=full
+		CXXFLAGS += -Wl,--dynamic-linker=../glibc/build/lib/ld-linux-x86-64.so.2 -fcf-protection=full
+		OBJECT_CXXFLAGS += -Wl,--dynamic-linker=../glibc/build/lib/ld-linux-x86-64.so.2 -fcf-protection=full
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-cet_ss
 	endif
 
