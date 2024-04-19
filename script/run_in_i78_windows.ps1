@@ -5,7 +5,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 Set-Location ..
 
 $i = 1
-while ($i -le 6) {
+while ($i -le 3) {
     # Create a new directory name
     $new_dir = "cpu-sec-bench-$i"
     # Use Copy-Item to copy the current directory into the new directory
@@ -126,7 +126,7 @@ $job3 = Start-Job -ScriptBlock{
 
 Set-Location "cpu-sec-bench"
 
-Wait-Job -Job $job0, $job1,$job2,$job3,$job4,$job5,$job6
+Wait-Job -Job $job0, $job1,$job2,$job3
 
 $output1 = Receive-Job -Job $job1
 Write-Output "job 1: $output1"
@@ -136,12 +136,3 @@ Write-Output "job 2: $output2"
 
 $output3 = Receive-Job -Job $job3
 Write-Output "job 3: $output3"
-
-$output4 = Receive-Job -Job $job4
-Write-Output "job 4: $output4"
-
-$output5 = Receive-Job -Job $job5
-Write-Output "job 5: $output5"
-
-$output6 = Receive-Job -Job $job6
-Write-Output "job 6: $output6"
