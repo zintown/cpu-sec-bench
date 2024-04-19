@@ -43,6 +43,8 @@ SIMPLE_FLAGS    := default
 # common option in Windows, msvc specific safety feature
 #enable_extra_stack_protection  = yes
 #enable_heap_integrity          = yes
+#enable_return_address_sanitizer    = yes
+#enable_fuzzer_address_sanitizer    = yes
 
 # specific hardware secrutiy features
 
@@ -165,9 +167,22 @@ ifeq ($(OSType),Windows_NT)
 
 	ifdef enable_default_address_sanitizer
 		CXXFLAGS += /fsanitize=address
+		OBJECT_CXXFLAGS += /fsanitize=address
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-asan
 	endif
 
+	ifdef enable_fuzzer_address_sanitizer
+		CXXFLAGS += /fsanitize=fuzzer
+		OBJECT_CXXFLAGS += /fsanitize=fuzzer
+		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-r-asan
+	endif
+
+	ifdef enable_return_address_sanitizer
+		CXXFLAGS += /fsanitize-address-use-after-return
+		OBJECT_CXXFLAGS += /fsanitize-address-use-after-return
+		RUN_PREFIX += ASAN_OPTIONS=detect_stack_use_after_return=1 
+		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-f-asan
+	endif
 else
 
 	# platform
@@ -427,7 +442,7 @@ ifeq ($(OSType),Windows_NT)
 $(test-path)/sys_info.txt:
 	-mkdir $(test-path)
 	-mkdir $(log-path)
-	echo "OVERVIEW:$(ARCH)-$(CXX)-$(SIMPLE_FLAGS)" > $(test-path)/sys_info.txt
+	echo "OVERVIEW:$(ARCH)-$(CXX)-$(SIMPLE_FLAGS)"> $(test-path)/sys_info.txt
 	echo "CPU: " >> $(test-path)/sys_info.txt
 	systeminfo | findstr /C:"Intel" >> $(test-path)/sys_info.txt
 	echo "System:" >> $(test-path)/sys_info.txt
@@ -447,7 +462,7 @@ else
 $(test-path)/sys_info.txt:
 	-mkdir -p $(test-path)
 	-mkdir -p $(log-path)
-	echo "OVERVIEW:$(ARCH)-$(CXX)-$(SIMPLE_FLAGS)" > $(test-path)/sys_info.txt
+	echo "OVERVIEW:$(ARCH)-$(CXX)-$(SIMPLE_FLAGS)"> $(test-path)/sys_info.txt
 	echo "CPU:" >> $(test-path)/sys_info.txt
 	echo "$(CPU_INFO)" >> $(test-path)/sys_info.txt
 	echo "System: " >> $(test-path)/sys_info.txt
@@ -554,7 +569,7 @@ $(sec-tests-dump): %.dump:%
 
 prep: $(sec-tests-prep)
 
-res_and_rubbish:= $(rubbish) results.json results.dat variables.json *.dat *.log
+res_and_rubbish:= results.json results.dat variables.json *.dat *.log
 
 ifeq ($(OSType),Windows_NT)
 
@@ -567,7 +582,7 @@ clean:
 	-del /Q $(rubbish) $(test-path) $(log-path) *.tmp *.ilk *.pdb *.obj *.exe *.dump *.dll *.lib *.exp
 
 cleanall:
-	-del /Q $(res_and_rubbish) $(test-path) $(log-path) *.tmp *.ilk *.pdb *.obj *.exe *.dump *.dll *.lib *.exp
+	-del /Q $(res_and_rubbish) $(rubbish) $(test-path) $(log-path) *.tmp *.ilk *.pdb *.obj *.exe *.dump *.dll *.lib *.exp
 
 else
 
@@ -575,7 +590,7 @@ clean:
 	-rm -rf $(rubbish) $(test-path) $(log-path) *.tmp > /dev/null 2>&1
 
 cleanall:
-	-rm -rf $(res_and_rubbish) $(test-path) $(log-path) *.tmp > /dev/null 2>&1
+	-rm -rf $(res_and_rubbish) $(rubbish) $(test-path) $(log-path) *.tmp > /dev/null 2>&1
 
 endif
 

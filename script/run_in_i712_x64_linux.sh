@@ -140,7 +140,7 @@ prefix=GCC-ASan-undefined
 	mv "${base_name}".dat "${prefix}"_"${base_name}".dat
 ) &
 ind=5
-prefix=CLANG-ASan-undefined
+prefix=LLVM-ASan-undefined
 (
 	echo "${prefix}"
 	cd ..
@@ -202,7 +202,7 @@ prefix=LLVM-ASan-full
 	mv "${base_name}".dat "${prefix}"_"${base_name}".dat
 ) &
 ind=8
-prefix=I712G-GCC-stack
+prefix=G12-GCC-stack
 (
 	echo "${prefix}"
 	cd ..
@@ -223,7 +223,7 @@ prefix=I712G-GCC-stack
 	mv "${base_name}".dat "${prefix}"_"${base_name}".dat
 ) &
 ind=9
-prefix=I712G-GCC-CET
+prefix=G12-GCC-CET
 (
 	echo "${prefix}"
 	cd ..
@@ -243,7 +243,7 @@ prefix=I712G-GCC-CET
 	mv "${base_name}".dat "${prefix}"_"${base_name}".dat
 ) &
 ind=10
-prefix=I712G-GCC-FULL
+prefix=G12-GCC-FULL
 (
 	echo "${prefix}"
 	cd ..
@@ -256,6 +256,7 @@ prefix=I712G-GCC-FULL
 	export enable_stack_protection="yes"
 	export enable_stack_clash_protection="yes"
 	export enable_cet_shadow_stack="yes"
+	export enable_vtable_verify="yes"
 
 	make cleanall >temp.log 2>&1
 	make -e >>temp.log 2>&1
@@ -265,7 +266,7 @@ prefix=I712G-GCC-FULL
 	mv "${base_name}".dat "${prefix}"_"${base_name}".dat
 ) &
 ind=11
-prefix=I712G-LLVM-full
+prefix=G12-LLVM-full
 (
 	echo "${prefix}"
 	cd ..
@@ -286,6 +287,26 @@ prefix=I712G-LLVM-full
 	mv temp.log "${prefix}"_"${base_name}".log
 	mv "${base_name}".dat "${prefix}"_"${base_name}".dat
 ) &
+ind=12
+prefix=G12-GCC-vtv
+(
+	echo "${prefix}"
+	cd ..
+	cd cpu-sec-bench-"${ind}" || (
+		echo "no cpu-sec-bench-${ind}"
+		exit
+	)
+	export enable_vtable_verify="yes"
+
+	make cleanall >temp.log 2>&1
+	make -e >>temp.log 2>&1
+	./run-test exhausted-run >>temp.log 2>&1
+	base_name=$(rename_log)
+	mv temp.log "${prefix}"_"${base_name}".log
+	mv "${base_name}".dat "${prefix}"_"${base_name}".dat
+) &
+
+
 wait
 
 #-fsanitize-address-use-after-scope

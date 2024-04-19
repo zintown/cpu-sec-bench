@@ -182,7 +182,7 @@ str_list_t& append_str_list(str_list_t &l, const char *str_const) {
 }
 
 void report_gen() {
-
+  std::string invalid_chars = "<>:\"/\\|?*"; // Add any other characters that should be removed
   // insert sys infomation to the result file
   std::ifstream sys_info_file("test/sys_info.txt");
 
@@ -193,7 +193,12 @@ void report_gen() {
   size_t pos = str_buf.find("OVERVIEW:");
 
   if (pos != std::string::npos) {
-      resfile_name = str_buf.substr(pos + sizeof("OVERVIEW:")-1) + ".dat"; // Extract the string after "CPU:"
+      resfile_name = str_buf.substr(pos + sizeof("OVERVIEW:")-1);
+      for (char&c:resfile_name){
+        if (invalid_chars.find(c) != std::string::npos) c = '_';
+        if (c == '+') c = 'p';
+      }
+      resfile_name += ".dat"; // Extract the string after "CPU:"
   }
 
   std::ofstream report_file(resfile_name);
@@ -590,6 +595,7 @@ bool run_tests(std::list<std::string> cases) {
         if(debug_run) std::cout << "\"arguments\" ind is: " << ind << std::endl;
         auto alist = alists[ind];
         test_cond = case_parser(cn, tcase, ind, prog, gvar, dbvar, expect_results,make_config_macro, last_make_config_macro, need_rebuild, need_build);
+        long long curr_script_time = 0;
         if(!test_run || test_cond == 0) {
           if(debug_run)std::cout << "\n------ " << cn << " ------" << std::endl;
           int make_result = 0;
@@ -634,7 +640,7 @@ bool run_tests(std::list<std::string> cases) {
                         " " << dbvar.front() << " " << dbvar.back() << std::endl;
                   make_result = run_cmd(argv_conv("script\\msvc_get_addroffset_of_currfunc.bat", str_list_t{
                                   "test/" + prog +".exe", dbvar.front(), dbvar.back()}), NULL, curr_script_time);
-                  make_results.insert(make_result);
+                  if(make_result)make_results.insert(make_result);
               }
               #else
               curr_size = get_file_size("test/" + prog);
@@ -652,6 +658,7 @@ bool run_tests(std::list<std::string> cases) {
               if(!extra_run_prefix.empty()) for(auto a:extra_run_prefix) std::cout << std::string(a) << " ";
               std::cout << cmd; for(auto a:arg) std::cout << " " << a; std::cout << std::endl;
               int one_run_result = run_cmd(argv_conv(cmd, arg), run_env, one_run_time);
+              std::cout << "after run result is: " << one_run_result << std::endl;
               #ifdef _MSC_VER
               one_run_time += curr_script_time;
               #endif
@@ -720,6 +727,12 @@ FINISH_CURRENT_CASE:
           }
         }
       }
+      std::cout << "make results: ";
+      for(auto &a: make_results)
+        std::cerr << " " << a << std::endl;
+      std::cout << "test results: ";
+      for(auto &a: test_results)
+        std::cerr << " " << a << std::endl;
 
       current_test_checkdep_count = 0;
       result_db[cn]["result"] = test_result;
