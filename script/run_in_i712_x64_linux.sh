@@ -15,7 +15,7 @@ rename_log() {
 
 cd ../
 i=1
-while [ "$i" -le 11 ]; do
+while [ "$i" -le 12 ]; do
 	# Create a new directory name
 	new_dir="cpu-sec-bench-$i"
 	# Check if the directory already exists
@@ -234,6 +234,7 @@ prefix=G12-GCC-CET
 	unset CXX
 	export CXX=g++
 	export enable_cet_shadow_stack="yes"
+	export GLIBC_TUNABLES=glibc.cpu.hwcaps=SHSTK
 
 	make cleanall >temp.log 2>&1
 	make -e >>temp.log 2>&1
@@ -256,6 +257,7 @@ prefix=G12-GCC-FULL
 	export enable_stack_protection="yes"
 	export enable_stack_clash_protection="yes"
 	export enable_cet_shadow_stack="yes"
+	export GLIBC_TUNABLES=glibc.cpu.hwcaps=SHSTK
 	export enable_vtable_verify="yes"
 
 	make cleanall >temp.log 2>&1
@@ -279,6 +281,7 @@ prefix=G12-LLVM-full
 	export enable_stack_protection="yes"
 	export enable_stack_clash_protection="yes"
 	export enable_cet_shadow_stack="yes"
+	export GLIBC_TUNABLES=glibc.cpu.hwcaps=SHSTK
 
 	make cleanall >temp.log 2>&1
 	make -e >>temp.log 2>&1
