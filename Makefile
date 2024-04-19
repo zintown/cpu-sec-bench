@@ -167,19 +167,16 @@ ifeq ($(OSType),Windows_NT)
 
 	ifdef enable_default_address_sanitizer
 		CXXFLAGS += /fsanitize=address
-		OBJECT_CXXFLAGS += /fsanitize=address
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-asan
 	endif
 
 	ifdef enable_fuzzer_address_sanitizer
 		CXXFLAGS += /fsanitize=fuzzer
-		OBJECT_CXXFLAGS += /fsanitize=fuzzer
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-r-asan
 	endif
 
 	ifdef enable_return_address_sanitizer
 		CXXFLAGS += /fsanitize-address-use-after-return
-		OBJECT_CXXFLAGS += /fsanitize-address-use-after-return
 		RUN_PREFIX += ASAN_OPTIONS=detect_stack_use_after_return=1 
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-f-asan
 	endif
