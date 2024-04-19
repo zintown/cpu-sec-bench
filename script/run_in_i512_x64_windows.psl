@@ -1,0 +1,42 @@
+#! powershell
+
+# keep log name same with result name
+function rename_log {
+	$log_name = (ls -File | Sort-Object LastWriteTime -Descending)[0].Name
+	$base_name = [System.IO.Path]::GetFileNameWithoutExtension($log_name)
+	$base_name
+}
+
+$currentDir = (Get-Location)
+$parentDir = (Get-Item $currentDir).Parent.FullName
+Set-Location $parentDir
+
+$i = 1
+while ($i -le 11) {
+	$newDir = "cpu-sec-bench-$i"
+	if (Test-Path $newDir) {
+		Remove-Item -Recurse -Force $newDir
+	}
+	Copy-Item -Recurse "cpu-sec-bench" $newDir
+	$i++
+}
+Set-Location $currentDir
+
+$prefix = "x86-64-Lin-G"
+
+$scriptBlock = {
+	echo $prefix
+	$parentDir = (Get-Item (Get-Location).Parent).Parent.FullName
+	Set-Location $parentDir
+	Set-Location "cpu-sec-bench"
+	$Env:CXX = "g++"
+	.\cleanall >temp.log 2>&1
+	.\make.exe -e >>temp.log 2>&1
+	.\run-test.exe exhausted-run >>temp.log 2>&1
+	$base_name = rename_log
+	echo $base_name
+	Move-Item temp.log "$prefix`_$base_name.log"
+	Move-Item "$base_name.dat" "$prefix`_$base_name.dat"
+}
+
+Start-Job -ScriptBlock $scriptBlock

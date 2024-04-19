@@ -27,6 +27,7 @@ SIMPLE_FLAGS    := default
 #enable_aslr_protection         = yes
 #disable_aslr_protection        = yes
 #enable_cet_shadow_stack        = yes
+#enable_default_address_sanitizer = yes
 
 # common option in Linux
 #enable_got_protection          = yes
@@ -36,7 +37,8 @@ SIMPLE_FLAGS    := default
 #enable_control_flow_protection = yes
 #disable_control_flow_protection= yes
 #enable_stack_clash_protection  = yes
-#enable_address_sanitizer       = yes
+#enable_address_sanitizer_without_leaker       = yes
+#enable_undefined_sanitizer = yes
 
 # common option in Windows, msvc specific safety feature
 #enable_extra_stack_protection  = yes
@@ -161,7 +163,7 @@ ifeq ($(OSType),Windows_NT)
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-extra_stack_p
 	endif
 
-	ifdef enable_address_sanitizer
+	ifdef enable_default_address_sanitizer
 		CXXFLAGS += /fsanitize=address
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-asan
 	endif
@@ -180,9 +182,9 @@ else
 
 	#compiler
 	ifeq ($(OSType),Darwin)
-		CXX         := clang++
+		CXX         ?= clang++
 	else
-		CXX         := g++
+		CXX         ?= g++
 	endif
 	ASM           := as
 	CLIBAPI       := posix
@@ -240,11 +242,11 @@ else
 	ifdef disable_stack_nx_protection
 		CXXFLAGS += -z noexecstack
 	endif
-
+	# -fstack-protector-all > -fstack-protector-strong
 	ifdef enable_stack_protection
 		CXXFLAGS += -Wstack-protector -fstack-protector-all
 	ifeq ($(ARCH),x86_64)
-		CXXFLAGS += -mstack-protector-guard=guard
+		CXXFLAGS += -mstack-protector-guard=global
 	endif
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-stack_p
 	endif
@@ -290,7 +292,8 @@ else
 	endif
 
 	ifdef enable_cet_shadow_stack
-		CXXFLAGS += -fcf-protection=return
+		CXXFLAGS += -Wl,--rpath=../glibc-2.39/build -Wl,--dynamic-linker=../glibc/build/elf/ld-linux-x86-64.so.2 -fcf-protection=full
+		OBJECT_CXXFLAGS += -Wl,--rpath=../glibc-2.39/build -Wl,--dynamic-linker=../glibc/build/elf/ld-linux-x86-64.so.2 -fcf-protection=full
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-cet_ss
 	endif
 
@@ -305,17 +308,37 @@ else
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-stack_p
 	endif
 
-	ifdef enable_address_sanitizer
+	ifdef enable_address_sanitizer_without_leaker
 		CXXFLAGS += -fsanitize=address
+		OBJECT_CXXFLAGS += -fsanitize=address
 		RUN_PREFIX += ASAN_OPTIONS=detect_leaks=0
-		ifeq ($(CXX),$(filter $(CXX),clang++ c++))
-			LDFLAGS  += -static-libsan
-		else
-			LDFLAGS  += -static-libasan
-			CXXFLAGS += --param=asan-stack=1
-		endif
+		# ifeq ($(CXX),$(filter $(CXX),clang++ c++))
+		# 	LDFLAGS  += -static-libsan
+		# else
+		# 	LDFLAGS  += -static-libasan
+		# 	CXXFLAGS += --param=asan-stack=1
+		# endif
+		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-nl-asan
+	endif
+
+	ifdef enable_default_address_sanitizer
+		CXXFLAGS += -fsanitize=address
+		OBJECT_CXXFLAGS += -fsanitize=address
+		# ifeq ($(CXX),$(filter $(CXX),clang++ c++))
+		# 	LDFLAGS  += -static-libsan
+		# else
+		# 	LDFLAGS  += -static-libasan
+		# 	CXXFLAGS += --param=asan-stack=1
+		# endif
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-asan
 	endif
+
+	ifdef enable_undefined_sanitizer
+		CXXFLAGS += -fsanitize=undefined
+		OBJECT_CXXFLAGS += -fsanitize=undefined
+		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-uasan
+	endif
+
 endif
 
 ifdef enable_riscv64_cheri
@@ -404,7 +427,7 @@ ifeq ($(OSType),Windows_NT)
 $(test-path)/sys_info.txt:
 	-mkdir $(test-path)
 	-mkdir $(log-path)
-	echo "OVERVIEW:"$(ARCH)"-"$(CXX)"-"$(SIMPLE_FLAGS) > $(test-path)/sys_info.txt
+	echo "OVERVIEW:$(ARCH)-$(CXX)-$(SIMPLE_FLAGS)" > $(test-path)/sys_info.txt
 	echo "CPU: " >> $(test-path)/sys_info.txt
 	systeminfo | findstr /C:"Intel" >> $(test-path)/sys_info.txt
 	echo "System:" >> $(test-path)/sys_info.txt
@@ -424,7 +447,7 @@ else
 $(test-path)/sys_info.txt:
 	-mkdir -p $(test-path)
 	-mkdir -p $(log-path)
-	echo "OVERVIEW: $(ARCH)-$(CXX)-$(SIMPLE_FLAGS)" > $(test-path)/sys_info.txt
+	echo "OVERVIEW:$(ARCH)-$(CXX)-$(SIMPLE_FLAGS)" > $(test-path)/sys_info.txt
 	echo "CPU:" >> $(test-path)/sys_info.txt
 	echo "$(CPU_INFO)" >> $(test-path)/sys_info.txt
 	echo "System: " >> $(test-path)/sys_info.txt
