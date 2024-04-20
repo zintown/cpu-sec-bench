@@ -48,9 +48,12 @@ SIMPLE_FLAGS    := default
 
 # specific hardware secrutiy features
 
-#enable_riscv64_cheri           = yes
-#enable_aarch64_morello         = yes
 #enable_aarch64_tbi             = yes
+#enable_riscv64_cheri_default     = yes
+#enable_riscv64_cheri_everywhere_unsafe= yes
+#enable_riscv64_morello_default     = yes
+#enable_aarch64_morello_everywhere_unsafe= yes
+#enable_aarch64_mte             = yes
 #enable_aarch64_pa              = yes
 #enable_aarch64_bti             = yes
 #enable_aarch64_mte             = yes
@@ -355,18 +358,33 @@ else
 
 endif
 
-ifdef enable_riscv64_cheri
+ifdef enable_riscv64_cheri_default
 	ARCH :=cheri_riscv64
-	CXXFLAGS += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d -cheri-bounds=very-aggressive
+	CXXFLAGS += -mno-relax -fuse-ld=lld -march=rv64gcxcheri -mabi=l64pc128d
 	SCHEDULER_CXXFLAGS += -mno-relax
-	OBJECT_CXXFLAGS += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d -cheri-bounds=very-aggressive
+	OBJECT_CXXFLAGS += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-cheri
 endif
 
-ifdef enable_aarch64_morello
+ifdef enable_riscv64_cheri_everywhere_unsafe
+	ARCH :=cheri_riscv64
+	CXXFLAGS += -mno-relax -fuse-ld=lld -march=rv64gcxcheri -mabi=l64pc128d -cheri-bounds=everywhere-unsafe
+	SCHEDULER_CXXFLAGS += -mno-relax
+	OBJECT_CXXFLAGS += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d -cheri-bounds=everywhere-unsafe
+	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-cheri
+endif
+
+ifdet enable_riscv64_morello_default
 	ARCH        :=aarch64
-	CXXFLAGS += -march=morello -mabi=purecap -cheri-bounds=very-aggressive
-	OBJECT_CXXFLAGS += -march=morello -mabi=purecap -cheri-bounds=very-aggressive
+	CXXFLAGS += -march=morello -mabi=purecap
+	OBJECT_CXXFLAGS += -march=morello -mabi=purecap
+	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-morello
+endif
+
+ifdef enable_aarch64_morello_everywhere_unsafe
+	ARCH        :=aarch64
+	CXXFLAGS += -march=morello -mabi=purecap -cheri-bounds=everywhere-unsafe
+	OBJECT_CXXFLAGS += -march=morello -mabi=purecap -cheri-bounds=everywhere-unsafe
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-morello
 endif
 
