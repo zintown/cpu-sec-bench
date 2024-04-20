@@ -15,7 +15,7 @@ rename_log() {
 
 cd ../
 i=1
-while [ "$i" -le 11 ]; do
+while [ "$i" -le 5 ]; do
 	# Create a new directory name
 	new_dir="cpu-sec-bench-$i"
 	# Use cp to copy the current directory into the new directory
@@ -69,3 +69,97 @@ prefix=Armv8.5-Lin-L
 	mv temp.log "${prefix}"_"${base_name}".log
 	mv "${base_name}".dat "${prefix}"_"${base_name}".dat
 ) &
+
+ind=2
+prefix=G3-GCC-TBI
+(
+	echo "${prefix}"
+
+	cd ..
+	cd cpu-sec-bench-"${ind}" || (
+		echo "no cpu-sec-bench-${ind}"
+		exit
+	)
+	unset CXX
+	export CXX=g++
+
+	export enable_aarch64_tbi="yes"
+
+	make cleanall >temp.log 2>&1
+	make -e >>temp.log 2>&1
+	./run-test exhausted-run >>temp.log 2>&1
+	base_name=$(rename_log)
+	mv temp.log "${prefix}"_"${base_name}".log
+	mv "${base_name}".dat "${prefix}"_"${base_name}".dat
+) &
+
+ind=3
+prefix=G3-GCC-PA
+(
+	echo "${prefix}"
+
+	cd ..
+	cd cpu-sec-bench-"${ind}" || (
+		echo "no cpu-sec-bench-${ind}"
+		exit
+	)
+	unset CXX
+	export CXX=g++
+
+	export enable_aarch64_pa="yes"
+
+	make cleanall >temp.log 2>&1
+	make -e >>temp.log 2>&1
+	./run-test exhausted-run >>temp.log 2>&1
+	base_name=$(rename_log)
+	mv temp.log "${prefix}"_"${base_name}".log
+	mv "${base_name}".dat "${prefix}"_"${base_name}".dat
+) &
+
+ind=4
+prefix=G3-GCC-BTI
+(
+	echo "${prefix}"
+
+	cd ..
+	cd cpu-sec-bench-"${ind}" || (
+		echo "no cpu-sec-bench-${ind}"
+		exit
+	)
+	unset CXX
+	export CXX=g++
+
+	export enable_aarch64_bti="yes"
+
+	make cleanall >temp.log 2>&1
+	make -e >>temp.log 2>&1
+	./run-test exhausted-run >>temp.log 2>&1
+	base_name=$(rename_log)
+	mv temp.log "${prefix}"_"${base_name}".log
+	mv "${base_name}".dat "${prefix}"_"${base_name}".dat
+) &
+
+ind=5
+prefix=G3-GCC-MTE
+(
+	echo "${prefix}"
+
+	cd ..
+	cd cpu-sec-bench-"${ind}" || (
+		echo "no cpu-sec-bench-${ind}"
+		exit
+	)
+	unset CXX
+	export CXX=g++
+
+	export enable_aarch64_mte="yes"
+
+	make cleanall >temp.log 2>&1
+	make -e >>temp.log 2>&1
+	./run-test exhausted-run >>temp.log 2>&1
+	base_name=$(rename_log)
+	mv temp.log "${prefix}"_"${base_name}".log
+	mv "${base_name}".dat "${prefix}"_"${base_name}".dat
+) &
+
+wait

@@ -50,9 +50,11 @@ SIMPLE_FLAGS    := default
 
 #enable_riscv64_cheri           = yes
 #enable_aarch64_morello         = yes
-#enable_aarch64_mte             = yes
+#enable_aarch64_tbi             = yes
 #enable_aarch64_pa              = yes
 #enable_aarch64_bti             = yes
+#enable_aarch64_mte             = yes
+#enable_arm64e                  = yes
 
 # define paths and objects
 ifeq ($(OSType),Windows_NT)
@@ -368,9 +370,15 @@ ifdef enable_aarch64_morello
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-morello
 endif
 
+ifdef enable_aarch64_tbi
+	CXXFLAGS := $(CXXFLAGS) -fsanitize=hwaddress
+	OBJECT_CXXFLAGS += -fsanitize=hwaddress
+	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-tbi
+endif
+
 ifdef enable_aarch64_mte
-	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag -fsanitize=hwaddress
-	OBJECT_CXXFLAGS += -march=armv8.5-a+memtag -fsanitize=hwaddress
+	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag
+	OBJECT_CXXFLAGS += -march=armv8.5-a+memtag
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-mte
 endif
 
@@ -384,6 +392,14 @@ ifdef enable_aarch64_bti
 	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a -mbranch-protection=bti
 	OBJECT_CXXFLAGS += -march=armv8.5-a -mbranch-protection=bti
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-bti
+endif
+
+ifdef enable_arm64e
+	CXXFLAGS := -arch arm64e -ftrivial-auto-var-init-skip-non-ptr-array -fptrauth-calls -fptrauth-vtable-pointer-address-discrimination -fptrauth-function-pointer-type-discrimination -fptrauth-indirect-gotos -fptrauth-intrinsics -fptrauth-returns
+-fptrauth-soft -fptrauth-vtable-pointer-type-discrimination
+	OBJECT_CXXFLAGS := -arch arm64e -ftrivial-auto-var-init-skip-non-ptr-array -fptrauth-calls -fptrauth-vtable-pointer-address-discrimination -fptrauth-function-pointer-type-discrimination -fptrauth-indirect-gotos -fptrauth-intrinsics -fptrauth-returns
+-fptrauth-soft -fptrauth-vtable-pointer-type-discrimination
+	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-arm64e
 endif
 
 # define cases

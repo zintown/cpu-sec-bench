@@ -15,7 +15,7 @@ rename_log() {
 
 cd ../
 i=1
-while [ "$i" -le 1 ]; do
+while [ "$i" -le 2 ]; do
 	# Create a new directory name
 	new_dir="cpu-sec-bench-$i"
 	# Use cp to copy the current directory into the new directory
@@ -29,7 +29,7 @@ cd - || (
 	exit
 )
 
-prefix=Armv8.0-Lin-G
+prefix=Armv8.6-Dar-L
 (
 	echo "${prefix}"
 
@@ -39,7 +39,8 @@ prefix=Armv8.0-Lin-G
 		exit
 	)
 	unset CXX
-	export CXX=g++
+	# which means apple llvm
+	export CXX=c++
 	make cleanall >temp.log 2>&1
 	make -e >>temp.log 2>&1
 	./run-test exhausted-run >>temp.log 2>&1
@@ -50,7 +51,7 @@ prefix=Armv8.0-Lin-G
 ) &
 
 ind=1
-prefix=Armv8.0-Lin-L
+prefix=M2-ASan-full
 (
 	echo "${prefix}"
 
@@ -60,7 +61,33 @@ prefix=Armv8.0-Lin-L
 		exit
 	)
 	unset CXX
-	export CXX=clang++
+	export CXX=c++
+    export enable_undefined_sanitizer="yes"
+    export enable_default_address_sanitizer="yes"
+
+
+	make cleanall >temp.log 2>&1
+	make -e >>temp.log 2>&1
+	./run-test exhausted-run >>temp.log 2>&1
+	base_name=$(rename_log)
+	mv temp.log "${prefix}"_"${base_name}".log
+	mv "${base_name}".dat "${prefix}"_"${base_name}".dat
+) &
+
+
+ind=2
+prefix=M2-Apple-PA
+(
+	echo "${prefix}"
+
+	cd ..
+	cd cpu-sec-bench-"${ind}" || (
+		echo "no cpu-sec-bench-${ind}"
+		exit
+	)
+	unset CXX
+	export CXX=c++
+	export enable_arm64e="yes"
 
 	make cleanall >temp.log 2>&1
 	make -e >>temp.log 2>&1
