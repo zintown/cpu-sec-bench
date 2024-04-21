@@ -51,7 +51,7 @@ SIMPLE_FLAGS    := default
 #enable_aarch64_tbi             = yes
 #enable_riscv64_cheri_default     = yes
 #enable_riscv64_cheri_everywhere_unsafe= yes
-#enable_riscv64_morello_default     = yes
+#enable_aarch64_morello_default     = yes
 #enable_aarch64_morello_everywhere_unsafe= yes
 #enable_aarch64_mte             = yes
 #enable_aarch64_pa              = yes
@@ -374,7 +374,7 @@ ifdef enable_riscv64_cheri_everywhere_unsafe
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-cheri
 endif
 
-ifdet enable_riscv64_morello_default
+ifdef enable_aarch64_morello_default
 	ARCH        :=aarch64
 	CXXFLAGS += -march=morello -mabi=purecap
 	OBJECT_CXXFLAGS += -march=morello -mabi=purecap
@@ -413,10 +413,8 @@ ifdef enable_aarch64_bti
 endif
 
 ifdef enable_arm64e
-	CXXFLAGS := -arch arm64e -ftrivial-auto-var-init-skip-non-ptr-array -fptrauth-calls -fptrauth-vtable-pointer-address-discrimination -fptrauth-function-pointer-type-discrimination -fptrauth-indirect-gotos -fptrauth-intrinsics -fptrauth-returns
--fptrauth-soft -fptrauth-vtable-pointer-type-discrimination
-	OBJECT_CXXFLAGS := -arch arm64e -ftrivial-auto-var-init-skip-non-ptr-array -fptrauth-calls -fptrauth-vtable-pointer-address-discrimination -fptrauth-function-pointer-type-discrimination -fptrauth-indirect-gotos -fptrauth-intrinsics -fptrauth-returns
--fptrauth-soft -fptrauth-vtable-pointer-type-discrimination
+	CXXFLAGS := $(CXXFLAGS) -arch arm64e -ftrivial-auto-var-init-skip-non-ptr-array -fptrauth-calls -fptrauth-indirect-gotos -fptrauth-intrinsics -fptrauth-returns -fptrauth-vtable-pointer-type-discrimination -fptrauth-vtable-pointer-address-discrimination
+	OBJECT_CXXFLAGS += -arch arm64e -ftrivial-auto-var-init-skip-non-ptr-array -fptrauth-calls  -fptrauth-indirect-gotos -fptrauth-intrinsics -fptrauth-returns -fptrauth-vtable-pointer-type-discrimination -fptrauth-vtable-pointer-address-discrimination
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-arm64e
 endif
 
