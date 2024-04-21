@@ -7,3 +7,24 @@ function rename_log {
         exit 1
     }
 }
+
+function run_test {
+    param (
+        [string]$prefix
+    )
+
+    # Call make cleanall and make -e
+    & make cleanall *> temp.log 2>&1
+    & make -e >> temp.log 2>&1
+    
+    # Run the test
+    & .\run-test.exe exhausted-run >> temp.log 2>&1
+    
+    $base_name = rename_log
+    Write-Output $base_name
+    
+    # Move the log and dat files
+    Move-Item temp.log "${prefix}_${base_name}.log"
+    Move-Item "${base_name}.dat" "${prefix}_${base_name}.dat"
+
+}

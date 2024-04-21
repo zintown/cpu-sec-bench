@@ -25,19 +25,7 @@ $job0 = Start-Job -ScriptBlock{
     
     Write-Output $using:prefix
 
-    # Call make cleanall and make -e
-    & make cleanall *> temp.log 2>&1
-    & make -e >> temp.log 2>&1
-    
-    # Run the test
-    & .\run-test.exe exhausted-run >> temp.log 2>&1
-    
-    $base_name = rename_log
-    Write-Output $base_name
-    
-    # Move the log and dat files
-    Move-Item temp.log "${using:prefix}_${base_name}.log"
-    Move-Item "${base_name}.dat" "${using:prefix}_${base_name}.dat"
+    run_test "$using:prefix"
 } 
 
 $prefix = "MSVC-ASan-return"
@@ -52,19 +40,7 @@ $job1 = Start-Job -ScriptBlock{
     $env:enable_return_address_sanitizer = "yes"
     $env:ASAN_OPTIONS="detect_stack_use_after_return=1"
 
-    # Call make cleanall and make -e
-    & make cleanall *> temp.log 2>&1
-    & make -e >> temp.log 2>&1
-    
-    # Run the test
-    & .\run-test.exe exhausted-run >> temp.log 2>&1
-    
-    $base_name = rename_log
-    Write-Output $base_name
-    
-    # Move the log and dat files
-    Move-Item temp.log "${using:prefix}_${base_name}.log"
-    Move-Item "${base_name}.dat" "${using:prefix}_${base_name}.dat"
+    run_test "$using:prefix"
 }
 
 $prefix = "MSVC-ASan-fuzzer"
@@ -78,19 +54,7 @@ $job2 = Start-Job -ScriptBlock{
 
     $env:enable_fuzzer_address_sanitizer = "yes"
 
-    # Call make cleanall and make -e
-    & make cleanall *> temp.log 2>&1
-    & make -e >> temp.log 2>&1
-    
-    # Run the test
-    & .\run-test.exe exhausted-run >> temp.log 2>&1
-    
-    $base_name = rename_log
-    Write-Output $base_name
-    
-    # Move the log and dat files
-    Move-Item temp.log "${using:prefix}_${base_name}.log"
-    Move-Item "${base_name}.dat" "${using:prefix}_${base_name}.dat"
+    run_test "$using:prefix"
 }
 
 $prefix = "MSVC-ASan-address"
@@ -104,19 +68,7 @@ $job3 = Start-Job -ScriptBlock{
 
     $env:enable_default_address_sanitizer = "yes"
 
-    # Call make cleanall and make -e
-    & make cleanall *> temp.log 2>&1
-    & make -e >> temp.log 2>&1
-    
-    # Run the test
-    & .\run-test.exe exhausted-run >> temp.log 2>&1
-    
-    $base_name = rename_log
-    Write-Output $base_name
-    
-    # Move the log and dat files
-    Move-Item temp.log "${using:prefix}_${base_name}.log"
-    Move-Item "${base_name}.dat" "${using:prefix}_${base_name}.dat"
+    run_test "$using:prefix"
 }
 
 $prefix = "MSVC-ASan-full"
@@ -133,19 +85,7 @@ $job4 = Start-Job -ScriptBlock{
     $env:ASAN_OPTIONS="detect_stack_use_after_return=1"
     $env:enable_return_address_sanitizer = "yes"
 
-    # Call make cleanall and make -e
-    & make cleanall *> temp.log 2>&1
-    & make -e >> temp.log 2>&1
-    
-    # Run the test
-    & .\run-test.exe exhausted-run >> temp.log 2>&1
-    
-    $base_name = rename_log
-    Write-Output $base_name
-    
-    # Move the log and dat files
-    Move-Item temp.log "${using:prefix}_${base_name}.log"
-    Move-Item "${base_name}.dat" "${using:prefix}_${base_name}.dat"
+    run_test "$using:prefix"
 }
 
 $prefix = "G12-Win-cf"
@@ -161,19 +101,7 @@ $job5 = Start-Job -ScriptBlock{
     $env:enable_control_flow_protection = "yes"
     $env:enable_extra_stack_protection = "yes"
 
-    # Call make cleanall and make -e
-    & make cleanall *> temp.log 2>&1
-    & make -e >> temp.log 2>&1
-    
-    # Run the test
-    & .\run-test.exe exhausted-run >> temp.log 2>&1
-    
-    $base_name = rename_log
-    Write-Output $base_name
-    
-    # Move the log and dat files
-    Move-Item temp.log "${using:prefix}_${base_name}.log"
-    Move-Item "${base_name}.dat" "${using:prefix}_${base_name}.dat"
+    run_test "$using:prefix"
 }
 
 $prefix = "G12-Win-full"
@@ -191,19 +119,7 @@ $job6 = Start-Job -ScriptBlock{
     $env:enable_heap_integrity = "yes"
     $env:enable_cet_shadow_stack = "yes"
 
-    # Call make cleanall and make -e
-    & make cleanall *> temp.log 2>&1
-    & make -e >> temp.log 2>&1
-    
-    # Run the test
-    & .\run-test.exe exhausted-run >> temp.log 2>&1
-    
-    $base_name = rename_log
-    Write-Output $base_name
-    
-    # Move the log and dat files
-    Move-Item temp.log "${using:prefix}_${base_name}.log"
-    Move-Item "${base_name}.dat" "${using:prefix}_${base_name}.dat"
+    run_test "$using:prefix"
 }
 
 Set-Location "cpu-sec-bench"

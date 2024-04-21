@@ -25,19 +25,7 @@ $job0 = Start-Job -ScriptBlock{
     
     Write-Output $using:prefix
 
-    # Call make cleanall and make -e
-    & make cleanall *> temp.log 2>&1
-    & make -e >> temp.log 2>&1
-    
-    # Run the test
-    & .\run-test.exe exhausted-run >> temp.log 2>&1
-    
-    $base_name = rename_log
-    Write-Output $base_name
-    
-    # Move the log and dat files
-    Move-Item temp.log "${using:prefix}_${base_name}.log"
-    Move-Item "${base_name}.dat" "${using:prefix}_${base_name}.dat"
+    run_test "$using:prefix"
 } 
 
 $prefix = "G8-Win-heap"
@@ -51,19 +39,7 @@ $job1 = Start-Job -ScriptBlock{
 
     $env:enable_heap_integrity = "yes"
 
-    # Call make cleanall and make -e
-    & make cleanall *> temp.log 2>&1
-    & make -e >> temp.log 2>&1
-    
-    # Run the test
-    & .\run-test.exe exhausted-run >> temp.log 2>&1
-    
-    $base_name = rename_log
-    Write-Output $base_name
-    
-    # Move the log and dat files
-    Move-Item temp.log "${using:prefix}_${base_name}.log"
-    Move-Item "${base_name}.dat" "${using:prefix}_${base_name}.dat"
+    run_test "$using:prefix"
 }
 
 $prefix = "G8-Win-cf"
@@ -79,19 +55,7 @@ $job2 = Start-Job -ScriptBlock{
     $env:enable_control_flow_protection = "yes"
     $env:enable_extra_stack_protection = "yes"
 
-    # Call make cleanall and make -e
-    & make cleanall *> temp.log 2>&1
-    & make -e >> temp.log 2>&1
-    
-    # Run the test
-    & .\run-test.exe exhausted-run >> temp.log 2>&1
-    
-    $base_name = rename_log
-    Write-Output $base_name
-    
-    # Move the log and dat files
-    Move-Item temp.log "${using:prefix}_${base_name}.log"
-    Move-Item "${base_name}.dat" "${using:prefix}_${base_name}.dat"
+    run_test "$using:prefix"
 }
 
 $prefix = "G8-Win-full"
@@ -109,19 +73,7 @@ $job3 = Start-Job -ScriptBlock{
     $env:enable_heap_integrity = "yes"
     $env:enable_cet_shadow_stack = "yes"
 
-    # Call make cleanall and make -e
-    & make cleanall *> temp.log 2>&1
-    & make -e >> temp.log 2>&1
-    
-    # Run the test
-    & .\run-test.exe exhausted-run >> temp.log 2>&1
-    
-    $base_name = rename_log
-    Write-Output $base_name
-    
-    # Move the log and dat files
-    Move-Item temp.log "${using:prefix}_${base_name}.log"
-    Move-Item "${base_name}.dat" "${using:prefix}_${base_name}.dat"
+    run_test "$using:prefix"
 }
 
 Set-Location "cpu-sec-bench"
