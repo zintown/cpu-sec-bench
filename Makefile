@@ -370,9 +370,9 @@ else
 	endif
 
 	ifdef enable_cet_shadow_stack
-		CXXFLAGS += -Wl,--dynamic-linker=../glibc/build/lib/ld-linux-x86-64.so.2 -fcf-protection=full
+		CXXFLAGS += -Wl,--rpath=/home/ciyan/glibc-2.39/install/lib -Wl,--dynamic-linker=../glibc/build/lib/ld-linux-x86-64.so.2 -fcf-protection=full
 		ifndef without_extra_ojbect_safety_options
-			OBJECT_CXXFLAGS += -Wl,--dynamic-linker=../glibc/build/lib/ld-linux-x86-64.so.2 -fcf-protection=full
+			OBJECT_CXXFLAGS += -Wl,--rpath=/home/ciyan/glibc-2.39/install/lib -Wl,--dynamic-linker=../glibc/build/lib/ld-linux-x86-64.so.2 -fcf-protection=full
 		endif
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-cet_ss
 	endif
