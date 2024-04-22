@@ -505,7 +505,7 @@ endif
 
 ifdef enable_arm64e
 	CXXFLAGS := $(CXXFLAGS) -arch arm64e -ftrivial-auto-var-init-skip-non-ptr-array -fptrauth-calls -fptrauth-indirect-gotos -fptrauth-intrinsics -fptrauth-returns -fptrauth-vtable-pointer-type-discrimination -fptrauth-vtable-pointer-address-discrimination
-	ifdef ifndef without_extra_ojbect_safety_options
+	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -arch arm64e -ftrivial-auto-var-init-skip-non-ptr-array -fptrauth-calls  -fptrauth-indirect-gotos -fptrauth-intrinsics -fptrauth-returns -fptrauth-vtable-pointer-type-discrimination -fptrauth-vtable-pointer-address-discrimination
 	endif
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-arm64e
