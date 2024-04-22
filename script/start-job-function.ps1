@@ -3,10 +3,14 @@ function run_test {
         [string]$prefix,
         [string]$result_dir
     )
+    Write-Output "current dir: $PWD"
 
-    make cleanall > temp.log 2>&1
-    make -e >> temp.log 2>&1
-    ./run-test exhausted-run >> temp.log 2>&1
+    # Call make cleanall and make -e
+    & make cleanall *> temp.log 2>&1
+    & make -e >> temp.log 2>&1
+    
+    # Run the test
+    & .\run-test.exe exhausted-run >> temp.log 2>&1
     $base_name = rename_log
     $final_name = "${prefix}_$base_name"
     Write-Output $final_name
@@ -27,17 +31,12 @@ function collect_results {
     Get-ChildItem -Recurse -Filter *.log | Copy-Item -Destination $result_dir
 
 }
-
-function export_func {
-    param (
-        [string]$exported_vars
-    )
-    # Split rest_columns with comma into an array
-    $columns_array = $exported_vars -split ','
-
-    # Iterate over the columns array
-    foreach ($column in $columns_array) {
-        Write-Output "\$env:$column"
-        $env:$column
+function rename_log {
+    $log_name = Get-ChildItem -Filter *.dat | Sort-Object LastAccessTime -Descending | Select-Object -First 1
+    if ($log_name) {
+        $base_name = [System.IO.Path]::GetFileNameWithoutExtension($log_name)
+        return $base_name
+    } else {
+        exit 1
     }
 }

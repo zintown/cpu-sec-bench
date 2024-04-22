@@ -440,7 +440,7 @@ ifdef enable_riscv64_cheri_default
 		OBJECT_CXXFLAGS += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d
 	endif
 	SCHEDULER_CXXFLAGS += -mno-relax
-	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-cheri
+	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-referenceonly
 endif
 
 ifdef enable_riscv64_cheri_everywhere_unsafe
@@ -450,7 +450,7 @@ ifdef enable_riscv64_cheri_everywhere_unsafe
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d -cheri-bounds=everywhere-unsafe
 	endif
-	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-cheri
+	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-everywhereunsafe
 endif
 
 ifdef enable_aarch64_morello_default
