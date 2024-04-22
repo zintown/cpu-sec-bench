@@ -391,7 +391,7 @@ else
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -fstack-clash-protection
 		endif
-		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-stack_p
+		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-stack_cp
 	endif
 
 	ifdef enable_address_sanitizer_without_leaker
