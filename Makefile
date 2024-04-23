@@ -216,6 +216,7 @@ ifeq ($(OSType),Windows_NT)
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-f-no-asan
 	endif
 
+	// experimantal option, must be used with -fsanitize=address
 	ifdef enable_return_address_sanitizer
 		CXXFLAGS += /fsanitize-address-use-after-return
 		ifndef without_extra_ojbect_safety_options
