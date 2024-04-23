@@ -718,6 +718,9 @@
         },
         "default_args": {
             "0": [
+                "0"
+            ],
+            "1": [
                 "2"
             ]
         },
@@ -1902,6 +1905,9 @@
         },
         "default_args": {
             "0": [
+                "0"
+            ],
+            "1": [
                 "2"
             ]
         },
@@ -1959,6 +1965,9 @@
         },
         "default_args": {
             "0": [
+                "0"
+            ],
+            "1": [
                 "2"
             ]
         },
@@ -2016,6 +2025,9 @@
         },
         "default_args": {
             "0": [
+                "0"
+            ],
+            "1": [
                 "2"
             ]
         },
@@ -2073,6 +2085,9 @@
         },
         "default_args": {
             "0": [
+                "1"
+            ],
+            "1": [
                 "3"
             ]
         },
@@ -2135,6 +2150,9 @@
         },
         "default_args": {
             "0": [
+                "1"
+            ],
+            "1": [
                 "3"
             ]
         },
@@ -2197,6 +2215,9 @@
         },
         "default_args": {
             "0": [
+                "1"
+            ],
+            "1": [
                 "3"
             ]
         },
@@ -2254,6 +2275,9 @@
         },
         "default_args": {
             "0": [
+                "0"
+            ],
+            "1": [
                 "2"
             ]
         },
@@ -2315,6 +2339,9 @@
         },
         "default_args": {
             "0": [
+                "0"
+            ],
+            "1": [
                 "2"
             ]
         },
@@ -2367,6 +2394,9 @@
         },
         "default_args": {
             "0": [
+                "0"
+            ],
+            "1": [
                 "2"
             ]
         },
@@ -2419,6 +2449,9 @@
         },
         "default_args": {
             "0": [
+                "1"
+            ],
+            "1": [
                 "3"
             ]
         },
@@ -2476,6 +2509,9 @@
         },
         "default_args": {
             "0": [
+                "1"
+            ],
+            "1": [
                 "3"
             ]
         },
@@ -2533,6 +2569,9 @@
         },
         "default_args": {
             "0": [
+                "1"
+            ],
+            "1": [
                 "3"
             ]
         },
@@ -2587,11 +2626,6 @@
     },
     "mss-write-by-bare-array-index-stack-overflow": {
         "program": "mss-write-by-bare-array-index",
-        "default_args": {
-            "0": [
-                "2"
-            ]
-        },
         "conf-macro": {
             "0": {
                 "BUFFER_SIZE": "8",
@@ -2638,6 +2672,14 @@
                 "-vredzone_inter_obj_stack"
             ]
         },
+        "default_args": {
+            "0": [
+                "0"
+            ],
+            "1": [
+                "2"
+            ]
+        },
         "reference": {
             "cwe": [
                 "119",
@@ -2653,11 +2695,6 @@
     },
     "mss-write-by-bare-array-index-heap-overflow": {
         "program": "mss-write-by-bare-array-index",
-        "default_args": {
-            "0": [
-                "2"
-            ]
-        },
         "require-comment": [
             "utilization",
             "utilization"
@@ -2685,6 +2722,14 @@
             "2": [
                 "4",
                 "-vredzone_inter_obj_heap"
+            ]
+        },
+        "default_args": {
+            "0": [
+                "0"
+            ],
+            "1": [
+                "2"
             ]
         },
         "conf-macro": {
@@ -2741,6 +2786,9 @@
         },
         "default_args": {
             "0": [
+                "0"
+            ],
+            "1": [
                 "2"
             ]
         },
@@ -2767,11 +2815,6 @@
     },
     "mss-write-by-bare-array-index-stack-underflow": {
         "program": "mss-write-by-bare-array-index",
-        "default_args": {
-            "0": [
-                "3"
-            ]
-        },
         "require-comment": [
             "utilization",
             "utilization"
@@ -2801,6 +2844,14 @@
                 "-vredzone_inter_obj_stack"
             ]
         },
+        "default_args": {
+            "0": [
+                "1"
+            ],
+            "1": [
+                "3"
+            ]
+        },
         "conf-macro": {
             "0": {
                 "BUFFER_SIZE": "8",
@@ -2824,11 +2875,6 @@
     },
     "mss-write-by-bare-array-index-heap-underflow": {
         "program": "mss-write-by-bare-array-index",
-        "default_args": {
-            "0": [
-                "3"
-            ]
-        },
         "require-comment": [
             "utilization",
             "utilization"
@@ -2858,6 +2904,14 @@
                 "-vredzone_inter_obj_heap"
             ]
         },
+        "default_args": {
+            "0": [
+                "1"
+            ],
+            "1": [
+                "3"
+            ]
+        },
         "conf-macro": {
             "0": {
                 "BUFFER_SIZE": "8",
@@ -2881,11 +2935,6 @@
     },
     "mss-write-by-bare-array-index-data-underflow": {
         "program": "mss-write-by-bare-array-index",
-        "default_args": {
-            "0": [
-                "3"
-            ]
-        },
         "require-comment": [
             "utilization",
             "utilization"
@@ -2915,6 +2964,14 @@
                 "-vredzone_inter_obj_data"
             ]
         },
+        "default_args": {
+            "0": [
+                "1"
+            ],
+            "1": [
+                "3"
+            ]
+        },
         "conf-macro": {
             "0": {
                 "BUFFER_SIZE": "8",
@@ -2938,11 +2995,6 @@
     },
     "mss-write-by-bare-array-pointer-stack-overflow": {
         "program": "mss-write-by-bare-array-pointer",
-        "default_args": {
-            "0": [
-                "2"
-            ]
-        },
         "conf-macro": {
             "0": {
                 "BUFFER_SIZE": "8",
@@ -2989,6 +3041,14 @@
                 "-vredzone_inter_obj_stack"
             ]
         },
+        "default_args": {
+            "0": [
+                "0"
+            ],
+            "1": [
+                "2"
+            ]
+        },
         "reference": {
             "cwe": [
                 "119",
@@ -3004,11 +3064,6 @@
     },
     "mss-write-by-bare-array-pointer-heap-overflow": {
         "program": "mss-write-by-bare-array-pointer",
-        "default_args": {
-            "0": [
-                "2"
-            ]
-        },
         "require-comment": [
             "utilization",
             "utilization"
@@ -3036,6 +3091,14 @@
             "2": [
                 "4",
                 "-vredzone_inter_obj_heap"
+            ]
+        },
+        "default_args": {
+            "0": [
+                "0"
+            ],
+            "1": [
+                "2"
             ]
         },
         "conf-macro": {
@@ -3092,6 +3155,9 @@
         },
         "default_args": {
             "0": [
+                "0"
+            ],
+            "1": [
                 "2"
             ]
         },
@@ -3118,11 +3184,6 @@
     },
     "mss-write-by-bare-array-pointer-stack-underflow": {
         "program": "mss-write-by-bare-array-pointer",
-        "default_args": {
-            "0": [
-                "3"
-            ]
-        },
         "require-comment": [
             "utilization",
             "utilization"
@@ -3152,6 +3213,14 @@
                 "-vredzone_inter_obj_stack"
             ]
         },
+        "default_args": {
+            "0": [
+                "1"
+            ],
+            "1": [
+                "3"
+            ]
+        },
         "conf-macro": {
             "0": {
                 "BUFFER_SIZE": "8",
@@ -3175,11 +3244,6 @@
     },
     "mss-write-by-bare-array-pointer-heap-underflow": {
         "program": "mss-write-by-bare-array-pointer",
-        "default_args": {
-            "0": [
-                "3"
-            ]
-        },
         "require-comment": [
             "utilization",
             "utilization"
@@ -3209,6 +3273,14 @@
                 "-vredzone_inter_obj_heap"
             ]
         },
+        "default_args": {
+            "0": [
+                "1"
+            ],
+            "1": [
+                "3"
+            ]
+        },
         "conf-macro": {
             "0": {
                 "BUFFER_SIZE": "8",
@@ -3232,11 +3304,6 @@
     },
     "mss-write-by-bare-array-pointer-data-underflow": {
         "program": "mss-write-by-bare-array-pointer",
-        "default_args": {
-            "0": [
-                "3"
-            ]
-        },
         "require-comment": [
             "utilization",
             "utilization"
@@ -3264,6 +3331,14 @@
             "2": [
                 "5",
                 "-vredzone_inter_obj_data"
+            ]
+        },
+        "default_args": {
+            "0": [
+                "1"
+            ],
+            "1": [
+                "3"
             ]
         },
         "conf-macro": {
