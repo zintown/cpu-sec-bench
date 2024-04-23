@@ -345,9 +345,9 @@ else
 	endif
 
 	ifdef enable_vtable_verify
-		CXXFLAGS += -fvtable-verify=std
+		CXXFLAGS += -Wl,--rpath=../gcc_build/lib64 -fvtable-verify=std
 		ifndef without_extra_ojbect_safety_options
-			OBJECT_CXXFLAGS += -fvtable-verify=std
+			OBJECT_CXXFLAGS += -Wl,--rpath=../gcc_build/lib64 -fvtable-verify=std
 		endif
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-vtable_v
 	endif
@@ -370,9 +370,9 @@ else
 	endif
 
 	ifdef enable_cet_shadow_stack
-		CXXFLAGS += -Wl,--rpath=/home/ciyan/glibc-2.39/install/lib -Wl,--dynamic-linker=../glibc/build/lib/ld-linux-x86-64.so.2 -fcf-protection=full
+		CXXFLAGS += -Wl,--rpath=../glibc/build/lib -Wl,--dynamic-linker=../glibc/build/lib/ld-linux-x86-64.so.2 -fcf-protection=full
 		ifndef without_extra_ojbect_safety_options
-			OBJECT_CXXFLAGS += -Wl,--rpath=/home/ciyan/glibc-2.39/install/lib -Wl,--dynamic-linker=../glibc/build/lib/ld-linux-x86-64.so.2 -fcf-protection=full
+			OBJECT_CXXFLAGS += -Wl,--rpath=../glibc/build/lib -Wl,--dynamic-linker=../glibc/build/lib/ld-linux-x86-64.so.2 -fcf-protection=full
 		endif
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-cet_ss
 	endif
