@@ -45,6 +45,7 @@ SIMPLE_FLAGS    := default
 #enable_heap_integrity          = yes
 #enable_return_address_sanitizer    = yes
 #enable_fuzzer_address_sanitizer    = yes
+#enable_fuzzer_address_sanitizer_withou_object_flags = yes
 
 # specific hardware secrutiy features
 
@@ -207,7 +208,12 @@ ifeq ($(OSType),Windows_NT)
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += /fsanitize=fuzzer
 		endif
-		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-r-asan
+		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-f-asan
+	endif
+
+	ifdef enable_fuzzer_address_sanitizer_withou_object_flags
+		CXXFLAGS += /fsanitize=fuzzer
+		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-f-no-asan
 	endif
 
 	ifdef enable_return_address_sanitizer
@@ -216,7 +222,7 @@ ifeq ($(OSType),Windows_NT)
 			OBJECT_CXXFLAGS += /fsanitize-address-use-after-return
 		endif
 		RUN_PREFIX += ASAN_OPTIONS=detect_stack_use_after_return=1 
-		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-f-asan
+		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-r-asan
 	endif
 else
 
