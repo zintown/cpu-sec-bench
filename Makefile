@@ -283,7 +283,7 @@ else
 	func-opcode-gen   := ./script/get_x64_func_inst.sh
 	ifeq ($(ARCH), aarch64)
 		func-opcode-gen := ./script/get_aarch64_func_inst.sh
-	else ifeq ($(ARCH), riscv64)
+	ifeq ($(ARCH), riscv64)
 		func-opcode-gen := ./script/get_riscv64_func_inst.sh
 	endif
 	dynlibcfi := $(addsuffix $(DLL_SUFFIX), lib/common/libcfi)
@@ -467,8 +467,6 @@ else
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-uasan
 	endif
 
-endif
-
 ifdef enable_riscv64_cheri_default
 	ARCH :=cheri_riscv64
 	CXXFLAGS += -mno-relax -fuse-ld=lld -march=rv64gcxcheri -mabi=l64pc128d
@@ -534,7 +532,7 @@ endif
 ifdef enable_aarch64_bti
 	ifeq($(APPLE),M2)
 		LDFLAGS += -L/opt/homebrew/Cellar/llvm/17.0.6_1/lib/c++ -Wl,-rpath,/opt/homebrew/Cellar/llvm/17.0.6_1/lib/c++
-	else ifeq($(APPLE),M1)
+	ifeq($(APPLE),M1)
 		LDFLAGS += -L/opt/homebrew/Cellar/llvm@15/15.0.7/lib/c++ -Wl,-rpath,/opt/homebrew/Cellar/llvm@15/15.0.7/lib/c++
 	endif
 	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a -mbranch-protection=bti
