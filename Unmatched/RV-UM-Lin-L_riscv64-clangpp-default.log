@@ -1,0 +1,3535 @@
+mkdir -p test
+mkdir -p trace-log
+echo "OVERVIEW:riscv64-clang++-default"> test/sys_info.txt
+echo "CPU:" >> test/sys_info.txt
+echo "" >> test/sys_info.txt
+echo "System: " >> test/sys_info.txt
+uname -srp >> test/sys_info.txt
+echo "Compiler : " >> test/sys_info.txt
+clang++ --version >> test/sys_info.txt
+echo "LIBC : " >> test/sys_info.txt
+objdump --version >> test/sys_info.txt
+echo "Flags : " >> test/sys_info.txt
+echo "OBJECT_CXXFLAGS = " -O2  -I./lib -std=c++11 -Wall >> test/sys_info.txt
+echo "CXXFLAGS = "  -I./lib -std=c++11 -Wall -fuse-ld=lld >> test/sys_info.txt
+echo "LDFLAGS = "  >> test/sys_info.txt
+clang++ -O2  -I./lib -std=c++11 -Wall -I. -DRUN_PREFIX="\"\"" scheduler/run-test.cpp lib/common/temp_file.cpp  -o run-test
+scheduler/run-test.cpp:530:18: warning: loop variable 'a' creates a copy from type 'const value_type' (aka 'const std::string') [-Wrange-loop-construct]
+  530 |   for(const auto a:args) strcpy(arg_pool[i++],a.c_str());
+      |                  ^
+scheduler/run-test.cpp:530:7: note: use reference type 'const value_type &' (aka 'const std::string &') to prevent copying
+  530 |   for(const auto a:args) strcpy(arg_pool[i++],a.c_str());
+      |       ^~~~~~~~~~~~~
+      |                  &
+scheduler/run-test.cpp:539:18: warning: loop variable 'a' creates a copy from type 'const value_type' (aka 'const pair<const std::string, std::string>') [-Wrange-loop-construct]
+  539 |   for(const auto a:args) strcpy(arg_pool[i++],(a.first + "=" + a.second).c_str());
+      |                  ^
+scheduler/run-test.cpp:539:7: note: use reference type 'const value_type &' (aka 'const pair<const std::string, std::string> &') to prevent copying
+  539 |   for(const auto a:args) strcpy(arg_pool[i++],(a.first + "=" + a.second).c_str());
+      |       ^~~~~~~~~~~~~
+      |                  &
+scheduler/run-test.cpp:548:18: warning: loop variable 'a' creates a copy from type 'const value_type' (aka 'const std::string') [-Wrange-loop-construct]
+  548 |   for(const auto a:args1) strcpy(arg_pool[i++],a.c_str());
+      |                  ^
+scheduler/run-test.cpp:548:7: note: use reference type 'const value_type &' (aka 'const std::string &') to prevent copying
+  548 |   for(const auto a:args1) strcpy(arg_pool[i++],a.c_str());
+      |       ^~~~~~~~~~~~~
+      |                  &
+scheduler/run-test.cpp:549:18: warning: loop variable 'a' creates a copy from type 'const value_type' (aka 'const pair<const std::string, std::string>') [-Wrange-loop-construct]
+  549 |   for(const auto a:args2) strcpy(arg_pool[i++],(a.first + "=" + a.second).c_str());
+      |                  ^
+scheduler/run-test.cpp:549:7: note: use reference type 'const value_type &' (aka 'const pair<const std::string, std::string> &') to prevent copying
+  549 |   for(const auto a:args2) strcpy(arg_pool[i++],(a.first + "=" + a.second).c_str());
+      |       ^~~~~~~~~~~~~
+      |                  &
+scheduler/run-test.cpp:598:19: warning: unused variable 'curr_script_time' [-Wunused-variable]
+  598 |         long long curr_script_time = 0;
+      |                   ^~~~~~~~~~~~~~~~
+5 warnings generated.
+Need to add extra evironment variables
+The num of all cases is: 239
+
+========== start: acc-check-IBT =========
+make -e test/acc-check-IBT 
+clang++ -O2  -I./lib -std=c++11 -Wall acc/check-IBT.cpp -c -o test/acc-check-IBT.o 
+acc/check-IBT.cpp:13:16: warning: unused variable 'instr' [-Wunused-variable]
+   13 |   unsigned int instr = *(unsigned int *)(goto_label);
+      |                ^~~~~
+1 warning generated.
+clang++ -O2  -I./lib -std=c++11 -Wall lib/common/global_var.cpp -c -o lib/common/global_var.o 
+clang++ -O2  -I./lib -std=c++11 -Wall lib/common/temp_file.cpp -c -o lib/common/temp_file.o 
+clang++ -O2  -I./lib -std=c++11 -Wall lib/riscv64/assembly.cpp -c -o lib/riscv64/assembly.o 
+clang++ -O2  -I./lib -std=c++11 -Wall lib/posix/signal.cpp -c -o lib/posix/signal.o 
+lib/posix/signal.cpp:69:26: warning: suggest braces around initialization of subobject [-Wmissing-braces]
+   69 |   sigact_stack[++svp] = {expected_faulty_addr, si_signo, si_code, rv_code};
+      |                          ^~~~~~~~~~~~~~~~~~~~
+      |                          {                   }
+lib/posix/signal.cpp:74:26: warning: suggest braces around initialization of subobject [-Wmissing-braces]
+   74 |   sigact_stack[++svp] = {expected_faulty_addr, si_signo, si_code, rv_code};
+      |                          ^~~~~~~~~~~~~~~~~~~~
+      |                          {                   }
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/acc-check-IBT.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-check-IBT 
+
+test/acc-check-IBT 1
+after run result is: 32
+set runtime variable ibt-enabled to 0
+make results: test results:  0
+
+========== end: acc-check-IBT =========
+
+========== start: acc-check-data-pointer-arithmetic-data =========
+make -e test/acc-check-data-pointer-arithmetic BUFFER_KIND=0 BUFFER_SIZE=8 REGION_KIND=2 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=2 acc/check-data-pointer-arithmetic.cpp -c -o test/acc-check-data-pointer-arithmetic.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=2 -fuse-ld=lld test/acc-check-data-pointer-arithmetic.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-check-data-pointer-arithmetic 
+
+test/acc-check-data-pointer-arithmetic
+after run result is: 0
+make results: test results:  0
+
+========== end: acc-check-data-pointer-arithmetic-data =========
+
+========== start: acc-check-data-pointer-arithmetic-heap =========
+make -e -W acc/check-data-pointer-arithmetic.cpp test/acc-check-data-pointer-arithmetic BUFFER_KIND=0 BUFFER_SIZE=8 REGION_KIND=1 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=1 acc/check-data-pointer-arithmetic.cpp -c -o test/acc-check-data-pointer-arithmetic.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=1 -fuse-ld=lld test/acc-check-data-pointer-arithmetic.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-check-data-pointer-arithmetic 
+
+test/acc-check-data-pointer-arithmetic
+after run result is: 0
+make results: test results:  0
+
+========== end: acc-check-data-pointer-arithmetic-heap =========
+
+========== start: acc-check-data-pointer-arithmetic-rodata =========
+make -e -W acc/check-data-pointer-arithmetic.cpp test/acc-check-data-pointer-arithmetic BUFFER_KIND=0 BUFFER_SIZE=8 REGION_KIND=3 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=3 acc/check-data-pointer-arithmetic.cpp -c -o test/acc-check-data-pointer-arithmetic.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=3 -fuse-ld=lld test/acc-check-data-pointer-arithmetic.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-check-data-pointer-arithmetic 
+
+test/acc-check-data-pointer-arithmetic
+after run result is: 0
+make results: test results:  0
+
+========== end: acc-check-data-pointer-arithmetic-rodata =========
+
+========== start: acc-check-data-pointer-arithmetic-stack =========
+make -e -W acc/check-data-pointer-arithmetic.cpp test/acc-check-data-pointer-arithmetic BUFFER_KIND=0 BUFFER_SIZE=8 REGION_KIND=0 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=0 acc/check-data-pointer-arithmetic.cpp -c -o test/acc-check-data-pointer-arithmetic.o 
+acc/check-data-pointer-arithmetic.cpp:10:5: warning: unused variable 'stack_bare_array_underflow' [-Wunused-variable]
+   10 |     INIT_BUFFER;
+      |     ^~~~~~~~~~~
+./lib/include/conf.hpp:205:34: note: expanded from macro 'INIT_BUFFER'
+  205 |         #define INIT_BUFFER char stack_bare_array_underflow[] = {BUFFER_VAL_UNDERFLOW,0};   \
+      |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~
+1 warning generated.
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=0 -fuse-ld=lld test/acc-check-data-pointer-arithmetic.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-check-data-pointer-arithmetic 
+
+test/acc-check-data-pointer-arithmetic
+after run result is: 0
+make results: test results:  0
+
+========== end: acc-check-data-pointer-arithmetic-stack =========
+
+========== start: acc-check-inter-obj-data-redzone =========
+make -e test/acc-check-inter-nonalloc-redzone BUFFER_KIND=2 BUFFER_SIZE=128 REGION_KIND=2 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=128 -DBUFFER_KIND=2 -DREGION_KIND=2 acc/check-inter-nonalloc-redzone.cpp -c -o test/acc-check-inter-nonalloc-redzone.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=128 -DBUFFER_KIND=2 -DREGION_KIND=2 -fuse-ld=lld test/acc-check-inter-nonalloc-redzone.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-check-inter-nonalloc-redzone 
+
+test/acc-check-inter-nonalloc-redzone 1
+after run result is: 64
+set runtime variable redzone_inter_obj_data to 1 by reading test/acc-check-inter-nonalloc-redzone_1.tmp
+make results: test results:  0
+
+========== end: acc-check-inter-obj-data-redzone =========
+
+========== start: acc-check-inter-obj-heap-redzone =========
+make -e test/acc-check-inter-alloc-redzone BUFFER_KIND=2 BUFFER_SIZE=128 REGION_KIND=1 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=128 -DBUFFER_KIND=2 -DREGION_KIND=1 acc/check-inter-alloc-redzone.cpp -c -o test/acc-check-inter-alloc-redzone.o 
+acc/check-inter-alloc-redzone.cpp:25:26: warning: taking the absolute value of unsigned type 'unsigned long long' has no effect [-Wabsolute-value]
+   25 |           long long d  = llabs(pa - pp) - s;
+      |                          ^
+acc/check-inter-alloc-redzone.cpp:25:26: note: remove the call to 'llabs' since unsigned values cannot be negative
+   25 |           long long d  = llabs(pa - pp) - s;
+      |                          ^~~~~
+1 warning generated.
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=128 -DBUFFER_KIND=2 -DREGION_KIND=1 -fuse-ld=lld test/acc-check-inter-alloc-redzone.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-check-inter-alloc-redzone 
+
+test/acc-check-inter-alloc-redzone
+after run result is: 64
+set runtime variable redzone_inter_obj_heap to 72 by reading test/acc-check-inter-alloc-redzone.tmp
+make results: test results:  0
+
+========== end: acc-check-inter-obj-heap-redzone =========
+
+========== start: acc-check-inter-obj-rodata-redzone =========
+make -e -W acc/check-inter-nonalloc-redzone.cpp test/acc-check-inter-nonalloc-redzone BUFFER_KIND=2 BUFFER_SIZE=128 REGION_KIND=3 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=128 -DBUFFER_KIND=2 -DREGION_KIND=3 acc/check-inter-nonalloc-redzone.cpp -c -o test/acc-check-inter-nonalloc-redzone.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=128 -DBUFFER_KIND=2 -DREGION_KIND=3 -fuse-ld=lld test/acc-check-inter-nonalloc-redzone.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-check-inter-nonalloc-redzone 
+
+test/acc-check-inter-nonalloc-redzone 2
+after run result is: 64
+set runtime variable redzone_inter_obj_rodata to 1 by reading test/acc-check-inter-nonalloc-redzone_2.tmp
+make results: test results:  0
+
+========== end: acc-check-inter-obj-rodata-redzone =========
+
+========== start: acc-check-inter-obj-stack-redzone =========
+make -e -W acc/check-inter-nonalloc-redzone.cpp test/acc-check-inter-nonalloc-redzone BUFFER_KIND=2 BUFFER_SIZE=128 REGION_KIND=0 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=128 -DBUFFER_KIND=2 -DREGION_KIND=0 acc/check-inter-nonalloc-redzone.cpp -c -o test/acc-check-inter-nonalloc-redzone.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=128 -DBUFFER_KIND=2 -DREGION_KIND=0 -fuse-ld=lld test/acc-check-inter-nonalloc-redzone.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-check-inter-nonalloc-redzone 
+
+test/acc-check-inter-nonalloc-redzone 0
+after run result is: 64
+set runtime variable redzone_inter_obj_stack to -1 by reading test/acc-check-inter-nonalloc-redzone_0.tmp
+make results: test results:  0
+
+========== end: acc-check-inter-obj-stack-redzone =========
+
+========== start: acc-check-intra-obj-data-redzone =========
+make -e test/acc-check-intra-redzone BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=2 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 acc/check-intra-redzone.cpp -c -o test/acc-check-intra-redzone.o 
+acc/check-intra-redzone.cpp:16:14: warning: unused variable 'str' [-Wunused-variable]
+   16 |   const char str[] = STR(STR2UL(RSTR(REGION_KIND), BSTR(BUFFER_KIND)));
+      |              ^~~
+1 warning generated.
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 -fuse-ld=lld test/acc-check-intra-redzone.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-check-intra-redzone 
+
+test/acc-check-intra-redzone 2
+after run result is: 64
+set runtime variable redzone_intra_obj_data to 8 by reading test/acc-check-intra-redzone_2.tmp
+make results: test results:  0
+
+========== end: acc-check-intra-obj-data-redzone =========
+
+========== start: acc-check-intra-obj-heap-redzone =========
+make -e -W acc/check-intra-redzone.cpp test/acc-check-intra-redzone BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=1 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 acc/check-intra-redzone.cpp -c -o test/acc-check-intra-redzone.o 
+acc/check-intra-redzone.cpp:16:14: warning: unused variable 'str' [-Wunused-variable]
+   16 |   const char str[] = STR(STR2UL(RSTR(REGION_KIND), BSTR(BUFFER_KIND)));
+      |              ^~~
+1 warning generated.
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 -fuse-ld=lld test/acc-check-intra-redzone.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-check-intra-redzone 
+
+test/acc-check-intra-redzone 1
+after run result is: 64
+set runtime variable redzone_intra_obj_heap to 8 by reading test/acc-check-intra-redzone_1.tmp
+make results: test results:  0
+
+========== end: acc-check-intra-obj-heap-redzone =========
+
+========== start: acc-check-intra-obj-rodata-redzone =========
+make -e -W acc/check-intra-redzone.cpp test/acc-check-intra-redzone BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=3 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=3 acc/check-intra-redzone.cpp -c -o test/acc-check-intra-redzone.o 
+acc/check-intra-redzone.cpp:16:14: warning: unused variable 'str' [-Wunused-variable]
+   16 |   const char str[] = STR(STR2UL(RSTR(REGION_KIND), BSTR(BUFFER_KIND)));
+      |              ^~~
+1 warning generated.
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=3 -fuse-ld=lld test/acc-check-intra-redzone.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-check-intra-redzone 
+
+test/acc-check-intra-redzone 3
+after run result is: 64
+set runtime variable redzone_intra_obj_rodata to 8 by reading test/acc-check-intra-redzone_3.tmp
+make results: test results:  0
+
+========== end: acc-check-intra-obj-rodata-redzone =========
+
+========== start: acc-check-intra-obj-stack-redzone =========
+make -e -W acc/check-intra-redzone.cpp test/acc-check-intra-redzone BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=0 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 acc/check-intra-redzone.cpp -c -o test/acc-check-intra-redzone.o 
+acc/check-intra-redzone.cpp:16:14: warning: unused variable 'str' [-Wunused-variable]
+   16 |   const char str[] = STR(STR2UL(RSTR(REGION_KIND), BSTR(BUFFER_KIND)));
+      |              ^~~
+acc/check-intra-redzone.cpp:13:3: warning: unused variable 'stack_enclosing_array_underflow' [-Wunused-variable]
+   13 |   INIT_BUFFER;
+      |   ^~~~~~~~~~~
+./lib/include/conf.hpp:211:40: note: expanded from macro 'INIT_BUFFER'
+  211 |         #define INIT_BUFFER charBuffer stack_enclosing_array_underflow = charBuffer('u','d','o');  \
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+acc/check-intra-redzone.cpp:13:3: warning: unused variable 'stack_enclosing_array_overflow' [-Wunused-variable]
+   13 |   INIT_BUFFER;
+      |   ^~~~~~~~~~~
+./lib/include/conf.hpp:213:40: note: expanded from macro 'INIT_BUFFER'
+  213 |                             charBuffer stack_enclosing_array_overflow  = charBuffer('u','d','o')
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 -fuse-ld=lld test/acc-check-intra-redzone.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-check-intra-redzone 
+
+test/acc-check-intra-redzone 0
+after run result is: 64
+set runtime variable redzone_intra_obj_stack to 8 by reading test/acc-check-intra-redzone_0.tmp
+make results: test results:  0
+
+========== end: acc-check-intra-obj-stack-redzone =========
+
+========== start: acc-check-prog-ASLR =========
+make -e test/acc-check-ASLR 
+clang++ -O2  -I./lib -std=c++11 -Wall acc/check-ASLR.cpp -c -o test/acc-check-ASLR.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/acc-check-ASLR.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-check-ASLR 
+
+test/acc-check-ASLR 0 0
+after run result is: 1
+Run expected result: acc-check-prog-ASLR failed with expected exit value 1
+make results: test results:  1
+
+========== end: acc-check-prog-ASLR =========
+
+========== start: acc-check-stack-region-ASLR =========
+make -e test/acc-check-ASLR 
+make: 'test/acc-check-ASLR' is up to date.
+
+test/acc-check-ASLR 0 1
+after run result is: 1
+Run expected result: acc-check-stack-region-ASLR failed with expected exit value 1
+make results: test results:  1
+
+========== end: acc-check-stack-region-ASLR =========
+
+========== start: acc-copy-stackra-to-heap-explicit-arith =========
+make -e test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/jump-func-ra-from-heap-memcpy-explicit-arith.cpp -c -o test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith.o 
+clang++ -O2  -I./lib -std=c++11 -Wall lib/common/cfi.cpp -shared -fPIC -o lib/common/libcfi.so 
+In file included from lib/common/cfi.cpp:7:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith 
+
+test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith 2 1
+after run result is: 0
+make results: test results:  0
+
+========== end: acc-copy-stackra-to-heap-explicit-arith =========
+
+========== start: acc-copy-stackra-to-heap-implicit-arith =========
+make -e test/cfi-jump-func-ra-from-heap-memcpy-implicit-arith 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/jump-func-ra-from-heap-memcpy-implicit-arith.cpp -c -o test/cfi-jump-func-ra-from-heap-memcpy-implicit-arith.o 
+cfi/jump-func-ra-from-heap-memcpy-implicit-arith.cpp:69:17: warning: misleading indentation; statement is not part of the previous 'if' [-Wmisleading-indentation]
+   69 |                 return 0;
+      |                 ^
+cfi/jump-func-ra-from-heap-memcpy-implicit-arith.cpp:67:13: note: previous statement is here
+   67 |             if(*(uintptr_t*)addr_buffer == (uintptr_t)global_ra_pos)
+      |             ^
+1 warning generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-jump-func-ra-from-heap-memcpy-implicit-arith.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-jump-func-ra-from-heap-memcpy-implicit-arith 
+
+test/cfi-jump-func-ra-from-heap-memcpy-implicit-arith 2 0 1
+after run result is: 0
+make results: test results:  0
+
+========== end: acc-copy-stackra-to-heap-implicit-arith =========
+
+========== start: acc-get-frame-size =========
+make -e test/acc-get-frame-size 
+clang++ -O2  -I./lib -std=c++11 -Wall acc/get-frame-size.cpp -c -o test/acc-get-frame-size.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/acc-get-frame-size.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-get-frame-size 
+
+test/acc-get-frame-size
+after run result is: 64
+set runtime variable frame-size to 4 by reading test/acc-get-frame-size.tmp
+make results: test results:  0
+
+========== end: acc-get-frame-size =========
+
+========== start: acc-get-ra-offset-v-p-g0 =========
+make -e test/acc-get-ra-offset 
+clang++ -O2  -I./lib -std=c++11 -Wall acc/get-ra-offset.cpp -c -o test/acc-get-ra-offset.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/acc-get-ra-offset.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-get-ra-offset 
+
+test/acc-get-ra-offset 1 v-p-g0
+after run result is: 34
+set runtime variable stack-offset-v-p-g0 to 2
+make results: test results:  0
+
+========== end: acc-get-ra-offset-v-p-g0 =========
+
+========== start: acc-get-ra-offset-v-p-g1 =========
+make -e test/acc-get-ra-offset 
+make: 'test/acc-get-ra-offset' is up to date.
+
+test/acc-get-ra-offset 1 v-p-g1
+after run result is: 38
+set runtime variable stack-offset-v-p-g1 to 6
+make results: test results:  0
+
+========== end: acc-get-ra-offset-v-p-g1 =========
+
+========== start: acc-read-GOT =========
+make -e test/acc-read-GOT 
+clang++ -O2  -I./lib -std=c++11 -Wall acc/read-GOT.cpp -c -o test/acc-read-GOT.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/acc-read-GOT.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-read-GOT 
+
+test/acc-read-GOT 0
+after run result is: 0
+make results: test results:  0
+
+========== end: acc-read-GOT =========
+
+========== start: acc-read-func =========
+make -e test/acc-read-func.gen 
+clang++ -O2  -I./lib -std=c++11 -Wall acc/read-func.cpp -c -o test/acc-read-func.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/acc-read-func.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -o test/acc-read-func 
+script/get_riscv64_func_inst.sh test/acc-read-func helper 8 test/acc-read-func-func-opcode.tmp
+cut: byte/character positions are numbered from 1
+Try 'cut --help' for more information.
+cut: byte/character positions are numbered from 1
+Try 'cut --help' for more information.
+cut: byte/character positions are numbered from 1
+Try 'cut --help' for more information.
+cut: byte/character positions are numbered from 1
+Try 'cut --help' for more information.
+cut: byte/character positions are numbered from 1
+Try 'cut --help' for more information.
+cut: byte/character positions are numbered from 1
+Try 'cut --help' for more information.
+cut: byte/character positions are numbered from 1
+Try 'cut --help' for more information.
+cp test/acc-read-func test/acc-read-func.gen
+
+test/acc-read-func.gen ./test/acc-read-func-func-opcode.tmp
+after run result is: 1
+Try test failed: acc-read-func failed with unexpected exit value 1
+Run abnormality: acc-read-func failed with unexpected exit value 1
+make results: test results:  1
+
+========== end: acc-read-func =========
+
+========== start: cfi-call-fake-vtable =========
+make -e test/cfi-call-fake-vtable 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-fake-vtable.cpp -c -o test/cfi-call-fake-vtable.o 
+In file included from cfi/call-fake-vtable.cpp:3:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-fake-vtable.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-fake-vtable 
+
+test/cfi-call-fake-vtable
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-fake-vtable =========
+
+========== start: cfi-call-fake-vtable-arg-num =========
+make -e test/cfi-call-fake-vtable-arg-num 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-fake-vtable-arg-num.cpp -c -o test/cfi-call-fake-vtable-arg-num.o 
+In file included from cfi/call-fake-vtable-arg-num.cpp:2:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-fake-vtable-arg-num.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-fake-vtable-arg-num 
+
+test/cfi-call-fake-vtable-arg-num
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-fake-vtable-arg-num =========
+
+========== start: cfi-call-fake-vtable-arg-type =========
+make -e test/cfi-call-fake-vtable-arg-type 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-fake-vtable-arg-type.cpp -c -o test/cfi-call-fake-vtable-arg-type.o 
+In file included from cfi/call-fake-vtable-arg-type.cpp:2:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-fake-vtable-arg-type.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-fake-vtable-arg-type 
+
+test/cfi-call-fake-vtable-arg-type 4
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-fake-vtable-arg-type =========
+
+========== start: cfi-call-fake-vtable-arg-type-modified =========
+make -e test/cfi-call-fake-vtable-arg-type-modified 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-fake-vtable-arg-type-modified.cpp -c -o test/cfi-call-fake-vtable-arg-type-modified.o 
+In file included from cfi/call-fake-vtable-arg-type-modified.cpp:1:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-fake-vtable-arg-type-modified.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-fake-vtable-arg-type-modified 
+
+test/cfi-call-fake-vtable-arg-type-modified 4
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-fake-vtable-arg-type-modified =========
+
+========== start: cfi-call-fake-vtable-with-func-data =========
+make -e test/cfi-call-fake-vtable-with-func 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-fake-vtable-with-func.cpp -c -o test/cfi-call-fake-vtable-with-func.o 
+In file included from cfi/call-fake-vtable-with-func.cpp:2:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-fake-vtable-with-func.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-fake-vtable-with-func 
+
+test/cfi-call-fake-vtable-with-func 2
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-fake-vtable-with-func-data =========
+
+========== start: cfi-call-fake-vtable-with-func-heap =========
+make -e test/cfi-call-fake-vtable-with-func 
+make: 'test/cfi-call-fake-vtable-with-func' is up to date.
+
+test/cfi-call-fake-vtable-with-func 1
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-fake-vtable-with-func-heap =========
+
+========== start: cfi-call-fake-vtable-with-func-stack =========
+make -e test/cfi-call-fake-vtable-with-func 
+make: 'test/cfi-call-fake-vtable-with-func' is up to date.
+
+test/cfi-call-fake-vtable-with-func 0
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-fake-vtable-with-func-stack =========
+
+========== start: cfi-call-instruction-in-data =========
+make -e test/cfi-code-injection 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/code-injection.cpp -c -o test/cfi-code-injection.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-code-injection.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-code-injection 
+
+test/cfi-code-injection 1 1
+after run result is: 16
+make -e test/cfi-code-injection 
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 1 1
+after run result is: 16
+Run expected result: cfi-call-instruction-in-data failed with expected exit value 16
+make results: test results:  16
+
+========== end: cfi-call-instruction-in-data =========
+
+========== start: cfi-call-instruction-in-heap =========
+make -e test/cfi-code-injection 
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 1 3
+after run result is: 16
+make -e test/cfi-code-injection 
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 1 3
+after run result is: 16
+Run expected result: cfi-call-instruction-in-heap failed with expected exit value 16
+make results: test results:  16
+
+========== end: cfi-call-instruction-in-heap =========
+
+========== start: cfi-call-instruction-in-rodata =========
+make -e test/cfi-code-injection 
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 1 0
+after run result is: 16
+make -e test/cfi-code-injection 
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 1 0
+after run result is: 16
+Run expected result: cfi-call-instruction-in-rodata failed with expected exit value 16
+make results: test results:  16
+
+========== end: cfi-call-instruction-in-rodata =========
+
+========== start: cfi-call-instruction-in-stack =========
+make -e test/cfi-code-injection 
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 1 2
+after run result is: 16
+make -e test/cfi-code-injection 
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 1 2
+after run result is: 16
+Run expected result: cfi-call-instruction-in-stack failed with expected exit value 16
+make results: test results:  16
+
+========== end: cfi-call-instruction-in-stack =========
+
+========== start: cfi-call-mid-func =========
+make -e test/cfi-call-mid-func 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-mid-func.cpp -c -o test/cfi-call-mid-func.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-mid-func.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-mid-func 
+
+test/cfi-call-mid-func
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-mid-func =========
+
+========== start: cfi-call-wrong-func =========
+make -e test/cfi-call-wrong-func 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-func.cpp -c -o test/cfi-call-wrong-func.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-func.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-func 
+
+test/cfi-call-wrong-func 1
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-func =========
+
+========== start: cfi-call-wrong-func-within-static-analysis =========
+make -e test/cfi-call-wrong-func-within-static-analysis 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-func-within-static-analysis.cpp -c -o test/cfi-call-wrong-func-within-static-analysis.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-func-within-static-analysis.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-func-within-static-analysis 
+
+test/cfi-call-wrong-func-within-static-analysis 1
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-func-within-static-analysis =========
+
+========== start: cfi-call-wrong-num-arg-func =========
+make -e test/cfi-call-wrong-num-arg-func 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-num-arg-func.cpp -c -o test/cfi-call-wrong-num-arg-func.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-num-arg-func.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-num-arg-func 
+
+test/cfi-call-wrong-num-arg-func
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-num-arg-func =========
+
+========== start: cfi-call-wrong-type-arg-dp2fp-func-data =========
+make -e test/cfi-call-wrong-type-arg-dp2fp-func-data 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-type-arg-dp2fp-func-data.cpp -c -o test/cfi-call-wrong-type-arg-dp2fp-func-data.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-type-arg-dp2fp-func-data.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-type-arg-dp2fp-func-data 
+
+test/cfi-call-wrong-type-arg-dp2fp-func-data
+dummy print: m = 0x2ae9c86558
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-type-arg-dp2fp-func-data =========
+
+========== start: cfi-call-wrong-type-arg-dp2fp-func-heap =========
+make -e test/cfi-call-wrong-type-arg-dp2fp-func-heap 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-type-arg-dp2fp-func-heap.cpp -c -o test/cfi-call-wrong-type-arg-dp2fp-func-heap.o 
+cfi/call-wrong-type-arg-dp2fp-func-heap.cpp:29:3: warning: 'delete' applied to a pointer that was allocated with 'new[]'; did you mean 'delete[]'? [-Wmismatched-new-delete]
+   29 |   delete m;
+      |   ^
+      |         []
+cfi/call-wrong-type-arg-dp2fp-func-heap.cpp:18:22: note: allocated with 'new[]' here
+   18 |   unsigned char *m = new unsigned char [16];
+      |                      ^
+1 warning generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-type-arg-dp2fp-func-heap.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-type-arg-dp2fp-func-heap 
+
+test/cfi-call-wrong-type-arg-dp2fp-func-heap
+dummy print: m = 0x2ad339f430
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-type-arg-dp2fp-func-heap =========
+
+========== start: cfi-call-wrong-type-arg-dp2fp-func-rodata =========
+make -e test/cfi-call-wrong-type-arg-dp2fp-func-rodata 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-type-arg-dp2fp-func-rodata.cpp -c -o test/cfi-call-wrong-type-arg-dp2fp-func-rodata.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-type-arg-dp2fp-func-rodata.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-type-arg-dp2fp-func-rodata 
+
+test/cfi-call-wrong-type-arg-dp2fp-func-rodata
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-type-arg-dp2fp-func-rodata =========
+
+========== start: cfi-call-wrong-type-arg-dp2fp-func-stack =========
+make -e test/cfi-call-wrong-type-arg-dp2fp-func-stack 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-type-arg-dp2fp-func-stack.cpp -c -o test/cfi-call-wrong-type-arg-dp2fp-func-stack.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-type-arg-dp2fp-func-stack.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-type-arg-dp2fp-func-stack 
+
+test/cfi-call-wrong-type-arg-dp2fp-func-stack 0
+dummy print: m = 0x3fc86f79a8
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-type-arg-dp2fp-func-stack =========
+
+========== start: cfi-call-wrong-type-arg-fp2dp-func =========
+make -e test/cfi-call-wrong-type-arg-fp2dp-func 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-type-arg-fp2dp-func.cpp -c -o test/cfi-call-wrong-type-arg-fp2dp-func.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-type-arg-fp2dp-func.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-type-arg-fp2dp-func 
+
+test/cfi-call-wrong-type-arg-fp2dp-func
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-type-arg-fp2dp-func =========
+
+========== start: cfi-call-wrong-type-arg-int2double-func =========
+make -e test/cfi-call-wrong-type-arg-int2double-func 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-type-arg-int2double-func.cpp -c -o test/cfi-call-wrong-type-arg-int2double-func.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-type-arg-int2double-func.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-type-arg-int2double-func 
+
+test/cfi-call-wrong-type-arg-int2double-func
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-type-arg-int2double-func =========
+
+========== start: cfi-call-wrong-type-arg-op2doublep-func =========
+make -e test/cfi-call-wrong-type-arg-op2doublep-func 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-type-arg-op2doublep-func.cpp -c -o test/cfi-call-wrong-type-arg-op2doublep-func.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-type-arg-op2doublep-func.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-type-arg-op2doublep-func 
+
+test/cfi-call-wrong-type-arg-op2doublep-func 2
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-type-arg-op2doublep-func =========
+
+========== start: cfi-call-wrong-type-arg-op2intp-func =========
+make -e test/cfi-call-wrong-type-arg-op2intp-func 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-type-arg-op2intp-func.cpp -c -o test/cfi-call-wrong-type-arg-op2intp-func.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-type-arg-op2intp-func.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-type-arg-op2intp-func 
+
+test/cfi-call-wrong-type-arg-op2intp-func 2
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-type-arg-op2intp-func =========
+
+========== start: cfi-call-wrong-vtable =========
+make -e test/cfi-call-wrong-vtable 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-vtable.cpp -c -o test/cfi-call-wrong-vtable.o 
+In file included from cfi/call-wrong-vtable.cpp:2:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-vtable.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-vtable 
+
+test/cfi-call-wrong-vtable
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-vtable =========
+
+========== start: cfi-call-wrong-vtable-arg-num =========
+make -e test/cfi-call-wrong-vtable-arg-num 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-vtable-arg-num.cpp -c -o test/cfi-call-wrong-vtable-arg-num.o 
+In file included from cfi/call-wrong-vtable-arg-num.cpp:2:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-vtable-arg-num.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-vtable-arg-num 
+
+test/cfi-call-wrong-vtable-arg-num
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-vtable-arg-num =========
+
+========== start: cfi-call-wrong-vtable-arg-type =========
+make -e test/cfi-call-wrong-vtable-arg-type 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-vtable-arg-type.cpp -c -o test/cfi-call-wrong-vtable-arg-type.o 
+In file included from cfi/call-wrong-vtable-arg-type.cpp:1:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-vtable-arg-type.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-vtable-arg-type 
+
+test/cfi-call-wrong-vtable-arg-type
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-vtable-arg-type =========
+
+========== start: cfi-call-wrong-vtable-arg-type-modified =========
+make -e test/cfi-call-wrong-vtable-arg-type-modified 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-vtable-arg-type-modified.cpp -c -o test/cfi-call-wrong-vtable-arg-type-modified.o 
+In file included from cfi/call-wrong-vtable-arg-type-modified.cpp:1:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-vtable-arg-type-modified.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-vtable-arg-type-modified 
+
+test/cfi-call-wrong-vtable-arg-type-modified
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-vtable-arg-type-modified =========
+
+========== start: cfi-call-wrong-vtable-child =========
+make -e test/cfi-call-wrong-vtable-child 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-vtable-child.cpp -c -o test/cfi-call-wrong-vtable-child.o 
+In file included from cfi/call-wrong-vtable-child.cpp:1:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-vtable-child.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-vtable-child 
+
+test/cfi-call-wrong-vtable-child
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-vtable-child =========
+
+========== start: cfi-call-wrong-vtable-func-num =========
+make -e test/cfi-call-wrong-vtable-func-num 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-vtable-func-num.cpp -c -o test/cfi-call-wrong-vtable-func-num.o 
+In file included from cfi/call-wrong-vtable-func-num.cpp:2:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-vtable-func-num.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-vtable-func-num 
+
+test/cfi-call-wrong-vtable-func-num
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-vtable-func-num =========
+
+========== start: cfi-call-wrong-vtable-offset =========
+make -e test/cfi-call-wrong-vtable-offset 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-vtable-offset.cpp -c -o test/cfi-call-wrong-vtable-offset.o 
+In file included from cfi/call-wrong-vtable-offset.cpp:1:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-vtable-offset.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-vtable-offset 
+
+test/cfi-call-wrong-vtable-offset 0
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-vtable-offset =========
+
+========== start: cfi-call-wrong-vtable-parent =========
+make -e test/cfi-call-wrong-vtable-parent 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-vtable-parent.cpp -c -o test/cfi-call-wrong-vtable-parent.o 
+In file included from cfi/call-wrong-vtable-parent.cpp:1:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-vtable-parent.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-vtable-parent 
+
+test/cfi-call-wrong-vtable-parent
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-vtable-parent =========
+
+========== start: cfi-call-wrong-vtable-released =========
+make -e test/cfi-call-wrong-vtable-released 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-vtable-released.cpp -c -o test/cfi-call-wrong-vtable-released.o 
+In file included from cfi/call-wrong-vtable-released.cpp:2:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-vtable-released.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-vtable-released 
+
+test/cfi-call-wrong-vtable-released
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-vtable-released =========
+
+========== start: cfi-call-wrong-vtable-sibling =========
+make -e test/cfi-call-wrong-vtable-sibling 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/call-wrong-vtable-sibling.cpp -c -o test/cfi-call-wrong-vtable-sibling.o 
+In file included from cfi/call-wrong-vtable-sibling.cpp:1:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-call-wrong-vtable-sibling.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-call-wrong-vtable-sibling 
+
+test/cfi-call-wrong-vtable-sibling
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-call-wrong-vtable-sibling =========
+
+========== start: cfi-jump-func-ra-from-heap-memcpy-explicit-arith =========
+make -e test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith 
+make: 'test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith' is up to date.
+
+test/cfi-jump-func-ra-from-heap-memcpy-explicit-arith 2 2
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-jump-func-ra-from-heap-memcpy-explicit-arith =========
+
+========== start: cfi-jump-func-ra-from-heap-memcpy-implicit-arith =========
+make -e test/cfi-jump-func-ra-from-heap-memcpy-implicit-arith 
+make: 'test/cfi-jump-func-ra-from-heap-memcpy-implicit-arith' is up to date.
+
+test/cfi-jump-func-ra-from-heap-memcpy-implicit-arith 2 0 2
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-jump-func-ra-from-heap-memcpy-implicit-arith =========
+
+========== start: cfi-jump-instruction-in-data =========
+make -e test/cfi-code-injection 
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 2 1 0
+after run result is: 16
+Run expected result: cfi-jump-instruction-in-data failed with expected exit value 16
+make results: test results:  16
+
+========== end: cfi-jump-instruction-in-data =========
+
+========== start: cfi-jump-instruction-in-heap =========
+make -e test/cfi-code-injection 
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 2 3 0
+after run result is: 16
+Run expected result: cfi-jump-instruction-in-heap failed with expected exit value 16
+make results: test results:  16
+
+========== end: cfi-jump-instruction-in-heap =========
+
+========== start: cfi-jump-instruction-in-rodata =========
+make -e test/cfi-code-injection 
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 2 0 0
+after run result is: 16
+Run expected result: cfi-jump-instruction-in-rodata failed with expected exit value 16
+make results: test results:  16
+
+========== end: cfi-jump-instruction-in-rodata =========
+
+========== start: cfi-jump-instruction-in-stack =========
+make -e test/cfi-code-injection 
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 2 2 0
+after run result is: 16
+Run expected result: cfi-jump-instruction-in-stack failed with expected exit value 16
+make results: test results:  16
+
+========== end: cfi-jump-instruction-in-stack =========
+
+========== start: cfi-jump-mid-func =========
+make -e test/cfi-jump-mid-func 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/jump-mid-func.cpp -c -o test/cfi-jump-mid-func.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-jump-mid-func.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-jump-mid-func 
+
+test/cfi-jump-mid-func 1
+after run result is: 0
+make results: test results:  0
+
+========== end: cfi-jump-mid-func =========
+
+========== start: cfi-return-to-func =========
+make -e test/cfi-return-to-func 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/return-to-func.cpp -c -o test/cfi-return-to-func.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-return-to-func.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-return-to-func 
+
+test/cfi-return-to-func 0
+after run result is: 1
+Try test failed: cfi-return-to-func failed with unexpected exit value 1
+
+test/cfi-return-to-func 1
+after run result is: 1
+Try test failed: cfi-return-to-func failed with unexpected exit value 1
+
+test/cfi-return-to-func 2
+after run result is: 1
+Try test failed: cfi-return-to-func failed with unexpected exit value 1
+
+test/cfi-return-to-func 3
+after run result is: 1
+Try test failed: cfi-return-to-func failed with unexpected exit value 1
+
+test/cfi-return-to-func 4
+after run result is: 1
+Try test failed: cfi-return-to-func failed with unexpected exit value 1
+
+test/cfi-return-to-func 5
+test/cfi-return-to-func terminated with signal 11
+after run result is: 267
+Try test failed: cfi-return-to-func failed with unexpected exit value 267
+
+test/cfi-return-to-func 6
+after run result is: 0
+make results: test results:  0
+ 1
+ 267
+
+========== end: cfi-return-to-func =========
+
+========== start: cfi-return-to-instruction-in-data =========
+make -e test/cfi-code-injection 
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 0 1 0
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-data failed with unexpected exit value 2
+
+test/cfi-code-injection 0 1 1
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-data failed with unexpected exit value 2
+
+test/cfi-code-injection 0 1 2
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-data failed with unexpected exit value 2
+
+test/cfi-code-injection 0 1 3
+test/cfi-code-injection terminated with signal 11
+after run result is: 267
+Try test failed: cfi-return-to-instruction-in-data failed with unexpected exit value 267
+
+test/cfi-code-injection 0 1 4
+free(): invalid pointer
+test/cfi-code-injection terminated with signal 6
+after run result is: 262
+Try test failed: cfi-return-to-instruction-in-data failed with unexpected exit value 262
+
+test/cfi-code-injection 0 1 5
+after run result is: 16
+
+test/cfi-code-injection 0 1 6
+after run result is: 16
+
+test/cfi-code-injection 0 1 7
+after run result is: 16
+
+test/cfi-code-injection 0 1 8
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-data failed with unexpected exit value 2
+
+test/cfi-code-injection 0 1 9
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-data failed with unexpected exit value 2
+
+test/cfi-code-injection 0 1 10
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-data failed with unexpected exit value 2
+
+test/cfi-code-injection 0 1 11
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-data failed with unexpected exit value 2
+
+test/cfi-code-injection 0 1 12
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-data failed with unexpected exit value 2
+
+test/cfi-code-injection 0 1 13
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-data failed with unexpected exit value 2
+
+test/cfi-code-injection 0 1 14
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-data failed with unexpected exit value 2
+
+test/cfi-code-injection 0 1 15
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-data failed with unexpected exit value 2
+Run expected result: cfi-return-to-instruction-in-data failed with expected exit value 16
+make results: test results:  2
+ 16
+ 262
+ 267
+
+========== end: cfi-return-to-instruction-in-data =========
+
+========== start: cfi-return-to-instruction-in-heap =========
+make -e test/cfi-code-injection 
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 0 3 0
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-heap failed with unexpected exit value 2
+
+test/cfi-code-injection 0 3 1
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-heap failed with unexpected exit value 2
+
+test/cfi-code-injection 0 3 2
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-heap failed with unexpected exit value 2
+
+test/cfi-code-injection 0 3 3
+test/cfi-code-injection terminated with signal 11
+after run result is: 267
+Try test failed: cfi-return-to-instruction-in-heap failed with unexpected exit value 267
+
+test/cfi-code-injection 0 3 4
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-heap failed with unexpected exit value 2
+
+test/cfi-code-injection 0 3 5
+after run result is: 16
+
+test/cfi-code-injection 0 3 6
+after run result is: 16
+
+test/cfi-code-injection 0 3 7
+after run result is: 16
+
+test/cfi-code-injection 0 3 8
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-heap failed with unexpected exit value 2
+
+test/cfi-code-injection 0 3 9
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-heap failed with unexpected exit value 2
+
+test/cfi-code-injection 0 3 10
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-heap failed with unexpected exit value 2
+
+test/cfi-code-injection 0 3 11
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-heap failed with unexpected exit value 2
+
+test/cfi-code-injection 0 3 12
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-heap failed with unexpected exit value 2
+
+test/cfi-code-injection 0 3 13
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-heap failed with unexpected exit value 2
+
+test/cfi-code-injection 0 3 14
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-heap failed with unexpected exit value 2
+
+test/cfi-code-injection 0 3 15
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-heap failed with unexpected exit value 2
+Run expected result: cfi-return-to-instruction-in-heap failed with expected exit value 16
+make results: test results:  2
+ 16
+ 267
+
+========== end: cfi-return-to-instruction-in-heap =========
+
+========== start: cfi-return-to-instruction-in-rodata =========
+make -e test/cfi-code-injection 
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 0 0 0
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-rodata failed with unexpected exit value 2
+
+test/cfi-code-injection 0 0 1
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-rodata failed with unexpected exit value 2
+
+test/cfi-code-injection 0 0 2
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-rodata failed with unexpected exit value 2
+
+test/cfi-code-injection 0 0 3
+test/cfi-code-injection terminated with signal 11
+after run result is: 267
+Try test failed: cfi-return-to-instruction-in-rodata failed with unexpected exit value 267
+
+test/cfi-code-injection 0 0 4
+free(): invalid pointer
+test/cfi-code-injection terminated with signal 6
+after run result is: 262
+Try test failed: cfi-return-to-instruction-in-rodata failed with unexpected exit value 262
+
+test/cfi-code-injection 0 0 5
+after run result is: 16
+
+test/cfi-code-injection 0 0 6
+after run result is: 16
+
+test/cfi-code-injection 0 0 7
+after run result is: 16
+
+test/cfi-code-injection 0 0 8
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-rodata failed with unexpected exit value 2
+
+test/cfi-code-injection 0 0 9
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-rodata failed with unexpected exit value 2
+
+test/cfi-code-injection 0 0 10
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-rodata failed with unexpected exit value 2
+
+test/cfi-code-injection 0 0 11
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-rodata failed with unexpected exit value 2
+
+test/cfi-code-injection 0 0 12
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-rodata failed with unexpected exit value 2
+
+test/cfi-code-injection 0 0 13
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-rodata failed with unexpected exit value 2
+
+test/cfi-code-injection 0 0 14
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-rodata failed with unexpected exit value 2
+
+test/cfi-code-injection 0 0 15
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-rodata failed with unexpected exit value 2
+Run expected result: cfi-return-to-instruction-in-rodata failed with expected exit value 16
+make results: test results:  2
+ 16
+ 262
+ 267
+
+========== end: cfi-return-to-instruction-in-rodata =========
+
+========== start: cfi-return-to-instruction-in-stack =========
+make -e test/cfi-code-injection 
+make: 'test/cfi-code-injection' is up to date.
+
+test/cfi-code-injection 0 2 0
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-stack failed with unexpected exit value 2
+
+test/cfi-code-injection 0 2 1
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-stack failed with unexpected exit value 2
+
+test/cfi-code-injection 0 2 2
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-stack failed with unexpected exit value 2
+
+test/cfi-code-injection 0 2 3
+test/cfi-code-injection terminated with signal 11
+after run result is: 267
+
+test/cfi-code-injection 0 2 4
+free(): invalid pointer
+test/cfi-code-injection terminated with signal 6
+after run result is: 262
+Try test failed: cfi-return-to-instruction-in-stack failed with unexpected exit value 262
+
+test/cfi-code-injection 0 2 5
+after run result is: 16
+
+test/cfi-code-injection 0 2 6
+after run result is: 16
+
+test/cfi-code-injection 0 2 7
+after run result is: 16
+
+test/cfi-code-injection 0 2 8
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-stack failed with unexpected exit value 2
+
+test/cfi-code-injection 0 2 9
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-stack failed with unexpected exit value 2
+
+test/cfi-code-injection 0 2 10
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-stack failed with unexpected exit value 2
+
+test/cfi-code-injection 0 2 11
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-stack failed with unexpected exit value 2
+
+test/cfi-code-injection 0 2 12
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-stack failed with unexpected exit value 2
+
+test/cfi-code-injection 0 2 13
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-stack failed with unexpected exit value 2
+
+test/cfi-code-injection 0 2 14
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-stack failed with unexpected exit value 2
+
+test/cfi-code-injection 0 2 15
+after run result is: 2
+Try test failed: cfi-return-to-instruction-in-stack failed with unexpected exit value 2
+Run expected result: cfi-return-to-instruction-in-stack failed with expected exit value 16
+make results: test results:  2
+ 16
+ 262
+ 267
+
+========== end: cfi-return-to-instruction-in-stack =========
+
+========== start: cfi-return-to-libc =========
+make -e test/cfi-return-to-libc 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/return-to-libc.cpp -c -o test/cfi-return-to-libc.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-return-to-libc.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-return-to-libc 
+
+test/cfi-return-to-libc 0
+after run result is: 3
+Try test failed: cfi-return-to-libc failed with unexpected exit value 3
+
+test/cfi-return-to-libc 1
+after run result is: 3
+Try test failed: cfi-return-to-libc failed with unexpected exit value 3
+
+test/cfi-return-to-libc 2
+after run result is: 3
+Try test failed: cfi-return-to-libc failed with unexpected exit value 3
+
+test/cfi-return-to-libc 3
+after run result is: 3
+Try test failed: cfi-return-to-libc failed with unexpected exit value 3
+
+test/cfi-return-to-libc 4
+after run result is: 3
+Try test failed: cfi-return-to-libc failed with unexpected exit value 3
+
+test/cfi-return-to-libc 5
+test/cfi-return-to-libc terminated with signal 11
+after run result is: 267
+Try test failed: cfi-return-to-libc failed with unexpected exit value 267
+
+test/cfi-return-to-libc 6
+after run result is: 0
+make results: test results:  0
+ 3
+ 267
+
+========== end: cfi-return-to-libc =========
+
+========== start: cfi-return-to-non-call-site =========
+make -e test/cfi-return-to-non-call-site 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/return-to-non-call-site.cpp -c -o test/cfi-return-to-non-call-site.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-return-to-non-call-site.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-return-to-non-call-site 
+
+test/cfi-return-to-non-call-site 0
+after run result is: 4
+Try test failed: cfi-return-to-non-call-site failed with unexpected exit value 4
+
+test/cfi-return-to-non-call-site 1
+after run result is: 4
+Try test failed: cfi-return-to-non-call-site failed with unexpected exit value 4
+
+test/cfi-return-to-non-call-site 2
+after run result is: 4
+Try test failed: cfi-return-to-non-call-site failed with unexpected exit value 4
+
+test/cfi-return-to-non-call-site 3
+after run result is: 4
+Try test failed: cfi-return-to-non-call-site failed with unexpected exit value 4
+
+test/cfi-return-to-non-call-site 4
+after run result is: 4
+Try test failed: cfi-return-to-non-call-site failed with unexpected exit value 4
+
+test/cfi-return-to-non-call-site 5
+test/cfi-return-to-non-call-site terminated with signal 11
+after run result is: 267
+Try test failed: cfi-return-to-non-call-site failed with unexpected exit value 267
+
+test/cfi-return-to-non-call-site 6
+after run result is: 0
+make results: test results:  0
+ 4
+ 267
+
+========== end: cfi-return-to-non-call-site =========
+
+========== start: cfi-return-to-wrong-call-site =========
+make -e test/cfi-return-to-wrong-call-site 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/return-to-wrong-call-site.cpp -c -o test/cfi-return-to-wrong-call-site.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-return-to-wrong-call-site.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-return-to-wrong-call-site 
+
+test/cfi-return-to-wrong-call-site 0
+after run result is: 4
+Try test failed: cfi-return-to-wrong-call-site failed with unexpected exit value 4
+
+test/cfi-return-to-wrong-call-site 1
+after run result is: 4
+Try test failed: cfi-return-to-wrong-call-site failed with unexpected exit value 4
+
+test/cfi-return-to-wrong-call-site 2
+after run result is: 4
+Try test failed: cfi-return-to-wrong-call-site failed with unexpected exit value 4
+
+test/cfi-return-to-wrong-call-site 3
+after run result is: 4
+Try test failed: cfi-return-to-wrong-call-site failed with unexpected exit value 4
+
+test/cfi-return-to-wrong-call-site 4
+after run result is: 4
+Try test failed: cfi-return-to-wrong-call-site failed with unexpected exit value 4
+
+test/cfi-return-to-wrong-call-site 5
+test/cfi-return-to-wrong-call-site terminated with signal 11
+after run result is: 267
+Try test failed: cfi-return-to-wrong-call-site failed with unexpected exit value 267
+
+test/cfi-return-to-wrong-call-site 6
+after run result is: 0
+make results: test results:  0
+ 4
+ 267
+
+========== end: cfi-return-to-wrong-call-site =========
+
+========== start: cfi-return-to-wrong-call-site-within-static-analysis =========
+make -e test/cfi-return-to-wrong-call-site-within-static-analysis 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/return-to-wrong-call-site-within-static-analysis.cpp -c -o test/cfi-return-to-wrong-call-site-within-static-analysis.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-return-to-wrong-call-site-within-static-analysis.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-return-to-wrong-call-site-within-static-analysis 
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 0 0 0
+after run result is: 1
+
+test/cfi-return-to-wrong-call-site-within-static-analysis 0 0 1
+after run result is: 0
+make results: test results:  0
+ 1
+
+========== end: cfi-return-to-wrong-call-site-within-static-analysis =========
+
+========== start: cfi-return-without-call =========
+make -e test/cfi-return-without-call 
+clang++ -O2  -I./lib -std=c++11 -Wall cfi/return-without-call.cpp -c -o test/cfi-return-without-call.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cfi-return-without-call.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cfi-return-without-call 
+
+test/cfi-return-without-call 1 0
+after run result is: 1
+Try test failed: cfi-return-without-call failed with unexpected exit value 1
+
+test/cfi-return-without-call 1 1
+after run result is: 1
+Try test failed: cfi-return-without-call failed with unexpected exit value 1
+
+test/cfi-return-without-call 1 2
+after run result is: 16
+
+test/cfi-return-without-call 1 3
+after run result is: 16
+
+test/cfi-return-without-call 1 4
+after run result is: 0
+make results: test results:  0
+ 1
+ 16
+
+========== end: cfi-return-without-call =========
+
+========== start: cpi-func-pointer-arithmetic =========
+make -e test/cpi-func-pointer-arithmetic 
+clang++ -O2  -I./lib -std=c++11 -Wall cpi/func-pointer-arithmetic.cpp -c -o test/cpi-func-pointer-arithmetic.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cpi-func-pointer-arithmetic.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cpi-func-pointer-arithmetic  
+
+test/cpi-func-pointer-arithmetic
+after run result is: 0
+make results: test results:  0
+
+========== end: cpi-func-pointer-arithmetic =========
+
+========== start: cpi-func-pointer-assign =========
+make -e test/cpi-func-pointer-assign 
+clang++ -O2  -I./lib -std=c++11 -Wall cpi/func-pointer-assign.cpp -c -o test/cpi-func-pointer-assign.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cpi-func-pointer-assign.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cpi-func-pointer-assign  
+
+test/cpi-func-pointer-assign
+after run result is: 0
+make results: test results:  0
+
+========== end: cpi-func-pointer-assign =========
+
+========== start: cpi-modify-GOT =========
+make -e test/cpi-modify-GOT 
+clang++ -O2  -I./lib -std=c++11 -Wall cpi/modify-GOT.cpp -c -o test/cpi-modify-GOT.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cpi-modify-GOT.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cpi-modify-GOT  
+
+test/cpi-modify-GOT 0
+Interrupt
+after run result is: 16
+
+test/cpi-modify-GOT 1
+Interrupt
+after run result is: 16
+Run expected result: cpi-modify-GOT failed with expected exit value 16
+make results: test results:  16
+
+========== end: cpi-modify-GOT =========
+
+========== start: cpi-read-data-vtable-pointer =========
+make -e test/cpi-read-vtable-pointer 
+clang++ -O2  -I./lib -std=c++11 -Wall cpi/read-vtable-pointer.cpp -c -o test/cpi-read-vtable-pointer.o 
+In file included from cpi/read-vtable-pointer.cpp:1:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cpi-read-vtable-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cpi-read-vtable-pointer  
+
+test/cpi-read-vtable-pointer 2
+after run result is: 0
+make results: test results:  0
+
+========== end: cpi-read-data-vtable-pointer =========
+
+========== start: cpi-read-heap-vtable-pointer =========
+make -e test/cpi-read-vtable-pointer 
+make: 'test/cpi-read-vtable-pointer' is up to date.
+
+test/cpi-read-vtable-pointer 1
+after run result is: 0
+make results: test results:  0
+
+========== end: cpi-read-heap-vtable-pointer =========
+
+========== start: cpi-read-rodata-vtable-pointer =========
+make -e test/cpi-read-vtable-pointer 
+make: 'test/cpi-read-vtable-pointer' is up to date.
+
+test/cpi-read-vtable-pointer 3
+after run result is: 0
+make results: test results:  0
+
+========== end: cpi-read-rodata-vtable-pointer =========
+
+========== start: cpi-read-stack-vtable-pointer =========
+make -e test/cpi-read-vtable-pointer 
+make: 'test/cpi-read-vtable-pointer' is up to date.
+
+test/cpi-read-vtable-pointer 0
+after run result is: 0
+make results: test results:  0
+
+========== end: cpi-read-stack-vtable-pointer =========
+
+========== start: cpi-write-data-vtable-pointer =========
+make -e test/cpi-write-vtable-pointer 
+clang++ -O2  -I./lib -std=c++11 -Wall cpi/write-vtable-pointer.cpp -c -o test/cpi-write-vtable-pointer.o 
+In file included from cpi/write-vtable-pointer.cpp:1:
+./lib/include/cfi.hpp:45:31: warning: 'Helper2::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   45 |   DLL_DEFINITION virtual void virtual_func(int arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+./lib/include/cfi.hpp:54:31: warning: 'Helper3::virtual_func' hides overloaded virtual function [-Woverloaded-virtual]
+   54 |   DLL_DEFINITION virtual void virtual_func(double arg);
+      |                               ^
+./lib/include/cfi.hpp:28:16: note: hidden overloaded virtual function 'Base::virtual_func' declared here: different number of parameters (0 vs 1)
+   28 |   virtual void virtual_func();
+      |                ^
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/cpi-write-vtable-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  -Llib/common/ -Wl,-rpath,lib/common/ -lcfi -o test/cpi-write-vtable-pointer  
+
+test/cpi-write-vtable-pointer 2
+after run result is: 0
+make results: test results:  0
+
+========== end: cpi-write-data-vtable-pointer =========
+
+========== start: cpi-write-heap-vtable-pointer =========
+make -e test/cpi-write-vtable-pointer 
+make: 'test/cpi-write-vtable-pointer' is up to date.
+
+test/cpi-write-vtable-pointer 1
+after run result is: 0
+make results: test results:  0
+
+========== end: cpi-write-heap-vtable-pointer =========
+
+========== start: cpi-write-stack-vtable-pointer =========
+make -e test/cpi-write-vtable-pointer 
+make: 'test/cpi-write-vtable-pointer' is up to date.
+
+test/cpi-write-vtable-pointer 0
+after run result is: 0
+make results: test results:  0
+
+========== end: cpi-write-stack-vtable-pointer =========
+
+========== start: mss-read-by-bare-array-pointer-data-overflow =========
+make -e test/mss-read-by-bare-array-pointer BUFFER_KIND=0 BUFFER_SIZE=8 BUFFER_VAL_MID=VAL_4D,VAL_2D,VAL_1D BUFFER_VAL_OVERFLOW=VAL_4O,VAL_2O,VAL_1O BUFFER_VAL_UNDERFLOW=VAL_4U,VAL_2U,VAL_1U REGION_KIND=2 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=2 -DBUFFER_VAL_UNDERFLOW=VAL_4U,VAL_2U,VAL_1U -DBUFFER_VAL_MID=VAL_4D,VAL_2D,VAL_1D -DBUFFER_VAL_OVERFLOW=VAL_4O,VAL_2O,VAL_1O mss/read-by-bare-array-pointer.cpp -c -o test/mss-read-by-bare-array-pointer.o 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=2 -DBUFFER_VAL_UNDERFLOW=VAL_4U,VAL_2U,VAL_1U -DBUFFER_VAL_MID=VAL_4D,VAL_2D,VAL_1D -DBUFFER_VAL_OVERFLOW=VAL_4O,VAL_2O,VAL_1O -c lib/common/mss.cpp -c -o lib/common/mss.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=2 -DBUFFER_VAL_UNDERFLOW=VAL_4U,VAL_2U,VAL_1U -DBUFFER_VAL_MID=VAL_4D,VAL_2D,VAL_1D -DBUFFER_VAL_OVERFLOW=VAL_4O,VAL_2O,VAL_1O -fuse-ld=lld test/mss-read-by-bare-array-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-bare-array-pointer 
+
+test/mss-read-by-bare-array-pointer 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-bare-array-pointer-data-overflow =========
+
+========== start: mss-read-by-bare-array-pointer-data-underflow =========
+
+test/mss-read-by-bare-array-pointer 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-bare-array-pointer-data-underflow =========
+
+========== start: mss-read-by-bare-array-pointer-heap-overflow =========
+make -e -W mss/read-by-bare-array-pointer.cpp test/mss-read-by-bare-array-pointer BUFFER_KIND=0 BUFFER_SIZE=8 BUFFER_VAL_MID=VAL_4D,VAL_2D,VAL_1D BUFFER_VAL_OVERFLOW=VAL_4O,VAL_2O,VAL_1O BUFFER_VAL_UNDERFLOW=VAL_4U,VAL_2U,VAL_1U REGION_KIND=1 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=1 -DBUFFER_VAL_UNDERFLOW=VAL_4U,VAL_2U,VAL_1U -DBUFFER_VAL_MID=VAL_4D,VAL_2D,VAL_1D -DBUFFER_VAL_OVERFLOW=VAL_4O,VAL_2O,VAL_1O mss/read-by-bare-array-pointer.cpp -c -o test/mss-read-by-bare-array-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=1 -DBUFFER_VAL_UNDERFLOW=VAL_4U,VAL_2U,VAL_1U -DBUFFER_VAL_MID=VAL_4D,VAL_2D,VAL_1D -DBUFFER_VAL_OVERFLOW=VAL_4O,VAL_2O,VAL_1O -fuse-ld=lld test/mss-read-by-bare-array-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-bare-array-pointer 
+
+test/mss-read-by-bare-array-pointer 0
+after run result is: 1
+Try test failed: mss-read-by-bare-array-pointer-heap-overflow failed with unexpected exit value 1
+
+test/mss-read-by-bare-array-pointer 2
+after run result is: 0
+make results: test results:  0
+ 1
+
+========== end: mss-read-by-bare-array-pointer-heap-overflow =========
+
+========== start: mss-read-by-bare-array-pointer-heap-underflow =========
+
+test/mss-read-by-bare-array-pointer 1
+after run result is: 1
+Try test failed: mss-read-by-bare-array-pointer-heap-underflow failed with unexpected exit value 1
+
+test/mss-read-by-bare-array-pointer 3
+after run result is: 0
+make results: test results:  0
+ 1
+
+========== end: mss-read-by-bare-array-pointer-heap-underflow =========
+
+========== start: mss-read-by-bare-array-pointer-rodata-overflow =========
+make -e -W mss/read-by-bare-array-pointer.cpp test/mss-read-by-bare-array-pointer BUFFER_KIND=0 BUFFER_SIZE=8 BUFFER_VAL_MID=VAL_4D,VAL_2D,VAL_1D BUFFER_VAL_OVERFLOW=VAL_4O,VAL_2O,VAL_1O BUFFER_VAL_UNDERFLOW=VAL_4U,VAL_2U,VAL_1U REGION_KIND=3 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=3 -DBUFFER_VAL_UNDERFLOW=VAL_4U,VAL_2U,VAL_1U -DBUFFER_VAL_MID=VAL_4D,VAL_2D,VAL_1D -DBUFFER_VAL_OVERFLOW=VAL_4O,VAL_2O,VAL_1O mss/read-by-bare-array-pointer.cpp -c -o test/mss-read-by-bare-array-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=3 -DBUFFER_VAL_UNDERFLOW=VAL_4U,VAL_2U,VAL_1U -DBUFFER_VAL_MID=VAL_4D,VAL_2D,VAL_1D -DBUFFER_VAL_OVERFLOW=VAL_4O,VAL_2O,VAL_1O -fuse-ld=lld test/mss-read-by-bare-array-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-bare-array-pointer 
+
+test/mss-read-by-bare-array-pointer 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-bare-array-pointer-rodata-overflow =========
+
+========== start: mss-read-by-bare-array-pointer-rodata-underflow =========
+
+test/mss-read-by-bare-array-pointer 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-bare-array-pointer-rodata-underflow =========
+
+========== start: mss-read-by-bare-array-pointer-stack-overflow =========
+make -e -W mss/read-by-bare-array-pointer.cpp test/mss-read-by-bare-array-pointer BUFFER_KIND=0 BUFFER_SIZE=8 BUFFER_VAL_MID=VAL_4D,VAL_2D,VAL_1D BUFFER_VAL_OVERFLOW=VAL_4O,VAL_2O,VAL_1O BUFFER_VAL_UNDERFLOW=VAL_4U,VAL_2U,VAL_1U REGION_KIND=0 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=0 -DBUFFER_VAL_UNDERFLOW=VAL_4U,VAL_2U,VAL_1U -DBUFFER_VAL_MID=VAL_4D,VAL_2D,VAL_1D -DBUFFER_VAL_OVERFLOW=VAL_4O,VAL_2O,VAL_1O mss/read-by-bare-array-pointer.cpp -c -o test/mss-read-by-bare-array-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=0 -DBUFFER_VAL_UNDERFLOW=VAL_4U,VAL_2U,VAL_1U -DBUFFER_VAL_MID=VAL_4D,VAL_2D,VAL_1D -DBUFFER_VAL_OVERFLOW=VAL_4O,VAL_2O,VAL_1O -fuse-ld=lld test/mss-read-by-bare-array-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-bare-array-pointer 
+
+test/mss-read-by-bare-array-pointer 0
+after run result is: 1
+Try test failed: mss-read-by-bare-array-pointer-stack-overflow failed with unexpected exit value 1
+
+test/mss-read-by-bare-array-pointer 2
+after run result is: 0
+make results: test results:  0
+ 1
+
+========== end: mss-read-by-bare-array-pointer-stack-overflow =========
+
+========== start: mss-read-by-bare-array-pointer-stack-underflow =========
+
+test/mss-read-by-bare-array-pointer 1
+after run result is: 1
+Try test failed: mss-read-by-bare-array-pointer-stack-underflow failed with unexpected exit value 1
+
+test/mss-read-by-bare-array-pointer 3
+after run result is: 0
+make results: test results:  0
+ 1
+
+========== end: mss-read-by-bare-array-pointer-stack-underflow =========
+
+========== start: mss-read-by-enclosing-array-index-data-overflow =========
+make -e test/mss-read-by-enclosing-array-index BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=2 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 mss/read-by-enclosing-array-index.cpp -c -o test/mss-read-by-enclosing-array-index.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 -fuse-ld=lld test/mss-read-by-enclosing-array-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-enclosing-array-index 
+
+test/mss-read-by-enclosing-array-index 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-index-data-overflow =========
+
+========== start: mss-read-by-enclosing-array-index-data-underflow =========
+
+test/mss-read-by-enclosing-array-index 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-index-data-underflow =========
+
+========== start: mss-read-by-enclosing-array-index-heap-overflow =========
+make -e -W mss/read-by-enclosing-array-index.cpp test/mss-read-by-enclosing-array-index BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=1 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 mss/read-by-enclosing-array-index.cpp -c -o test/mss-read-by-enclosing-array-index.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 -fuse-ld=lld test/mss-read-by-enclosing-array-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-enclosing-array-index 
+
+test/mss-read-by-enclosing-array-index 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-index-heap-overflow =========
+
+========== start: mss-read-by-enclosing-array-index-heap-underflow =========
+
+test/mss-read-by-enclosing-array-index 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-index-heap-underflow =========
+
+========== start: mss-read-by-enclosing-array-index-rodata-overflow =========
+make -e -W mss/read-by-enclosing-array-index.cpp test/mss-read-by-enclosing-array-index BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=3 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=3 mss/read-by-enclosing-array-index.cpp -c -o test/mss-read-by-enclosing-array-index.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=3 -fuse-ld=lld test/mss-read-by-enclosing-array-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-enclosing-array-index 
+
+test/mss-read-by-enclosing-array-index 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-index-rodata-overflow =========
+
+========== start: mss-read-by-enclosing-array-index-rodata-underflow =========
+
+test/mss-read-by-enclosing-array-index 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-index-rodata-underflow =========
+
+========== start: mss-read-by-enclosing-array-index-stack-overflow =========
+make -e -W mss/read-by-enclosing-array-index.cpp test/mss-read-by-enclosing-array-index BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=0 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 mss/read-by-enclosing-array-index.cpp -c -o test/mss-read-by-enclosing-array-index.o 
+mss/read-by-enclosing-array-index.cpp:8:3: warning: unused variable 'stack_enclosing_array_underflow' [-Wunused-variable]
+    8 |   INIT_BUFFER;
+      |   ^~~~~~~~~~~
+./lib/include/conf.hpp:211:40: note: expanded from macro 'INIT_BUFFER'
+  211 |         #define INIT_BUFFER charBuffer stack_enclosing_array_underflow = charBuffer('u','d','o');  \
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+mss/read-by-enclosing-array-index.cpp:8:3: warning: unused variable 'stack_enclosing_array_overflow' [-Wunused-variable]
+    8 |   INIT_BUFFER;
+      |   ^~~~~~~~~~~
+./lib/include/conf.hpp:213:40: note: expanded from macro 'INIT_BUFFER'
+  213 |                             charBuffer stack_enclosing_array_overflow  = charBuffer('u','d','o')
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 -fuse-ld=lld test/mss-read-by-enclosing-array-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-enclosing-array-index 
+
+test/mss-read-by-enclosing-array-index 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-index-stack-overflow =========
+
+========== start: mss-read-by-enclosing-array-index-stack-underflow =========
+
+test/mss-read-by-enclosing-array-index 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-index-stack-underflow =========
+
+========== start: mss-read-by-enclosing-array-pointer-data-overflow =========
+make -e test/mss-read-by-enclosing-array-pointer BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=2 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 mss/read-by-enclosing-array-pointer.cpp -c -o test/mss-read-by-enclosing-array-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 -fuse-ld=lld test/mss-read-by-enclosing-array-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-enclosing-array-pointer 
+
+test/mss-read-by-enclosing-array-pointer 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-pointer-data-overflow =========
+
+========== start: mss-read-by-enclosing-array-pointer-data-underflow =========
+
+test/mss-read-by-enclosing-array-pointer 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-pointer-data-underflow =========
+
+========== start: mss-read-by-enclosing-array-pointer-heap-overflow =========
+make -e -W mss/read-by-enclosing-array-pointer.cpp test/mss-read-by-enclosing-array-pointer BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=1 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 mss/read-by-enclosing-array-pointer.cpp -c -o test/mss-read-by-enclosing-array-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 -fuse-ld=lld test/mss-read-by-enclosing-array-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-enclosing-array-pointer 
+
+test/mss-read-by-enclosing-array-pointer 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-pointer-heap-overflow =========
+
+========== start: mss-read-by-enclosing-array-pointer-heap-underflow =========
+
+test/mss-read-by-enclosing-array-pointer 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-pointer-heap-underflow =========
+
+========== start: mss-read-by-enclosing-array-pointer-large-count-data-overflow =========
+make -e test/mss-read-by-enclosing-array-pointer-large-count BUFFER_KIND=3 BUFFER_SIZE=0xffff REGION_KIND=2 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=0xffff -DBUFFER_KIND=3 -DREGION_KIND=2 mss/read-by-enclosing-array-pointer-large-count.cpp -c -o test/mss-read-by-enclosing-array-pointer-large-count.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=0xffff -DBUFFER_KIND=3 -DREGION_KIND=2 -fuse-ld=lld test/mss-read-by-enclosing-array-pointer-large-count.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-enclosing-array-pointer-large-count 
+
+test/mss-read-by-enclosing-array-pointer-large-count 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-pointer-large-count-data-overflow =========
+
+========== start: mss-read-by-enclosing-array-pointer-large-count-data-underflow =========
+
+test/mss-read-by-enclosing-array-pointer-large-count 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-pointer-large-count-data-underflow =========
+
+========== start: mss-read-by-enclosing-array-pointer-large-count-heap-overflow =========
+make -e -W mss/read-by-enclosing-array-pointer-large-count.cpp test/mss-read-by-enclosing-array-pointer-large-count BUFFER_KIND=3 BUFFER_SIZE=0xffff REGION_KIND=1 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=0xffff -DBUFFER_KIND=3 -DREGION_KIND=1 mss/read-by-enclosing-array-pointer-large-count.cpp -c -o test/mss-read-by-enclosing-array-pointer-large-count.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=0xffff -DBUFFER_KIND=3 -DREGION_KIND=1 -fuse-ld=lld test/mss-read-by-enclosing-array-pointer-large-count.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-enclosing-array-pointer-large-count 
+
+test/mss-read-by-enclosing-array-pointer-large-count 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-pointer-large-count-heap-overflow =========
+
+========== start: mss-read-by-enclosing-array-pointer-large-count-heap-underflow =========
+
+test/mss-read-by-enclosing-array-pointer-large-count 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-pointer-large-count-heap-underflow =========
+
+========== start: mss-read-by-enclosing-array-pointer-large-count-rodata-overflow =========
+make -e -W mss/read-by-enclosing-array-pointer-large-count.cpp test/mss-read-by-enclosing-array-pointer-large-count BUFFER_KIND=3 BUFFER_SIZE=0xffff REGION_KIND=3 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=0xffff -DBUFFER_KIND=3 -DREGION_KIND=3 mss/read-by-enclosing-array-pointer-large-count.cpp -c -o test/mss-read-by-enclosing-array-pointer-large-count.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=0xffff -DBUFFER_KIND=3 -DREGION_KIND=3 -fuse-ld=lld test/mss-read-by-enclosing-array-pointer-large-count.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-enclosing-array-pointer-large-count 
+
+test/mss-read-by-enclosing-array-pointer-large-count 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-pointer-large-count-rodata-overflow =========
+
+========== start: mss-read-by-enclosing-array-pointer-large-count-rodata-underflow =========
+
+test/mss-read-by-enclosing-array-pointer-large-count 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-pointer-large-count-rodata-underflow =========
+
+========== start: mss-read-by-enclosing-array-pointer-large-count-stack-overflow =========
+make -e -W mss/read-by-enclosing-array-pointer-large-count.cpp test/mss-read-by-enclosing-array-pointer-large-count BUFFER_KIND=3 BUFFER_SIZE=0xffff REGION_KIND=0 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=0xffff -DBUFFER_KIND=3 -DREGION_KIND=0 mss/read-by-enclosing-array-pointer-large-count.cpp -c -o test/mss-read-by-enclosing-array-pointer-large-count.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=0xffff -DBUFFER_KIND=3 -DREGION_KIND=0 -fuse-ld=lld test/mss-read-by-enclosing-array-pointer-large-count.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-enclosing-array-pointer-large-count 
+
+test/mss-read-by-enclosing-array-pointer-large-count 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-pointer-large-count-stack-overflow =========
+
+========== start: mss-read-by-enclosing-array-pointer-large-count-stack-underflow =========
+
+test/mss-read-by-enclosing-array-pointer-large-count 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-pointer-large-count-stack-underflow =========
+
+========== start: mss-read-by-enclosing-array-pointer-rodata-overflow =========
+make -e -W mss/read-by-enclosing-array-pointer.cpp test/mss-read-by-enclosing-array-pointer BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=3 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=3 mss/read-by-enclosing-array-pointer.cpp -c -o test/mss-read-by-enclosing-array-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=3 -fuse-ld=lld test/mss-read-by-enclosing-array-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-enclosing-array-pointer 
+
+test/mss-read-by-enclosing-array-pointer 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-pointer-rodata-overflow =========
+
+========== start: mss-read-by-enclosing-array-pointer-rodata-underflow =========
+
+test/mss-read-by-enclosing-array-pointer 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-pointer-rodata-underflow =========
+
+========== start: mss-read-by-enclosing-array-pointer-stack-overflow =========
+make -e -W mss/read-by-enclosing-array-pointer.cpp test/mss-read-by-enclosing-array-pointer BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=0 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 mss/read-by-enclosing-array-pointer.cpp -c -o test/mss-read-by-enclosing-array-pointer.o 
+mss/read-by-enclosing-array-pointer.cpp:7:3: warning: unused variable 'stack_enclosing_array_underflow' [-Wunused-variable]
+    7 |   INIT_BUFFER;
+      |   ^~~~~~~~~~~
+./lib/include/conf.hpp:211:40: note: expanded from macro 'INIT_BUFFER'
+  211 |         #define INIT_BUFFER charBuffer stack_enclosing_array_underflow = charBuffer('u','d','o');  \
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+mss/read-by-enclosing-array-pointer.cpp:7:3: warning: unused variable 'stack_enclosing_array_overflow' [-Wunused-variable]
+    7 |   INIT_BUFFER;
+      |   ^~~~~~~~~~~
+./lib/include/conf.hpp:213:40: note: expanded from macro 'INIT_BUFFER'
+  213 |                             charBuffer stack_enclosing_array_overflow  = charBuffer('u','d','o')
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 -fuse-ld=lld test/mss-read-by-enclosing-array-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-by-enclosing-array-pointer 
+
+test/mss-read-by-enclosing-array-pointer 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-pointer-stack-overflow =========
+
+========== start: mss-read-by-enclosing-array-pointer-stack-underflow =========
+
+test/mss-read-by-enclosing-array-pointer 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-by-enclosing-array-pointer-stack-underflow =========
+
+========== start: mss-read-cross-frame-index =========
+make -e test/mss-read-cross-frame-by-index 
+clang++ -O2  -I./lib -std=c++11 -Wall mss/read-cross-frame-by-index.cpp -c -o test/mss-read-cross-frame-by-index.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mss-read-cross-frame-by-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-frame-by-index 
+
+test/mss-read-cross-frame-by-index
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-frame-index =========
+
+========== start: mss-read-cross-frame-ptr =========
+make -e test/mss-read-cross-frame-by-pointer 
+clang++ -O2  -I./lib -std=c++11 -Wall mss/read-cross-frame-by-pointer.cpp -c -o test/mss-read-cross-frame-by-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mss-read-cross-frame-by-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-frame-by-pointer 
+
+test/mss-read-cross-frame-by-pointer
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-frame-ptr =========
+
+========== start: mss-read-cross-object-index-data =========
+make -e test/mss-read-cross-object-by-index BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=2 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 mss/read-cross-object-by-index.cpp -c -o test/mss-read-cross-object-by-index.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 -fuse-ld=lld test/mss-read-cross-object-by-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-object-by-index 
+
+test/mss-read-cross-object-by-index
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-object-index-data =========
+
+========== start: mss-read-cross-object-index-heap =========
+make -e -W mss/read-cross-object-by-index.cpp test/mss-read-cross-object-by-index BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=1 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 mss/read-cross-object-by-index.cpp -c -o test/mss-read-cross-object-by-index.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 -fuse-ld=lld test/mss-read-cross-object-by-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-object-by-index 
+
+test/mss-read-cross-object-by-index
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-object-index-heap =========
+
+========== start: mss-read-cross-object-index-rodata =========
+make -e -W mss/read-cross-object-by-index.cpp test/mss-read-cross-object-by-index BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=3 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=3 mss/read-cross-object-by-index.cpp -c -o test/mss-read-cross-object-by-index.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=3 -fuse-ld=lld test/mss-read-cross-object-by-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-object-by-index 
+
+test/mss-read-cross-object-by-index
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-object-index-rodata =========
+
+========== start: mss-read-cross-object-index-stack =========
+make -e -W mss/read-cross-object-by-index.cpp test/mss-read-cross-object-by-index BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=0 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 mss/read-cross-object-by-index.cpp -c -o test/mss-read-cross-object-by-index.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 -fuse-ld=lld test/mss-read-cross-object-by-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-object-by-index 
+
+test/mss-read-cross-object-by-index
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-object-index-stack =========
+
+========== start: mss-read-cross-object-ptr-data =========
+make -e test/mss-read-cross-object-by-pointer BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=2 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 mss/read-cross-object-by-pointer.cpp -c -o test/mss-read-cross-object-by-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 -fuse-ld=lld test/mss-read-cross-object-by-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-object-by-pointer 
+
+test/mss-read-cross-object-by-pointer
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-object-ptr-data =========
+
+========== start: mss-read-cross-object-ptr-heap =========
+make -e -W mss/read-cross-object-by-pointer.cpp test/mss-read-cross-object-by-pointer BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=1 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 mss/read-cross-object-by-pointer.cpp -c -o test/mss-read-cross-object-by-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 -fuse-ld=lld test/mss-read-cross-object-by-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-object-by-pointer 
+
+test/mss-read-cross-object-by-pointer
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-object-ptr-heap =========
+
+========== start: mss-read-cross-object-ptr-rodata =========
+make -e -W mss/read-cross-object-by-pointer.cpp test/mss-read-cross-object-by-pointer BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=3 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=3 mss/read-cross-object-by-pointer.cpp -c -o test/mss-read-cross-object-by-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=3 -fuse-ld=lld test/mss-read-cross-object-by-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-object-by-pointer 
+
+test/mss-read-cross-object-by-pointer
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-object-ptr-rodata =========
+
+========== start: mss-read-cross-object-ptr-stack =========
+make -e -W mss/read-cross-object-by-pointer.cpp test/mss-read-cross-object-by-pointer BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=0 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 mss/read-cross-object-by-pointer.cpp -c -o test/mss-read-cross-object-by-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 -fuse-ld=lld test/mss-read-cross-object-by-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-object-by-pointer 
+
+test/mss-read-cross-object-by-pointer
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-object-ptr-stack =========
+
+========== start: mss-read-cross-page-index-stack =========
+make -e test/mss-read-cross-page-by-index-in-stack 
+clang++ -O2  -I./lib -std=c++11 -Wall mss/read-cross-page-by-index-in-stack.cpp -c -o test/mss-read-cross-page-by-index-in-stack.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mss-read-cross-page-by-index-in-stack.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-page-by-index-in-stack 
+
+test/mss-read-cross-page-by-index-in-stack
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-page-index-stack =========
+
+========== start: mss-read-cross-page-ptr-stack =========
+make -e test/mss-read-cross-page-by-pointer-in-stack 
+clang++ -O2  -I./lib -std=c++11 -Wall mss/read-cross-page-by-pointer-in-stack.cpp -c -o test/mss-read-cross-page-by-pointer-in-stack.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mss-read-cross-page-by-pointer-in-stack.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-page-by-pointer-in-stack 
+
+test/mss-read-cross-page-by-pointer-in-stack
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-page-ptr-stack =========
+
+========== start: mss-read-cross-segment-data-to-heap-index =========
+make -e test/mss-read-cross-segment 
+clang++ -O2  -I./lib -std=c++11 -Wall mss/read-cross-segment.cpp -c -o test/mss-read-cross-segment.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mss-read-cross-segment.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-cross-segment 
+
+test/mss-read-cross-segment 2 1 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-data-to-heap-index =========
+
+========== start: mss-read-cross-segment-data-to-heap-ptr =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 1 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-data-to-heap-ptr =========
+
+========== start: mss-read-cross-segment-data-to-rodata-index =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 3 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-data-to-rodata-index =========
+
+========== start: mss-read-cross-segment-data-to-rodata-ptr =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 3 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-data-to-rodata-ptr =========
+
+========== start: mss-read-cross-segment-data-to-stack-index =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-data-to-stack-index =========
+
+========== start: mss-read-cross-segment-data-to-stack-ptr =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 2 0 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-data-to-stack-ptr =========
+
+========== start: mss-read-cross-segment-heap-to-data-index =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 2 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-heap-to-data-index =========
+
+========== start: mss-read-cross-segment-heap-to-data-ptr =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 2 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-heap-to-data-ptr =========
+
+========== start: mss-read-cross-segment-heap-to-rodata-index =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 3 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-heap-to-rodata-index =========
+
+========== start: mss-read-cross-segment-heap-to-rodata-ptr =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 3 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-heap-to-rodata-ptr =========
+
+========== start: mss-read-cross-segment-heap-to-stack-index =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-heap-to-stack-index =========
+
+========== start: mss-read-cross-segment-heap-to-stack-ptr =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 1 0 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-heap-to-stack-ptr =========
+
+========== start: mss-read-cross-segment-rodata-to-data-index =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 2 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-rodata-to-data-index =========
+
+========== start: mss-read-cross-segment-rodata-to-data-ptr =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 2 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-rodata-to-data-ptr =========
+
+========== start: mss-read-cross-segment-rodata-to-heap-index =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 1 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-rodata-to-heap-index =========
+
+========== start: mss-read-cross-segment-rodata-to-heap-ptr =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 1 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-rodata-to-heap-ptr =========
+
+========== start: mss-read-cross-segment-rodata-to-stack-index =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-rodata-to-stack-index =========
+
+========== start: mss-read-cross-segment-rodata-to-stack-ptr =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 3 0 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-rodata-to-stack-ptr =========
+
+========== start: mss-read-cross-segment-stack-to-data-index =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 2 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-stack-to-data-index =========
+
+========== start: mss-read-cross-segment-stack-to-data-ptr =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 2 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-stack-to-data-ptr =========
+
+========== start: mss-read-cross-segment-stack-to-heap-index =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 1 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-stack-to-heap-index =========
+
+========== start: mss-read-cross-segment-stack-to-heap-ptr =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 1 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-stack-to-heap-ptr =========
+
+========== start: mss-read-cross-segment-stack-to-rodata-index =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 3 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-stack-to-rodata-index =========
+
+========== start: mss-read-cross-segment-stack-to-rodata-ptr =========
+make -e test/mss-read-cross-segment 
+make: 'test/mss-read-cross-segment' is up to date.
+
+test/mss-read-cross-segment 0 3 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-cross-segment-stack-to-rodata-ptr =========
+
+========== start: mss-read-scalar-cast-to-array-data-overflow =========
+make -e test/mss-read-scalar-cast-to-array-overflow 
+clang++ -O2  -I./lib -std=c++11 -Wall mss/read-scalar-cast-to-array-overflow.cpp -c -o test/mss-read-scalar-cast-to-array-overflow.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mss-read-scalar-cast-to-array-overflow.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-scalar-cast-to-array-overflow 
+
+test/mss-read-scalar-cast-to-array-overflow 2
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-scalar-cast-to-array-data-overflow =========
+
+========== start: mss-read-scalar-cast-to-array-heap-overflow =========
+make -e test/mss-read-scalar-cast-to-array-overflow 
+make: 'test/mss-read-scalar-cast-to-array-overflow' is up to date.
+
+test/mss-read-scalar-cast-to-array-overflow 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-scalar-cast-to-array-heap-overflow =========
+
+========== start: mss-read-scalar-cast-to-array-rodata-overflow =========
+make -e test/mss-read-scalar-cast-to-array-overflow 
+make: 'test/mss-read-scalar-cast-to-array-overflow' is up to date.
+
+test/mss-read-scalar-cast-to-array-overflow 3
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-scalar-cast-to-array-rodata-overflow =========
+
+========== start: mss-read-scalar-cast-to-array-stack-overflow =========
+make -e test/mss-read-scalar-cast-to-array-overflow 
+make: 'test/mss-read-scalar-cast-to-array-overflow' is up to date.
+
+test/mss-read-scalar-cast-to-array-overflow 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-scalar-cast-to-array-stack-overflow =========
+
+========== start: mss-read-scalar-cast-to-scalar-data-overflow =========
+make -e test/mss-read-scalar-cast-to-scalar-overflow 
+clang++ -O2  -I./lib -std=c++11 -Wall mss/read-scalar-cast-to-scalar-overflow.cpp -c -o test/mss-read-scalar-cast-to-scalar-overflow.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mss-read-scalar-cast-to-scalar-overflow.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-read-scalar-cast-to-scalar-overflow 
+
+test/mss-read-scalar-cast-to-scalar-overflow 2
+dummy print to avoid dead code removal 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-scalar-cast-to-scalar-data-overflow =========
+
+========== start: mss-read-scalar-cast-to-scalar-heap-overflow =========
+make -e test/mss-read-scalar-cast-to-scalar-overflow 
+make: 'test/mss-read-scalar-cast-to-scalar-overflow' is up to date.
+
+test/mss-read-scalar-cast-to-scalar-overflow 1
+dummy print to avoid dead code removal 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-scalar-cast-to-scalar-heap-overflow =========
+
+========== start: mss-read-scalar-cast-to-scalar-rodata-overflow =========
+make -e test/mss-read-scalar-cast-to-scalar-overflow 
+make: 'test/mss-read-scalar-cast-to-scalar-overflow' is up to date.
+
+test/mss-read-scalar-cast-to-scalar-overflow 3
+dummy print to avoid dead code removal 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-scalar-cast-to-scalar-rodata-overflow =========
+
+========== start: mss-read-scalar-cast-to-scalar-stack-overflow =========
+make -e test/mss-read-scalar-cast-to-scalar-overflow 
+make: 'test/mss-read-scalar-cast-to-scalar-overflow' is up to date.
+
+test/mss-read-scalar-cast-to-scalar-overflow 0
+dummy print to avoid dead code removal 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-read-scalar-cast-to-scalar-stack-overflow =========
+
+========== start: mss-write-by-bare-array-index-data-overflow =========
+make -e test/mss-write-by-bare-array-index BUFFER_KIND=0 BUFFER_SIZE=8 REGION_KIND=2 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=2 mss/write-by-bare-array-index.cpp -c -o test/mss-write-by-bare-array-index.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=2 -fuse-ld=lld test/mss-write-by-bare-array-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-bare-array-index 
+
+test/mss-write-by-bare-array-index 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-bare-array-index-data-overflow =========
+
+========== start: mss-write-by-bare-array-index-data-underflow =========
+
+test/mss-write-by-bare-array-index 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-bare-array-index-data-underflow =========
+
+========== start: mss-write-by-bare-array-index-heap-overflow =========
+make -e -W mss/write-by-bare-array-index.cpp test/mss-write-by-bare-array-index BUFFER_KIND=0 BUFFER_SIZE=8 REGION_KIND=1 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=1 mss/write-by-bare-array-index.cpp -c -o test/mss-write-by-bare-array-index.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=1 -fuse-ld=lld test/mss-write-by-bare-array-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-bare-array-index 
+
+test/mss-write-by-bare-array-index 0
+after run result is: 1
+Try test failed: mss-write-by-bare-array-index-heap-overflow failed with unexpected exit value 1
+
+test/mss-write-by-bare-array-index 2
+after run result is: 0
+make results: test results:  0
+ 1
+
+========== end: mss-write-by-bare-array-index-heap-overflow =========
+
+========== start: mss-write-by-bare-array-index-heap-underflow =========
+
+test/mss-write-by-bare-array-index 1
+munmap_chunk(): invalid pointer
+test/mss-write-by-bare-array-index terminated with signal 6
+after run result is: 262
+Try test failed: mss-write-by-bare-array-index-heap-underflow failed with unexpected exit value 262
+
+test/mss-write-by-bare-array-index 3
+after run result is: 0
+make results: test results:  0
+ 262
+
+========== end: mss-write-by-bare-array-index-heap-underflow =========
+
+========== start: mss-write-by-bare-array-index-stack-overflow =========
+make -e -W mss/write-by-bare-array-index.cpp test/mss-write-by-bare-array-index BUFFER_KIND=0 BUFFER_SIZE=8 REGION_KIND=0 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=0 mss/write-by-bare-array-index.cpp -c -o test/mss-write-by-bare-array-index.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=0 -fuse-ld=lld test/mss-write-by-bare-array-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-bare-array-index 
+
+test/mss-write-by-bare-array-index 0
+after run result is: 1
+Try test failed: mss-write-by-bare-array-index-stack-overflow failed with unexpected exit value 1
+
+test/mss-write-by-bare-array-index 2
+after run result is: 0
+make results: test results:  0
+ 1
+
+========== end: mss-write-by-bare-array-index-stack-overflow =========
+
+========== start: mss-write-by-bare-array-index-stack-underflow =========
+
+test/mss-write-by-bare-array-index 1
+after run result is: 1
+Try test failed: mss-write-by-bare-array-index-stack-underflow failed with unexpected exit value 1
+
+test/mss-write-by-bare-array-index 3
+after run result is: 0
+make results: test results:  0
+ 1
+
+========== end: mss-write-by-bare-array-index-stack-underflow =========
+
+========== start: mss-write-by-bare-array-pointer-data-overflow =========
+make -e test/mss-write-by-bare-array-pointer BUFFER_KIND=0 BUFFER_SIZE=8 REGION_KIND=2 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=2 mss/write-by-bare-array-pointer.cpp -c -o test/mss-write-by-bare-array-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=2 -fuse-ld=lld test/mss-write-by-bare-array-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-bare-array-pointer 
+
+test/mss-write-by-bare-array-pointer 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-bare-array-pointer-data-overflow =========
+
+========== start: mss-write-by-bare-array-pointer-data-underflow =========
+
+test/mss-write-by-bare-array-pointer 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-bare-array-pointer-data-underflow =========
+
+========== start: mss-write-by-bare-array-pointer-heap-overflow =========
+make -e -W mss/write-by-bare-array-pointer.cpp test/mss-write-by-bare-array-pointer BUFFER_KIND=0 BUFFER_SIZE=8 REGION_KIND=1 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=1 mss/write-by-bare-array-pointer.cpp -c -o test/mss-write-by-bare-array-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=1 -fuse-ld=lld test/mss-write-by-bare-array-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-bare-array-pointer 
+
+test/mss-write-by-bare-array-pointer 0
+after run result is: 1
+Try test failed: mss-write-by-bare-array-pointer-heap-overflow failed with unexpected exit value 1
+
+test/mss-write-by-bare-array-pointer 2
+after run result is: 0
+make results: test results:  0
+ 1
+
+========== end: mss-write-by-bare-array-pointer-heap-overflow =========
+
+========== start: mss-write-by-bare-array-pointer-heap-underflow =========
+
+test/mss-write-by-bare-array-pointer 1
+munmap_chunk(): invalid pointer
+test/mss-write-by-bare-array-pointer terminated with signal 6
+after run result is: 262
+Try test failed: mss-write-by-bare-array-pointer-heap-underflow failed with unexpected exit value 262
+
+test/mss-write-by-bare-array-pointer 3
+after run result is: 0
+make results: test results:  0
+ 262
+
+========== end: mss-write-by-bare-array-pointer-heap-underflow =========
+
+========== start: mss-write-by-bare-array-pointer-stack-overflow =========
+make -e -W mss/write-by-bare-array-pointer.cpp test/mss-write-by-bare-array-pointer BUFFER_KIND=0 BUFFER_SIZE=8 REGION_KIND=0 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=0 mss/write-by-bare-array-pointer.cpp -c -o test/mss-write-by-bare-array-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=0 -DREGION_KIND=0 -fuse-ld=lld test/mss-write-by-bare-array-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-bare-array-pointer 
+
+test/mss-write-by-bare-array-pointer 0
+after run result is: 1
+Try test failed: mss-write-by-bare-array-pointer-stack-overflow failed with unexpected exit value 1
+
+test/mss-write-by-bare-array-pointer 2
+after run result is: 0
+make results: test results:  0
+ 1
+
+========== end: mss-write-by-bare-array-pointer-stack-overflow =========
+
+========== start: mss-write-by-bare-array-pointer-stack-underflow =========
+
+test/mss-write-by-bare-array-pointer 1
+after run result is: 1
+Try test failed: mss-write-by-bare-array-pointer-stack-underflow failed with unexpected exit value 1
+
+test/mss-write-by-bare-array-pointer 3
+after run result is: 0
+make results: test results:  0
+ 1
+
+========== end: mss-write-by-bare-array-pointer-stack-underflow =========
+
+========== start: mss-write-by-enclosing-array-index-data-overflow =========
+make -e test/mss-write-by-enclosing-array-index BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=2 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 mss/write-by-enclosing-array-index.cpp -c -o test/mss-write-by-enclosing-array-index.o 
+mss/write-by-enclosing-array-index.cpp:38:14: warning: variable 'rv' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+   38 |     }else if(flow_type == 5){
+      |              ^~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:45:10: note: uninitialized use occurs here
+   45 |   return rv;
+      |          ^~
+mss/write-by-enclosing-array-index.cpp:38:11: note: remove the 'if' if its condition is always true
+   38 |     }else if(flow_type == 5){
+      |           ^~~~~~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:33:12: warning: variable 'rv' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+   33 |   }else if(flow_type >= 4){
+      |            ^~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:45:10: note: uninitialized use occurs here
+   45 |   return rv;
+      |          ^~
+mss/write-by-enclosing-array-index.cpp:33:9: note: remove the 'if' if its condition is always true
+   33 |   }else if(flow_type >= 4){
+      |         ^~~~~~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:27:14: warning: variable 'rv' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+   27 |     }else if(flow_type == 3){
+      |              ^~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:45:10: note: uninitialized use occurs here
+   45 |   return rv;
+      |          ^~
+mss/write-by-enclosing-array-index.cpp:27:11: note: remove the 'if' if its condition is always true
+   27 |     }else if(flow_type == 3){
+      |           ^~~~~~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:11:9: note: initialize the variable 'rv' to silence this warning
+   11 |   int rv;
+      |         ^
+      |          = 0
+3 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 -fuse-ld=lld test/mss-write-by-enclosing-array-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-enclosing-array-index 
+
+test/mss-write-by-enclosing-array-index 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-index-data-overflow =========
+
+========== start: mss-write-by-enclosing-array-index-data-underflow =========
+
+test/mss-write-by-enclosing-array-index 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-index-data-underflow =========
+
+========== start: mss-write-by-enclosing-array-index-heap-overflow =========
+make -e -W mss/write-by-enclosing-array-index.cpp test/mss-write-by-enclosing-array-index BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=1 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 mss/write-by-enclosing-array-index.cpp -c -o test/mss-write-by-enclosing-array-index.o 
+mss/write-by-enclosing-array-index.cpp:38:14: warning: variable 'rv' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+   38 |     }else if(flow_type == 5){
+      |              ^~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:45:10: note: uninitialized use occurs here
+   45 |   return rv;
+      |          ^~
+mss/write-by-enclosing-array-index.cpp:38:11: note: remove the 'if' if its condition is always true
+   38 |     }else if(flow_type == 5){
+      |           ^~~~~~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:33:12: warning: variable 'rv' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+   33 |   }else if(flow_type >= 4){
+      |            ^~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:45:10: note: uninitialized use occurs here
+   45 |   return rv;
+      |          ^~
+mss/write-by-enclosing-array-index.cpp:33:9: note: remove the 'if' if its condition is always true
+   33 |   }else if(flow_type >= 4){
+      |         ^~~~~~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:27:14: warning: variable 'rv' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+   27 |     }else if(flow_type == 3){
+      |              ^~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:45:10: note: uninitialized use occurs here
+   45 |   return rv;
+      |          ^~
+mss/write-by-enclosing-array-index.cpp:27:11: note: remove the 'if' if its condition is always true
+   27 |     }else if(flow_type == 3){
+      |           ^~~~~~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:11:9: note: initialize the variable 'rv' to silence this warning
+   11 |   int rv;
+      |         ^
+      |          = 0
+3 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 -fuse-ld=lld test/mss-write-by-enclosing-array-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-enclosing-array-index 
+
+test/mss-write-by-enclosing-array-index 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-index-heap-overflow =========
+
+========== start: mss-write-by-enclosing-array-index-heap-underflow =========
+
+test/mss-write-by-enclosing-array-index 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-index-heap-underflow =========
+
+========== start: mss-write-by-enclosing-array-index-stack-overflow =========
+make -e -W mss/write-by-enclosing-array-index.cpp test/mss-write-by-enclosing-array-index BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=0 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 mss/write-by-enclosing-array-index.cpp -c -o test/mss-write-by-enclosing-array-index.o 
+mss/write-by-enclosing-array-index.cpp:8:3: warning: unused variable 'stack_enclosing_array_underflow' [-Wunused-variable]
+    8 |   INIT_BUFFER;
+      |   ^~~~~~~~~~~
+./lib/include/conf.hpp:211:40: note: expanded from macro 'INIT_BUFFER'
+  211 |         #define INIT_BUFFER charBuffer stack_enclosing_array_underflow = charBuffer('u','d','o');  \
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:8:3: warning: unused variable 'stack_enclosing_array_overflow' [-Wunused-variable]
+    8 |   INIT_BUFFER;
+      |   ^~~~~~~~~~~
+./lib/include/conf.hpp:213:40: note: expanded from macro 'INIT_BUFFER'
+  213 |                             charBuffer stack_enclosing_array_overflow  = charBuffer('u','d','o')
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:38:14: warning: variable 'rv' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+   38 |     }else if(flow_type == 5){
+      |              ^~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:45:10: note: uninitialized use occurs here
+   45 |   return rv;
+      |          ^~
+mss/write-by-enclosing-array-index.cpp:38:11: note: remove the 'if' if its condition is always true
+   38 |     }else if(flow_type == 5){
+      |           ^~~~~~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:33:12: warning: variable 'rv' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+   33 |   }else if(flow_type >= 4){
+      |            ^~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:45:10: note: uninitialized use occurs here
+   45 |   return rv;
+      |          ^~
+mss/write-by-enclosing-array-index.cpp:33:9: note: remove the 'if' if its condition is always true
+   33 |   }else if(flow_type >= 4){
+      |         ^~~~~~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:27:14: warning: variable 'rv' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+   27 |     }else if(flow_type == 3){
+      |              ^~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:45:10: note: uninitialized use occurs here
+   45 |   return rv;
+      |          ^~
+mss/write-by-enclosing-array-index.cpp:27:11: note: remove the 'if' if its condition is always true
+   27 |     }else if(flow_type == 3){
+      |           ^~~~~~~~~~~~~~~~~~
+mss/write-by-enclosing-array-index.cpp:11:9: note: initialize the variable 'rv' to silence this warning
+   11 |   int rv;
+      |         ^
+      |          = 0
+5 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 -fuse-ld=lld test/mss-write-by-enclosing-array-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-enclosing-array-index 
+
+test/mss-write-by-enclosing-array-index 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-index-stack-overflow =========
+
+========== start: mss-write-by-enclosing-array-index-stack-underflow =========
+
+test/mss-write-by-enclosing-array-index 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-index-stack-underflow =========
+
+========== start: mss-write-by-enclosing-array-pointer-data-overflow =========
+make -e test/mss-write-by-enclosing-array-pointer BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=2 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 mss/write-by-enclosing-array-pointer.cpp -c -o test/mss-write-by-enclosing-array-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 -fuse-ld=lld test/mss-write-by-enclosing-array-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-enclosing-array-pointer 
+
+test/mss-write-by-enclosing-array-pointer 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-pointer-data-overflow =========
+
+========== start: mss-write-by-enclosing-array-pointer-data-underflow =========
+
+test/mss-write-by-enclosing-array-pointer 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-pointer-data-underflow =========
+
+========== start: mss-write-by-enclosing-array-pointer-heap-overflow =========
+make -e -W mss/write-by-enclosing-array-pointer.cpp test/mss-write-by-enclosing-array-pointer BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=1 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 mss/write-by-enclosing-array-pointer.cpp -c -o test/mss-write-by-enclosing-array-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 -fuse-ld=lld test/mss-write-by-enclosing-array-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-enclosing-array-pointer 
+
+test/mss-write-by-enclosing-array-pointer 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-pointer-heap-overflow =========
+
+========== start: mss-write-by-enclosing-array-pointer-heap-underflow =========
+
+test/mss-write-by-enclosing-array-pointer 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-pointer-heap-underflow =========
+
+========== start: mss-write-by-enclosing-array-pointer-large-count-data-overflow =========
+make -e test/mss-write-by-enclosing-array-pointer-large-count BUFFER_KIND=3 BUFFER_SIZE=8 REGION_KIND=2 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=3 -DREGION_KIND=2 mss/write-by-enclosing-array-pointer-large-count.cpp -c -o test/mss-write-by-enclosing-array-pointer-large-count.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=3 -DREGION_KIND=2 -fuse-ld=lld test/mss-write-by-enclosing-array-pointer-large-count.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-enclosing-array-pointer-large-count 
+
+test/mss-write-by-enclosing-array-pointer-large-count 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-pointer-large-count-data-overflow =========
+
+========== start: mss-write-by-enclosing-array-pointer-large-count-data-underflow =========
+
+test/mss-write-by-enclosing-array-pointer-large-count 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-pointer-large-count-data-underflow =========
+
+========== start: mss-write-by-enclosing-array-pointer-large-count-heap-overflow =========
+make -e -W mss/write-by-enclosing-array-pointer-large-count.cpp test/mss-write-by-enclosing-array-pointer-large-count BUFFER_KIND=3 BUFFER_SIZE=8 REGION_KIND=1 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=3 -DREGION_KIND=1 mss/write-by-enclosing-array-pointer-large-count.cpp -c -o test/mss-write-by-enclosing-array-pointer-large-count.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=3 -DREGION_KIND=1 -fuse-ld=lld test/mss-write-by-enclosing-array-pointer-large-count.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-enclosing-array-pointer-large-count 
+
+test/mss-write-by-enclosing-array-pointer-large-count 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-pointer-large-count-heap-overflow =========
+
+========== start: mss-write-by-enclosing-array-pointer-large-count-heap-underflow =========
+
+test/mss-write-by-enclosing-array-pointer-large-count 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-pointer-large-count-heap-underflow =========
+
+========== start: mss-write-by-enclosing-array-pointer-large-count-stack-overflow =========
+make -e -W mss/write-by-enclosing-array-pointer-large-count.cpp test/mss-write-by-enclosing-array-pointer-large-count BUFFER_KIND=3 BUFFER_SIZE=8 REGION_KIND=0 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=3 -DREGION_KIND=0 mss/write-by-enclosing-array-pointer-large-count.cpp -c -o test/mss-write-by-enclosing-array-pointer-large-count.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=3 -DREGION_KIND=0 -fuse-ld=lld test/mss-write-by-enclosing-array-pointer-large-count.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-enclosing-array-pointer-large-count 
+
+test/mss-write-by-enclosing-array-pointer-large-count 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-pointer-large-count-stack-overflow =========
+
+========== start: mss-write-by-enclosing-array-pointer-large-count-stack-underflow =========
+
+test/mss-write-by-enclosing-array-pointer-large-count 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-pointer-large-count-stack-underflow =========
+
+========== start: mss-write-by-enclosing-array-pointer-stack-overflow =========
+make -e -W mss/write-by-enclosing-array-pointer.cpp test/mss-write-by-enclosing-array-pointer BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=0 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 mss/write-by-enclosing-array-pointer.cpp -c -o test/mss-write-by-enclosing-array-pointer.o 
+mss/write-by-enclosing-array-pointer.cpp:7:3: warning: unused variable 'stack_enclosing_array_underflow' [-Wunused-variable]
+    7 |   INIT_BUFFER;
+      |   ^~~~~~~~~~~
+./lib/include/conf.hpp:211:40: note: expanded from macro 'INIT_BUFFER'
+  211 |         #define INIT_BUFFER charBuffer stack_enclosing_array_underflow = charBuffer('u','d','o');  \
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+mss/write-by-enclosing-array-pointer.cpp:7:3: warning: unused variable 'stack_enclosing_array_overflow' [-Wunused-variable]
+    7 |   INIT_BUFFER;
+      |   ^~~~~~~~~~~
+./lib/include/conf.hpp:213:40: note: expanded from macro 'INIT_BUFFER'
+  213 |                             charBuffer stack_enclosing_array_overflow  = charBuffer('u','d','o')
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 -fuse-ld=lld test/mss-write-by-enclosing-array-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-enclosing-array-pointer 
+
+test/mss-write-by-enclosing-array-pointer 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-pointer-stack-overflow =========
+
+========== start: mss-write-by-enclosing-array-pointer-stack-underflow =========
+
+test/mss-write-by-enclosing-array-pointer 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-enclosing-array-pointer-stack-underflow =========
+
+========== start: mss-write-by-stack-pointer =========
+make -e test/mss-write-by-stack-pointer STEP=8 
+clang++ -O2  -I./lib -std=c++11 -Wall mss/write-by-stack-pointer.cpp -c -o test/mss-write-by-stack-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mss-write-by-stack-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-by-stack-pointer 
+
+test/mss-write-by-stack-pointer 0 0 0x1111111111111111ULL 0xffffffffffffffffULL
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-by-stack-pointer =========
+
+========== start: mss-write-cross-frame-index =========
+make -e test/mss-write-cross-frame-by-index 
+clang++ -O2  -I./lib -std=c++11 -Wall mss/write-cross-frame-by-index.cpp -c -o test/mss-write-cross-frame-by-index.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mss-write-cross-frame-by-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-frame-by-index 
+
+test/mss-write-cross-frame-by-index
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-frame-index =========
+
+========== start: mss-write-cross-frame-ptr =========
+make -e test/mss-write-cross-frame-by-pointer 
+clang++ -O2  -I./lib -std=c++11 -Wall mss/write-cross-frame-by-pointer.cpp -c -o test/mss-write-cross-frame-by-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mss-write-cross-frame-by-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-frame-by-pointer 
+
+test/mss-write-cross-frame-by-pointer
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-frame-ptr =========
+
+========== start: mss-write-cross-object-index-data-overflow =========
+make -e test/mss-write-cross-object-by-index BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=2 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 mss/write-cross-object-by-index.cpp -c -o test/mss-write-cross-object-by-index.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 -fuse-ld=lld test/mss-write-cross-object-by-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-object-by-index 
+
+test/mss-write-cross-object-by-index 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-object-index-data-overflow =========
+
+========== start: mss-write-cross-object-index-data-underflow =========
+
+test/mss-write-cross-object-by-index 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-object-index-data-underflow =========
+
+========== start: mss-write-cross-object-index-heap-overflow =========
+make -e -W mss/write-cross-object-by-index.cpp test/mss-write-cross-object-by-index BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=1 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 mss/write-cross-object-by-index.cpp -c -o test/mss-write-cross-object-by-index.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 -fuse-ld=lld test/mss-write-cross-object-by-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-object-by-index 
+
+test/mss-write-cross-object-by-index 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-object-index-heap-overflow =========
+
+========== start: mss-write-cross-object-index-heap-underflow =========
+
+test/mss-write-cross-object-by-index 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-object-index-heap-underflow =========
+
+========== start: mss-write-cross-object-index-stack-overflow =========
+make -e -W mss/write-cross-object-by-index.cpp test/mss-write-cross-object-by-index BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=0 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 mss/write-cross-object-by-index.cpp -c -o test/mss-write-cross-object-by-index.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 -fuse-ld=lld test/mss-write-cross-object-by-index.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-object-by-index 
+
+test/mss-write-cross-object-by-index 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-object-index-stack-overflow =========
+
+========== start: mss-write-cross-object-index-stack-underflow =========
+
+test/mss-write-cross-object-by-index 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-object-index-stack-underflow =========
+
+========== start: mss-write-cross-object-ptr-data-overflow =========
+make -e test/mss-write-cross-object-by-pointer BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=2 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 mss/write-cross-object-by-pointer.cpp -c -o test/mss-write-cross-object-by-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 -fuse-ld=lld test/mss-write-cross-object-by-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-object-by-pointer 
+
+test/mss-write-cross-object-by-pointer 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-object-ptr-data-overflow =========
+
+========== start: mss-write-cross-object-ptr-data-underflow =========
+
+test/mss-write-cross-object-by-pointer 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-object-ptr-data-underflow =========
+
+========== start: mss-write-cross-object-ptr-heap-overflow =========
+make -e -W mss/write-cross-object-by-pointer.cpp test/mss-write-cross-object-by-pointer BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=1 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 mss/write-cross-object-by-pointer.cpp -c -o test/mss-write-cross-object-by-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 -fuse-ld=lld test/mss-write-cross-object-by-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-object-by-pointer 
+
+test/mss-write-cross-object-by-pointer 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-object-ptr-heap-overflow =========
+
+========== start: mss-write-cross-object-ptr-heap-underflow =========
+
+test/mss-write-cross-object-by-pointer 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-object-ptr-heap-underflow =========
+
+========== start: mss-write-cross-object-ptr-stack-overflow =========
+make -e -W mss/write-cross-object-by-pointer.cpp test/mss-write-cross-object-by-pointer BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=0 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 mss/write-cross-object-by-pointer.cpp -c -o test/mss-write-cross-object-by-pointer.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 -fuse-ld=lld test/mss-write-cross-object-by-pointer.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-object-by-pointer 
+
+test/mss-write-cross-object-by-pointer 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-object-ptr-stack-overflow =========
+
+========== start: mss-write-cross-object-ptr-stack-underflow =========
+
+test/mss-write-cross-object-by-pointer 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-object-ptr-stack-underflow =========
+
+========== start: mss-write-cross-page-index-stack =========
+make -e test/mss-write-cross-page-by-index-in-stack 
+clang++ -O2  -I./lib -std=c++11 -Wall mss/write-cross-page-by-index-in-stack.cpp -c -o test/mss-write-cross-page-by-index-in-stack.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mss-write-cross-page-by-index-in-stack.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-page-by-index-in-stack 
+
+test/mss-write-cross-page-by-index-in-stack
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-page-index-stack =========
+
+========== start: mss-write-cross-page-ptr-stack =========
+make -e test/mss-write-cross-page-by-pointer-in-stack 
+clang++ -O2  -I./lib -std=c++11 -Wall mss/write-cross-page-by-pointer-in-stack.cpp -c -o test/mss-write-cross-page-by-pointer-in-stack.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mss-write-cross-page-by-pointer-in-stack.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-page-by-pointer-in-stack 
+
+test/mss-write-cross-page-by-pointer-in-stack
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-page-ptr-stack =========
+
+========== start: mss-write-cross-segment-data-to-heap-index =========
+make -e test/mss-write-cross-segment 
+clang++ -O2  -I./lib -std=c++11 -Wall mss/write-cross-segment.cpp -c -o test/mss-write-cross-segment.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mss-write-cross-segment.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-cross-segment 
+
+test/mss-write-cross-segment 2 1 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-segment-data-to-heap-index =========
+
+========== start: mss-write-cross-segment-data-to-heap-ptr =========
+make -e test/mss-write-cross-segment 
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 2 1 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-segment-data-to-heap-ptr =========
+
+========== start: mss-write-cross-segment-data-to-stack-index =========
+make -e test/mss-write-cross-segment 
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 2 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-segment-data-to-stack-index =========
+
+========== start: mss-write-cross-segment-data-to-stack-ptr =========
+make -e test/mss-write-cross-segment 
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 2 0 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-segment-data-to-stack-ptr =========
+
+========== start: mss-write-cross-segment-heap-to-data-index =========
+make -e test/mss-write-cross-segment 
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 1 2 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-segment-heap-to-data-index =========
+
+========== start: mss-write-cross-segment-heap-to-data-ptr =========
+make -e test/mss-write-cross-segment 
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 1 2 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-segment-heap-to-data-ptr =========
+
+========== start: mss-write-cross-segment-heap-to-stack-index =========
+make -e test/mss-write-cross-segment 
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 1 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-segment-heap-to-stack-index =========
+
+========== start: mss-write-cross-segment-heap-to-stack-ptr =========
+make -e test/mss-write-cross-segment 
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 1 0 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-segment-heap-to-stack-ptr =========
+
+========== start: mss-write-cross-segment-stack-to-data-index =========
+make -e test/mss-write-cross-segment 
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 0 2 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-segment-stack-to-data-index =========
+
+========== start: mss-write-cross-segment-stack-to-data-ptr =========
+make -e test/mss-write-cross-segment 
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 0 2 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-segment-stack-to-data-ptr =========
+
+========== start: mss-write-cross-segment-stack-to-heap-index =========
+make -e test/mss-write-cross-segment 
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 0 1 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-segment-stack-to-heap-index =========
+
+========== start: mss-write-cross-segment-stack-to-heap-ptr =========
+make -e test/mss-write-cross-segment 
+make: 'test/mss-write-cross-segment' is up to date.
+
+test/mss-write-cross-segment 0 1 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-cross-segment-stack-to-heap-ptr =========
+
+========== start: mss-write-spray-cross-frame =========
+make -e test/mss-write-spray-cross-frame 
+clang++ -O2  -I./lib -std=c++11 -Wall mss/write-spray-cross-frame.cpp -c -o test/mss-write-spray-cross-frame.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mss-write-spray-cross-frame.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-spray-cross-frame 
+
+test/mss-write-spray-cross-frame
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-spray-cross-frame =========
+
+========== start: mss-write-spray-cross-object-data =========
+make -e test/mss-write-spray-cross-object BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=2 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 mss/write-spray-cross-object.cpp -c -o test/mss-write-spray-cross-object.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=2 -fuse-ld=lld test/mss-write-spray-cross-object.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-spray-cross-object 
+
+test/mss-write-spray-cross-object
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-spray-cross-object-data =========
+
+========== start: mss-write-spray-cross-object-heap =========
+make -e -W mss/write-spray-cross-object.cpp test/mss-write-spray-cross-object BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=1 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 mss/write-spray-cross-object.cpp -c -o test/mss-write-spray-cross-object.o 
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=1 -fuse-ld=lld test/mss-write-spray-cross-object.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-spray-cross-object 
+
+test/mss-write-spray-cross-object
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-spray-cross-object-heap =========
+
+========== start: mss-write-spray-cross-object-stack =========
+make -e -W mss/write-spray-cross-object.cpp test/mss-write-spray-cross-object BUFFER_KIND=1 BUFFER_SIZE=8 REGION_KIND=0 
+clang++ -O2  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 mss/write-spray-cross-object.cpp -c -o test/mss-write-spray-cross-object.o 
+mss/write-spray-cross-object.cpp:8:3: warning: unused variable 'stack_enclosing_array_underflow' [-Wunused-variable]
+    8 |   INIT_BUFFER;
+      |   ^~~~~~~~~~~
+./lib/include/conf.hpp:211:40: note: expanded from macro 'INIT_BUFFER'
+  211 |         #define INIT_BUFFER charBuffer stack_enclosing_array_underflow = charBuffer('u','d','o');  \
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 warning generated.
+clang++  -I./lib -std=c++11 -Wall -DBUFFER_SIZE=8 -DBUFFER_KIND=1 -DREGION_KIND=0 -fuse-ld=lld test/mss-write-spray-cross-object.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-spray-cross-object 
+
+test/mss-write-spray-cross-object
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-spray-cross-object-stack =========
+
+========== start: mss-write-spray-cross-page-in-heap =========
+make -e test/mss-write-spray-cross-page-in-heap 
+clang++ -O2  -I./lib -std=c++11 -Wall mss/write-spray-cross-page-in-heap.cpp -c -o test/mss-write-spray-cross-page-in-heap.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mss-write-spray-cross-page-in-heap.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-spray-cross-page-in-heap 
+
+test/mss-write-spray-cross-page-in-heap
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-spray-cross-page-in-heap =========
+
+========== start: mss-write-spray-cross-page-in-stack =========
+make -e test/mss-write-spray-cross-page-in-stack 
+clang++ -O2  -I./lib -std=c++11 -Wall mss/write-spray-cross-page-in-stack.cpp -c -o test/mss-write-spray-cross-page-in-stack.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mss-write-spray-cross-page-in-stack.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mss-write-spray-cross-page-in-stack 
+
+test/mss-write-spray-cross-page-in-stack
+after run result is: 0
+make results: test results:  0
+
+========== end: mss-write-spray-cross-page-in-stack =========
+
+========== start: mts-access-after-free-alias-heap =========
+make -e test/mts-access-after-free-alias-heap 
+clang++ -O2  -I./lib -std=c++11 -Wall mts/access-after-free-alias-heap.cpp -c -o test/mts-access-after-free-alias-heap.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mts-access-after-free-alias-heap.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-access-after-free-alias-heap 
+
+test/mts-access-after-free-alias-heap 0 0
+after run result is: 1
+
+test/mts-access-after-free-alias-heap 1 0
+after run result is: 1
+
+test/mts-access-after-free-alias-heap 2 0
+after run result is: 0
+make results: test results:  0
+ 1
+
+========== end: mts-access-after-free-alias-heap =========
+
+========== start: mts-access-after-free-alias-stack =========
+make -e test/mts-access-after-free-alias-stack 
+clang++ -O2  -I./lib -std=c++11 -Wall mts/access-after-free-alias-stack.cpp -c -o test/mts-access-after-free-alias-stack.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mts-access-after-free-alias-stack.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-access-after-free-alias-stack 
+
+test/mts-access-after-free-alias-stack 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mts-access-after-free-alias-stack =========
+
+========== start: mts-access-after-free-org-heap =========
+make -e test/mts-access-after-free-org-heap 
+clang++ -O2  -I./lib -std=c++11 -Wall mts/access-after-free-org-heap.cpp -c -o test/mts-access-after-free-org-heap.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mts-access-after-free-org-heap.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-access-after-free-org-heap 
+
+test/mts-access-after-free-org-heap 0 0
+after run result is: 1
+
+test/mts-access-after-free-org-heap 1 0
+after run result is: 1
+
+test/mts-access-after-free-org-heap 2 0
+after run result is: 0
+make results: test results:  0
+ 1
+
+========== end: mts-access-after-free-org-heap =========
+
+========== start: mts-access-after-reclaim-heap =========
+make -e test/mts-access-after-reclaim-heap 
+clang++ -O2  -I./lib -std=c++11 -Wall mts/access-after-reclaim-heap.cpp -c -o test/mts-access-after-reclaim-heap.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mts-access-after-reclaim-heap.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-access-after-reclaim-heap 
+
+test/mts-access-after-reclaim-heap 0
+after run result is: 1
+
+test/mts-access-after-reclaim-heap 1
+after run result is: 1
+
+test/mts-access-after-reclaim-heap 2
+after run result is: 0
+make results: test results:  0
+ 1
+
+========== end: mts-access-after-reclaim-heap =========
+
+========== start: mts-access-after-reclaim-stack =========
+make -e test/mts-access-after-reclaim-stack 
+clang++ -O2  -I./lib -std=c++11 -Wall mts/access-after-reclaim-stack.cpp -c -o test/mts-access-after-reclaim-stack.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mts-access-after-reclaim-stack.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-access-after-reclaim-stack 
+
+test/mts-access-after-reclaim-stack 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mts-access-after-reclaim-stack =========
+
+========== start: mts-access-by-double-free-reallocate =========
+make -e test/mts-double-free 
+clang++ -O2  -I./lib -std=c++11 -Wall mts/double-free.cpp -c -o test/mts-double-free.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mts-double-free.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-double-free 
+
+test/mts-double-free 0 0 0 7 2
+after run result is: 0
+make results: test results:  0
+
+========== end: mts-access-by-double-free-reallocate =========
+
+========== start: mts-double-free =========
+make -e test/mts-double-free 
+make: 'test/mts-double-free' is up to date.
+
+test/mts-double-free 0 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mts-double-free =========
+
+========== start: mts-reallocate-heap =========
+make -e test/mts-reallocate-heap 
+clang++ -O2  -I./lib -std=c++11 -Wall mts/reallocate-heap.cpp -c -o test/mts-reallocate-heap.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mts-reallocate-heap.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-reallocate-heap 
+
+test/mts-reallocate-heap
+after run result is: 0
+make results: test results:  0
+
+========== end: mts-reallocate-heap =========
+
+========== start: mts-reallocate-stack =========
+make -e test/mts-reallocate-stack 
+clang++ -O2  -I./lib -std=c++11 -Wall mts/reallocate-stack.cpp -c -o test/mts-reallocate-stack.o 
+mts/reallocate-stack.cpp:10:39: warning: address of stack memory associated with local variable 'buffer' returned [-Wreturn-stack-address]
+   10 |     return reinterpret_cast<intptr_t>(buffer.data);
+      |                                       ^~~~~~
+mts/reallocate-stack.cpp:13:39: warning: address of stack memory associated with local variable 'buffer' returned [-Wreturn-stack-address]
+   13 |     return reinterpret_cast<intptr_t>(buffer.data);
+      |                                       ^~~~~~
+2 warnings generated.
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mts-reallocate-stack.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-reallocate-stack 
+
+test/mts-reallocate-stack
+after run result is: 0
+make results: test results:  0
+
+========== end: mts-reallocate-stack =========
+
+========== start: mts-write-after-free-heap =========
+make -e test/mts-write-after-free-heap 
+clang++ -O2  -I./lib -std=c++11 -Wall mts/write-after-free-heap.cpp -c -o test/mts-write-after-free-heap.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mts-write-after-free-heap.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-write-after-free-heap 
+
+test/mts-write-after-free-heap
+after run result is: 0
+make results: test results:  0
+
+========== end: mts-write-after-free-heap =========
+
+========== start: mts-write-after-free-stack =========
+make -e test/mts-write-after-free-stack 
+clang++ -O2  -I./lib -std=c++11 -Wall mts/write-after-free-stack.cpp -c -o test/mts-write-after-free-stack.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mts-write-after-free-stack.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-write-after-free-stack 
+
+test/mts-write-after-free-stack
+after run result is: 0
+make results: test results:  0
+
+========== end: mts-write-after-free-stack =========
+
+========== start: mts-write-after-reclaim-heap =========
+make -e test/mts-write-after-reclaim-heap 
+clang++ -O2  -I./lib -std=c++11 -Wall mts/write-after-reclaim-heap.cpp -c -o test/mts-write-after-reclaim-heap.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mts-write-after-reclaim-heap.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-write-after-reclaim-heap 
+
+test/mts-write-after-reclaim-heap
+after run result is: 0
+make results: test results:  0
+
+========== end: mts-write-after-reclaim-heap =========
+
+========== start: mts-write-after-reclaim-stack =========
+make -e test/mts-write-after-reclaim-stack 
+clang++ -O2  -I./lib -std=c++11 -Wall mts/write-after-reclaim-stack.cpp -c -o test/mts-write-after-reclaim-stack.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mts-write-after-reclaim-stack.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-write-after-reclaim-stack 
+
+test/mts-write-after-reclaim-stack c c
+after run result is: 0
+make results: test results:  0
+
+========== end: mts-write-after-reclaim-stack =========
+
+========== start: mts-write-before-reclaim-heap =========
+make -e test/mts-write-before-reclaim-heap 
+clang++ -O2  -I./lib -std=c++11 -Wall mts/write-before-reclaim-heap.cpp -c -o test/mts-write-before-reclaim-heap.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mts-write-before-reclaim-heap.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-write-before-reclaim-heap 
+
+test/mts-write-before-reclaim-heap 0
+after run result is: 0
+make results: test results:  0
+
+========== end: mts-write-before-reclaim-heap =========
+
+========== start: mts-write-before-reclaim-stack =========
+make -e test/mts-write-before-reclaim-stack 
+clang++ -O2  -I./lib -std=c++11 -Wall mts/write-before-reclaim-stack.cpp -c -o test/mts-write-before-reclaim-stack.o 
+clang++  -I./lib -std=c++11 -Wall -fuse-ld=lld test/mts-write-before-reclaim-stack.o lib/common/global_var.o lib/common/temp_file.o lib/riscv64/assembly.o lib/posix/signal.o  lib/common/mss.o -o test/mts-write-before-reclaim-stack 
+
+test/mts-write-before-reclaim-stack
+after run result is: 0
+make results: test results:  0
+
+========== end: mts-write-before-reclaim-stack =========
+
+========== start: mts-write-by-double-free-reallocate =========
+make -e test/mts-double-free 
+make: 'test/mts-double-free' is up to date.
+
+test/mts-double-free 0 0 0 7 1
+after run result is: 0
+make results: test results:  0
+
+========== end: mts-write-by-double-free-reallocate =========
