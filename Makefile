@@ -60,7 +60,8 @@ SIMPLE_FLAGS    := default
 #enable_aarch64_pa              = yes
 #enable_aarch64_bti             = yes
 #enable_aarch64_mte             = yes
-#enable_arm64e                  = yes
+#enable_arm64e_pa                  = yes
+#enable_arm64e_bti                 = yes
 
 # define paths and objects
 ifeq ($(OSType),Windows_NT)
@@ -537,12 +538,27 @@ ifdef enable_aarch64_bti
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-bti
 endif
 
-ifdef enable_arm64e
-	CXXFLAGS := $(CXXFLAGS) -arch arm64e -ftrivial-auto-var-init-skip-non-ptr-array -fptrauth-calls -fptrauth-indirect-gotos -fptrauth-intrinsics -fptrauth-returns -fptrauth-vtable-pointer-type-discrimination -fptrauth-vtable-pointer-address-discrimination
-	ifndef without_extra_ojbect_safety_options
-		OBJECT_CXXFLAGS += -arch arm64e -ftrivial-auto-var-init-skip-non-ptr-array -fptrauth-calls  -fptrauth-indirect-gotos -fptrauth-intrinsics -fptrauth-returns -fptrauth-vtable-pointer-type-discrimination -fptrauth-vtable-pointer-address-discrimination
+ifdef enable_arm64e_pa
+	ifneq (arm64e,$(filter arm64e,$(CXXFLAGS)))
+		ARCH_FLAGS := -arch arm64e
 	endif
-	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-arm64e
+	CXXFLAGS := $(CXXFLAGS) $(ARCH_FLAGS) -ftrivial-auto-var-init-skip-non-ptr-array -fptrauth-calls -fptrauth-indirect-gotos -fptrauth-intrinsics -fptrauth-returns -fptrauth-vtable-pointer-type-discrimination -fptrauth-vtable-pointer-address-discrimination
+	ifndef without_extra_ojbect_safety_options
+		OBJECT_CXXFLAGS += $(ARCH_FLAGS) -ftrivial-auto-var-init-skip-non-ptr-array -fptrauth-calls  -fptrauth-indirect-gotos -fptrauth-intrinsics -fptrauth-returns -fptrauth-vtable-pointer-type-discrimination -fptrauth-vtable-pointer-address-discrimination
+	endif
+	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-arm64epa
+endif
+
+ifdef enable_arm64e_bti
+	ifneq (arm64e,$(filter arm64e,$(CXXFLAGS)))
+		ARCH_FLAGS := -arch arm64e
+	endif
+	CXXFLAGS := $(CXXFLAGS) $(ARCH_FLAGS) -fbranch-target-identification
+	ifndef without_extra_ojbect_safety_options
+		OBJECT_CXXFLAGS += $(ARCH_FLAGS) -fbranch-target-identification
+	endif
+	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-arm64ebti
+
 endif
 
 # define cases
