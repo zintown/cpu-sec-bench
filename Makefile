@@ -37,8 +37,10 @@ SIMPLE_FLAGS    := default
 #enable_control_flow_protection = yes
 #disable_control_flow_protection= yes
 #enable_stack_clash_protection  = yes
-#enable_address_sanitizer_without_leaker       = yes
+#enable_address_sanitizer_without_leaker  = yes
+#enable_full_address_sanitizer = yes
 #enable_undefined_sanitizer = yes
+#enable_full_undefined_sanitizer =yes
 
 # common option in Windows, msvc specific safety feature
 #enable_extra_stack_protection  = yes
@@ -430,10 +432,35 @@ else
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-asan
 	endif
 
+	ifdef enable_full_address_sanitizer
+		CXXFLAGS += -fsanitize=address -fsanitize-address-use-after-scope -fno-common -fsanitize=pointer-compare -fsanitize=pointer-subtract
+		ifndef without_extra_ojbect_safety_options
+			OBJECT_CXXFLAGS += -fsanitize=address -fsanitize-address-use-after-scope -fno-common -fsanitize=pointer-compare -fsanitize=pointer-subtract
+		endif
+		ifeq ($(CXX),$(filter $(CXX),clang++ c++))
+			CXXFLAGS += -fsanitize-address-use-after-return=always
+			OBJECT_CXXFLAGS += -fsanitize-address-use-after-return=always
+		endif
+		RUN_PREFIX += ASAN_OPTIONS=detect_stack_use_after_return=1:detect_invalid_pointer_pairs=2
+		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-asan
+	endif
+
 	ifdef enable_undefined_sanitizer
 		CXXFLAGS += -fsanitize=undefined
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -fsanitize=undefined
+		endif
+		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-uasan
+	endif
+
+	ifdef enable_full_undefined_sanitizer
+		CXXFLAGS += -fsanitize=undefined -fsanitize=signed-integer-overflow 
+		ifndef without_extra_ojbect_safety_options
+			OBJECT_CXXFLAGS += -fsanitize=undefined -fsanitize=signed-integer-overflow 
+		endif
+		ifeq ($(CXX),$(filter $(CXX),clang++ c++))
+			CXXFLAGS += -fsanitize=local-bounds -fsanitize=unsigned-integer-overflow
+			OBJECT_CXXFLAGS += -fsanitize=local-bounds -fsanitize=unsigned-integer-overflow
 		endif
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-uasan
 	endif
