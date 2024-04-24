@@ -107,7 +107,7 @@ ifeq ($(OSType),Windows_NT)
 	OUTPUT_DYN_OPTION := /LD /Fe
 	MIDFILE_SUFFIX    := .obj
 	DLL_SUFFIX        := .dll
-	LDFLAGS           := /link /incremental:no /OPT:NOREF /OPT:NOICF
+	LDFLAGS           += /link /incremental:no /OPT:NOREF /OPT:NOICF
 	LIB_LDFLAGS       := /link
 	OBJDUMPFLAGS      := /DISASM
 	DYNCFI_OPTION     := libcfi.lib
@@ -276,7 +276,7 @@ else
 	OUTPUT_DYN_OPTION := -shared -fPIC -o 
 	MIDFILE_SUFFIX    := .o
 	DLL_SUFFIX        := .so
-	LDFLAGS           :=
+	LDFLAGS           +=
 	LIB_LDFLAGS       :=
 	OBJDUMPFLAGS      := -D -l -S
 	DYNCFI_OPTION     := -Llib/common/ -Wl,-rpath,lib/common/ -lcfi
