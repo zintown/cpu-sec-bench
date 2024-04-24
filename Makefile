@@ -62,6 +62,7 @@ SIMPLE_FLAGS    := default
 #enable_aarch64_mte             = yes
 #enable_arm64e_pa                  = yes
 #enable_arm64e_bti                 = yes
+#enable_arm64e_mte                 = yes
 
 # define paths and objects
 ifeq ($(OSType),Windows_NT)
@@ -558,7 +559,17 @@ ifdef enable_arm64e_bti
 		OBJECT_CXXFLAGS += $(ARCH_FLAGS) -fbranch-target-identification
 	endif
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-arm64ebti
+endif
 
+ifdef enable_arm64e_mte
+	ifneq (arm64e,$(filter arm64e,$(CXXFLAGS)))
+		ARCH_FLAGS := -arch arm64e
+	endif
+	CXXFLAGS := $(CXXFLAGS) $(ARCH_FLAGS) -march=armv8a+memtag -fsanitize=memtag
+	ifndef without_extra_ojbect_safety_options
+		OBJECT_CXXFLAGS += $(ARCH_FLAGS) -march=armv8a+memtag -fsanitize=memtag
+	endif
+	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-arm64emte
 endif
 
 # define cases

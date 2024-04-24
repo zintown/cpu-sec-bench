@@ -2,3 +2,5 @@ Armv8.6-Dar-L,CXX=c++
 M2-ASan-full,CXX=c++,enable_full_address_sanitizer="yes",enable_full_undefined_sanitizer="yes"
 M2-Apple-PA,CXX=c++,enable_arm64e_pa="yes"
 M2-Apple-BTI,CXX=c++,enable_arm64e_bti="yes"
+M2-Apple-MTE,CXX=c++,enable_arm64e_mte="yes"
+M2-Apple-FULL,CXX=c++,enable_arm64e_pa="yes",enable_arm64e_bti="yes",enable_arm64e_mte="yes"
