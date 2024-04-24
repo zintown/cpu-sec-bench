@@ -532,6 +532,11 @@ ifdef enable_aarch64_pa
 endif
 
 ifdef enable_aarch64_bti
+	ifeq($(APPLE),M2)
+		LDFLAGS += -L/opt/homebrew/Cellar/llvm/17.0.6_1/lib/c++ -Wl,-rpath,/opt/homebrew/Cellar/llvm/17.0.6_1/lib/c++
+	else ifeq($(APPLE),M1)
+		LDFLAGS += -L/opt/homebrew/Cellar/llvm@15/15.0.7/lib/c++ -Wl,-rpath,/opt/homebrew/Cellar/llvm@15/15.0.7/lib/c++
+	endif
 	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a -mbranch-protection=bti
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -march=armv8.5-a -mbranch-protection=bti
