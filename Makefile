@@ -283,6 +283,7 @@ else
 	func-opcode-gen   := ./script/get_x64_func_inst.sh
 	ifeq ($(ARCH), aarch64)
 		func-opcode-gen := ./script/get_aarch64_func_inst.sh
+	endif
 	ifeq ($(ARCH), riscv64)
 		func-opcode-gen := ./script/get_riscv64_func_inst.sh
 	endif
