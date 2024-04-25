@@ -587,8 +587,6 @@ ifdef enable_arm64e_mte
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-arm64emte
 endif
 
-endif
-
 # define cases
 mss-path  = mss
 mss-cpps  = $(wildcard $(mss-path)/*.cpp)
