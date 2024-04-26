@@ -37,6 +37,7 @@ SIMPLE_FLAGS    := default
 #enable_control_flow_protection = yes
 #disable_control_flow_protection= yes
 #enable_stack_clash_protection  = yes
+#enable_fortify_source          = yes
 #enable_address_sanitizer_without_leaker  = yes
 #enable_full_address_sanitizer = yes
 #enable_undefined_sanitizer = yes
@@ -407,10 +408,18 @@ else
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-stack_cp
 	endif
 
-	ifdef enable_address_sanitizer_without_leaker
-		CXXFLAGS += -fsanitize=address -fno-sanitize-recover=all
+	ifdef enable_fortify_source
+		CXXFLAGS += -D_FORTIFY_SOURCE=3
 		ifndef without_extra_ojbect_safety_options
-			OBJECT_CXXFLAGS += -fsanitize=address -fno-sanitize-recover=all
+			OBJECT_CXXFLAGS += -D_FORTIFY_SOURCE=3
+		endif
+		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-stack_cp
+	endif
+
+	ifdef enable_address_sanitizer_without_leaker
+		CXXFLAGS += -fsanitize=address -fno-sanitize-recover=all -U_FORTIFY_SOURCE
+		ifndef without_extra_ojbect_safety_options
+			OBJECT_CXXFLAGS += -fsanitize=address -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		endif
 		RUN_PREFIX += ASAN_OPTIONS=detect_leaks=0
 		# ifeq ($(CXX),$(filter $(CXX),clang++ c++))
@@ -423,9 +432,9 @@ else
 	endif
 
 	ifdef enable_default_address_sanitizer
-		CXXFLAGS += -fsanitize=address -fno-sanitize-recover=all
+		CXXFLAGS += -fsanitize=address -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		ifndef without_extra_ojbect_safety_options
-			OBJECT_CXXFLAGS += -fsanitize=address -fno-sanitize-recover=all
+			OBJECT_CXXFLAGS += -fsanitize=address -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		endif
 		# ifeq ($(CXX),$(filter $(CXX),clang++ c++))
 		# 	LDFLAGS  += -static-libsan
@@ -437,42 +446,42 @@ else
 	endif
 
 	ifdef enable_full_address_sanitizer
-		CXXFLAGS += -fsanitize=address -fsanitize-address-use-after-scope -fno-common -fsanitize=pointer-compare -fsanitize=pointer-subtract -fno-sanitize-recover=all
+		CXXFLAGS += -fsanitize=address -fsanitize-address-use-after-scope -fno-common -fsanitize=pointer-compare -fsanitize=pointer-subtract -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		ifndef without_extra_ojbect_safety_options
-			OBJECT_CXXFLAGS += -fsanitize=address -fsanitize-address-use-after-scope -fno-common -fsanitize=pointer-compare -fsanitize=pointer-subtract -fno-sanitize-recover=all
+			OBJECT_CXXFLAGS += -fsanitize=address -fsanitize-address-use-after-scope -fno-common -fsanitize=pointer-compare -fsanitize=pointer-subtract -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		endif
 		ifeq ($(CXX),$(filter $(CXX),clang++ c++))
 			CXXFLAGS += -fsanitize-address-use-after-return=always
 			OBJECT_CXXFLAGS += -fsanitize-address-use-after-return=always
 		endif
 		RUN_PREFIX += ASAN_OPTIONS=detect_stack_use_after_return=1:detect_invalid_pointer_pairs=2
-		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-asan
+		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-fullasan
 	endif
 
 	ifdef enable_undefined_sanitizer
-		CXXFLAGS += -fsanitize=undefined -fno-sanitize-recover=all
+		CXXFLAGS += -fsanitize=undefined -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		ifndef without_extra_ojbect_safety_options
-			OBJECT_CXXFLAGS += -fsanitize=undefined -fno-sanitize-recover=all
+			OBJECT_CXXFLAGS += -fsanitize=undefined -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		endif
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-uasan
 	endif
 
 	ifdef enable_full_undefined_sanitizer
-		CXXFLAGS += -fsanitize=undefined -fsanitize=signed-integer-overflow -fno-sanitize-recover=all
+		CXXFLAGS += -fsanitize=undefined -fsanitize=signed-integer-overflow -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		ifndef without_extra_ojbect_safety_options
-			OBJECT_CXXFLAGS += -fsanitize=undefined -fsanitize=signed-integer-overflow -fno-sanitize-recover=all
+			OBJECT_CXXFLAGS += -fsanitize=undefined -fsanitize=signed-integer-overflow -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		endif
 		ifeq ($(CXX),$(filter $(CXX),clang++ c++))
 			CXXFLAGS += -fsanitize=local-bounds -fsanitize=unsigned-integer-overflow
 			OBJECT_CXXFLAGS += -fsanitize=local-bounds -fsanitize=unsigned-integer-overflow
 		endif
-		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-uasan
+		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-fulluasan
 	endif
 
 	ifdef enable_safe_stack
-		CXXFLAGS += -fsanitize=safe-stack -fno-sanitize-recover=all
+		CXXFLAGS += -fsanitize=safe-stack -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		ifndef without_extra_ojbect_safety_options
-			OBJECT_CXXFLAGS += -fsanitize=safe-stack -fno-sanitize-recover=all
+			OBJECT_CXXFLAGS += -fsanitize=safe-stack -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		endif
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-safestack
 	endif
@@ -517,17 +526,17 @@ ifdef enable_aarch64_morello_everywhere_unsafe
 endif
 
 ifdef enable_aarch64_tbi
-	CXXFLAGS := $(CXXFLAGS) -fsanitize=hwaddress
+	CXXFLAGS := $(CXXFLAGS) -fsanitize=hwaddress -fno-sanitize-recover=all
 	ifndef without_extra_ojbect_safety_options
-		OBJECT_CXXFLAGS += -fsanitize=hwaddress
+		OBJECT_CXXFLAGS += -fsanitize=hwaddress -fno-sanitize-recover=all
 	endif
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-tbi
 endif
 
 ifdef enable_aarch64_mte
-	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag
+	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag -fsanitize=memtag -fno-sanitize-recover=all
 	ifndef without_extra_ojbect_safety_options
-		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag
+		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag -fsanitize=memtag -fno-sanitize-recover=all
 	endif
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-mte
 endif
@@ -580,9 +589,9 @@ ifdef enable_arm64e_mte
 	ifneq (arm64e,$(filter arm64e,$(CXXFLAGS)))
 		ARCH_FLAGS := -arch arm64e
 	endif
-	CXXFLAGS := $(CXXFLAGS) $(ARCH_FLAGS) -march=armv8a+memtag -fsanitize=memtag
+	CXXFLAGS := $(CXXFLAGS) $(ARCH_FLAGS) -march=armv8a+memtag -fsanitize=memtag -fno-sanitize-recover=all
 	ifndef without_extra_ojbect_safety_options
-		OBJECT_CXXFLAGS += $(ARCH_FLAGS) -march=armv8a+memtag -fsanitize=memtag
+		OBJECT_CXXFLAGS += $(ARCH_FLAGS) -march=armv8a+memtag -fsanitize=memtag -fno-sanitize-recover=all
 	endif
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-arm64emte
 endif
