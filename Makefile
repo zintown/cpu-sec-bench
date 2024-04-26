@@ -589,9 +589,10 @@ ifdef enable_arm64e_mte
 	ifneq (arm64e,$(filter arm64e,$(CXXFLAGS)))
 		ARCH_FLAGS := -arch arm64e
 	endif
-	CXXFLAGS := $(CXXFLAGS) $(ARCH_FLAGS) -march=armv8a+memtag -fsanitize=memtag -fno-sanitize-recover=all
+	# remove -fsanitize=memtag, for signal 4(illegal instruction) in apple M1/2/3(not supported MTE).
+	CXXFLAGS := $(CXXFLAGS) $(ARCH_FLAGS) -march=armv8a+memtag -fno-sanitize-recover=all
 	ifndef without_extra_ojbect_safety_options
-		OBJECT_CXXFLAGS += $(ARCH_FLAGS) -march=armv8a+memtag -fsanitize=memtag -fno-sanitize-recover=all
+		OBJECT_CXXFLAGS += $(ARCH_FLAGS) -march=armv8a+memtag -fno-sanitize-recover=all
 	endif
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-arm64emte
 endif
