@@ -5968,7 +5968,7 @@
         "require": {
             "0": [
                 [
-                    "acc-check-prog-ASLR"
+                    "cpi-func-pointer-assign"
                 ]
             ]
         },
@@ -6602,6 +6602,7 @@
         }
     },
     "cfi-call-wrong-vtable-released": {
+        "todo": "add mechanism to check access-after case results"
         "require-comment": [
             "relaxation",
             "utilization",
@@ -6610,9 +6611,7 @@
         "require": {
             "0": [
                 [
-                    "cfi-call-wrong-vtable"
-                ],
-                [
+                    "cfi-call-wrong-vtable" ,
                     "mts-access-after-free-org-heap",
                     "mts-write-after-free-stack"
                 ]
