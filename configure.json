@@ -5799,6 +5799,7 @@
         }
     },
     "mts-access-after-free-alias-heap": {
+        "todo": "need check the require: mts-reallocate-heap's return result, if 290 intercepted by the check mechannism, then require failed, else if 1, it may due to not reallocate enough which won't lead to curr case failed.need add extra not-intercepted code and handle mechanism",
         "arguments": {
             "0": [
                 "-rsize",
@@ -5806,12 +5807,14 @@
             ]
         },
         "require-comment": [
+            "utilization",
             "relaxation"
         ],
         "require": {
             "0": [
                 [
-                    "mts-reallocate-heap"
+                    "mts-reallocate-heap",
+                    "mts-reallocate-stack"
                 ]
             ]
         },
@@ -6283,6 +6286,7 @@
         }
     },
     "cfi-call-wrong-func-within-static-analysis": {
+        "todo":"add read-code-address replace of read-func",
         "comment": "add chain type support",
         "arguments": {
             "0": [
@@ -6296,10 +6300,7 @@
         "require": {
             "0": [
                 [
-                    "acc-read-func"
-                ],
-                [
-                    "cpi-func-pointer-assign"
+                    "acc-read-func","cpi-func-pointer-assign"
                 ]
             ]
         }
@@ -6583,7 +6584,7 @@
         "require": {
             "0": [
                 [
-                    "cpi-func-pointer-arithmetic"
+                    "cfi-call-wrong-vtable","cpi-func-pointer-arithmetic"
                 ]
             ]
         }
@@ -6727,7 +6728,10 @@
         "require": {
             "0": [
                 [
-                    "cfi-call-wrong-type-arg-fp2dp-func"
+                    "cfi-call-wrong-type-arg-fp2dp-func",
+                    "cfi-call-wrong-type-arg-int2double-func",
+                    "cfi-call-wrong-type-arg-op2doublep-func",
+                    "cfi-call-wrong-type-arg-op2intp-func"
                 ]
             ]
         },
@@ -6927,9 +6931,7 @@
         "require": {
             "0": [
                 [
-                    "acc-read-func"
-                ],
-                [
+                    "acc-read-func",
                     "cpi-func-pointer-assign"
                 ]
             ]
@@ -6943,9 +6945,7 @@
         "require": {
             "0": [
                 [
-                    "acc-copy-stackra-to-heap-explicit-arith"
-                ],
-                [
+                    "acc-copy-stackra-to-heap-explicit-arith",
                     "cfi-jump-instruction-in-heap"
                 ]
             ]
@@ -6968,9 +6968,7 @@
         "require": {
             "0": [
                 [
-                    "acc-copy-stackra-to-heap-implicit-arith"
-                ],
-                [
+                    "acc-copy-stackra-to-heap-implicit-arith",
                     "cfi-jump-instruction-in-heap"
                 ]
             ]
