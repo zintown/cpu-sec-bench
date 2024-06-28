@@ -259,7 +259,7 @@ else
 	else
 		CXXFLAGS_BASE = ${CXXFLAGS} -I./lib -std=c++11 -Wall
 	endif
-	
+
 	ifdef BUFFER_SIZE
 		CXXFLAGS_BASE += -DBUFFER_SIZE=$(BUFFER_SIZE)
 	endif
@@ -286,12 +286,9 @@ else
 		OUTPUT_DYN_OPTION :=$(OUTPUT_LIB_OPTION)
 		DLL_SUFFIX        :=$(MIDFILE_SUFFIX)
 	else
-	OUTPUT_DYN_OPTION := -shared -fPIC -o 
-	OUTPUT_DYN_OPTION := -shared -fPIC -o 
-	MIDFILE_SUFFIX    := .o
 		OUTPUT_DYN_OPTION := -shared -fPIC -o 
-	MIDFILE_SUFFIX    := .o
 		DLL_SUFFIX        := .so
+	endif
 	LDFLAGS           +=
 	LIB_LDFLAGS       :=
 	OBJDUMPFLAGS      := -D -l -S
@@ -299,6 +296,7 @@ else
 		DYNCFI_OPTION     := ./lib/common/libcfi.o
 	else
 		DYNCFI_OPTION     := -Llib/common/ -Wl,-rpath,lib/common/ -lcfi
+	endif
 	func-opcode-gen   := ./script/get_x64_func_inst.sh
 	ifeq ($(ARCH), aarch64)
 		func-opcode-gen := ./script/get_aarch64_func_inst.sh
@@ -729,14 +727,46 @@ $(libmss): %$(MIDFILE_SUFFIX) : %.cpp lib/include/mss.hpp
 
 rubbish += $(libmss) results.json variables.json
 
+# if CURR_CASE_NAME is defined, then compile target name is CURR_CASE_NAME
+ifdef CURR_CASE_NAME
+MIDFILE := $(test-path)/$(CURR_CASE_NAME)$(MIDFILE_SUFFIX)
+EXEFILE := $(test-path)/$(CURR_CASE_NAME)
+
+$(mss-obj): $(test-path)/mss-%$(MIDFILE_SUFFIX):$(mss-path)/%.cpp
+	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$(MIDFILE) $(LIB_LDFLAGS)
+$(mss-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(libmss) $(independent_assembly)
+	$(CXX) $(CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(libmss) $(OUTPUT_EXE_OPTION)$(EXEFILE) $(LDFLAGS)
+
+$(mts-obj): $(test-path)/mts-%$(MIDFILE_SUFFIX):$(mts-path)/%.cpp
+	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$(MIDFILE) $(LIB_LDFLAGS)
+
+$(mts-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(libmss) $(independent_assembly)
+	$(CXX) $(CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(libmss) $(OUTPUT_EXE_OPTION)$(EXEFILE)$(LDFLAGS)
+
+$(acc-obj): $(test-path)/acc-%$(MIDFILE_SUFFIX):$(acc-path)/%.cpp
+	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$(MIDFILE) $(LIB_LDFLAGS)
+
+$(acc-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(independent_assembly)
+	$(CXX) $(CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(OUTPUT_EXE_OPTION)$(EXEFILE) $(LDFLAGS)
+
+$(cpi-obj): $(test-path)/cpi-%$(MIDFILE_SUFFIX):$(cpi-path)/%.cpp
+	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$(MIDFILE) $(LIB_LDFLAGS)
+
+$(cpi-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(dynlibcfi) $(independent_assembly)
+	$(CXX) $(CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(DYNCFI_OPTION) $(OUTPUT_EXE_OPTION)$(EXEFILE)  $(LDFLAGS)
+
+$(cfi-obj): $(test-path)/cfi-%$(MIDFILE_SUFFIX):$(cfi-path)/%.cpp
+	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$(MIDFILE) $(LIB_LDFLAGS)
+
+$(cfi-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(dynlibcfi) $(independent_assembly)
+	$(CXX) $(CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(DYNCFI_OPTION) $(OUTPUT_EXE_OPTION)$(EXEFILE) $(LDFLAGS)
+
+else
+
 $(mss-obj): $(test-path)/mss-%$(MIDFILE_SUFFIX):$(mss-path)/%.cpp
 	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$@ $(LIB_LDFLAGS)
-
 $(mss-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(libmss) $(independent_assembly)
 	$(CXX) $(CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(libmss) $(OUTPUT_EXE_OPTION)$@ $(LDFLAGS)
-
-$(mss-cpps-prep): %.prep:%
-	$(CXX) -E $(CXXFLAGS) $< > $@
 
 $(mts-obj): $(test-path)/mts-%$(MIDFILE_SUFFIX):$(mts-path)/%.cpp
 	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$@ $(LIB_LDFLAGS)
@@ -744,14 +774,25 @@ $(mts-obj): $(test-path)/mts-%$(MIDFILE_SUFFIX):$(mts-path)/%.cpp
 $(mts-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(libmss) $(independent_assembly)
 	$(CXX) $(CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(libmss) $(OUTPUT_EXE_OPTION)$@ $(LDFLAGS)
 
-$(mts-cpps-prep): %.prep:%
-	$(CXX) -E $(CXXFLAGS) $< > $@
-
 $(acc-obj): $(test-path)/acc-%$(MIDFILE_SUFFIX):$(acc-path)/%.cpp
 	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$@ $(LIB_LDFLAGS)
 
 $(acc-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(independent_assembly)
 	$(CXX) $(CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(OUTPUT_EXE_OPTION)$@ $(LDFLAGS)
+
+$(cpi-obj): $(test-path)/cpi-%$(MIDFILE_SUFFIX):$(cpi-path)/%.cpp
+	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$@ $(LIB_LDFLAGS)
+
+$(cpi-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(dynlibcfi) $(independent_assembly)
+	$(CXX) $(CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(DYNCFI_OPTION) $(OUTPUT_EXE_OPTION)$@  $(LDFLAGS)
+
+$(cfi-obj): $(test-path)/cfi-%$(MIDFILE_SUFFIX):$(cfi-path)/%.cpp
+	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$@ $(LIB_LDFLAGS)
+
+$(cfi-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(dynlibcfi) $(independent_assembly)
+	$(CXX) $(CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(DYNCFI_OPTION) $(OUTPUT_EXE_OPTION)$@ $(LDFLAGS)
+
+endif
 
 $(test-path)/acc-read-func-func-opcode.tmp: $(func-opcode-gen) $(test-path)/acc-read-func
 ifeq ($(OSType),Windows_NT)
@@ -767,23 +808,17 @@ else
 	cp $< $@
 endif
 
+$(mss-cpps-prep): %.prep:%
+	$(CXX) -E $(CXXFLAGS) $< > $@
+
+$(mts-cpps-prep): %.prep:%
+	$(CXX) -E $(CXXFLAGS) $< > $@
+
 $(acc-cpps-prep): %.prep:%
 	$(CXX) -E $(CXXFLAGS) $< > $@
 
-$(cpi-obj): $(test-path)/cpi-%$(MIDFILE_SUFFIX):$(cpi-path)/%.cpp
-	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$@ $(LIB_LDFLAGS)
-
-$(cpi-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(dynlibcfi) $(independent_assembly)
-	$(CXX) $(CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(DYNCFI_OPTION) $(OUTPUT_EXE_OPTION)$@  $(LDFLAGS)
-
 $(cpi-cpps-prep): %.prep:%
 	$(CXX) -E $(CXXFLAGS) $< > $@
-
-$(cfi-obj): $(test-path)/cfi-%$(MIDFILE_SUFFIX):$(cfi-path)/%.cpp
-	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$@ $(LIB_LDFLAGS)
-
-$(cfi-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(dynlibcfi) $(independent_assembly)
-	$(CXX) $(CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(DYNCFI_OPTION) $(OUTPUT_EXE_OPTION)$@ $(LDFLAGS)
 
 $(cfi-cpps-prep): %.prep:%
 	$(CXX) -E $(CXXFLAGS) $< > $@
