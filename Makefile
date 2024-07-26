@@ -62,7 +62,9 @@ SIMPLE_FLAGS    := default
 #enable_aarch64_mte             = yes
 #enable_aarch64_pa              = yes
 #enable_aarch64_bti             = yes
-#enable_aarch64_mte             = yes
+#enable_aarch64_mte_heap = yes
+#enable_aarch64_mte_stack =yes
+#enable_aarch64_mte_global =yes
 #enable_arm64e_pa                  = yes
 #enable_arm64e_bti                 = yes
 #enable_arm64e_mte                 = yes
@@ -556,10 +558,34 @@ ifdef enable_aarch64_mte
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-mte
 endif
 
-ifdef enable_aarch64_pa
-	CXXFLAGS := $(CXXFLAGS) -march=armv8.3-a+pauth -mbranch-protection=pac-ret
+ifdef enable_aarch64_mte_heap
+	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag -fsanitize=memtag-heap -fno-sanitize-recover=all
 	ifndef without_extra_ojbect_safety_options
-		OBJECT_CXXFLAGS += -march=armv8.3-a+pauth -mbranch-protection=pac-ret
+		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag -fsanitize=memtag-heap -fno-sanitize-recover=all
+	endif
+	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-mte
+endif
+
+ifdef enable_aarch64_mte_stack
+	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag -fsanitize=memtag-stack -fno-sanitize-recover=all
+	ifndef without_extra_ojbect_safety_options
+		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag -fsanitize=memtag-stack -fno-sanitize-recover=all
+	endif
+	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-mte
+endif
+
+ifdef enable_aarch64_mte_default
+	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag+pauth -fsanitize=memtag -fno-sanitize-recover=all
+	ifndef without_extra_ojbect_safety_options
+		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag+pauth -fsanitize=memtag -fno-sanitize-recover=all
+	endif
+	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-mte
+endif
+
+ifdef enable_aarch64_pa
+	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag+pauth -mbranch-protection=pac-ret
+	ifndef without_extra_ojbect_safety_options
+		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag+pauth -mbranch-protection=pac-ret
 	endif
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-pa
 endif
@@ -571,9 +597,9 @@ ifdef enable_aarch64_bti
 	ifeq ($(APPLE),M1)
 		LDFLAGS += -L/opt/homebrew/Cellar/llvm@15/15.0.7/lib/c++ -Wl,-rpath,/opt/homebrew/Cellar/llvm@15/15.0.7/lib/c++
 	endif
-	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a -mbranch-protection=bti
+	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag+pauth -mbranch-protection=bti
 	ifndef without_extra_ojbect_safety_options
-		OBJECT_CXXFLAGS += -march=armv8.5-a -mbranch-protection=bti
+		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag+pauth -mbranch-protection=bti
 	endif
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-bti
 endif
