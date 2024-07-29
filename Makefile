@@ -307,7 +307,8 @@ else
 		func-opcode-gen := ./script/get_riscv64_func_inst.sh
 	endif
 	dynlibcfi := $(addsuffix $(DLL_SUFFIX), lib/common/libcfi)
-	independent_assembly :=
+	independent_assembly := $(addprefix lib/$(ARCH)/, indepassembly.o)
+	
 
 	ifeq ($(CXX),$(filter $(CXX),clang++ c++))
 		ifneq ($(OSType),Darwin)
@@ -544,6 +545,7 @@ endif
 
 ifdef enable_aarch64_tbi
 	CXXFLAGS := $(CXXFLAGS) -fsanitize=hwaddress -fno-sanitize-recover=all
+	LIB_LDFLAGS := -fsanitize=hwaddress -fno-sanitize-recover=all
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -fsanitize=hwaddress -fno-sanitize-recover=all
 	endif
@@ -552,6 +554,7 @@ endif
 
 ifdef enable_aarch64_mte
 	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag -fsanitize=memtag -fno-sanitize-recover=all
+	LIB_LDFLAGS := -march=armv8.5-a+memtag -fsanitize=memtag -fno-sanitize-recover=all
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag -fsanitize=memtag -fno-sanitize-recover=all
 	endif
@@ -560,6 +563,7 @@ endif
 
 ifdef enable_aarch64_mte_heap
 	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag -fsanitize=memtag-heap -fno-sanitize-recover=all
+	LIB_LDFLAGS := -march=armv8.5-a+memtag -fsanitize=memtag-heap -fno-sanitize-recover=all
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag -fsanitize=memtag-heap -fno-sanitize-recover=all
 	endif
@@ -568,6 +572,7 @@ endif
 
 ifdef enable_aarch64_mte_stack
 	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag -fsanitize=memtag-stack -fno-sanitize-recover=all
+	LIB_LDFLAGS := -march=armv8.5-a+memtag -fsanitize=memtag-stack -fno-sanitize-recover=all
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag -fsanitize=memtag-stack -fno-sanitize-recover=all
 	endif
@@ -576,6 +581,7 @@ endif
 
 ifdef enable_aarch64_mte_default
 	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag+pauth -fsanitize=memtag -fno-sanitize-recover=all
+	LIB_LDFLAGS := -march=armv8.5-a+memtag+pauth -fsanitize=memtag -fno-sanitize-recover=all
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag+pauth -fsanitize=memtag -fno-sanitize-recover=all
 	endif
@@ -584,6 +590,7 @@ endif
 
 ifdef enable_aarch64_pa
 	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag+pauth -mbranch-protection=pac-ret
+	LIB_LDFLAGS := -march=armv8.5-a+memtag+pauth -mbranch-protection=pac-ret
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag+pauth -mbranch-protection=pac-ret
 	endif
@@ -598,6 +605,7 @@ ifdef enable_aarch64_bti
 		LDFLAGS += -L/opt/homebrew/Cellar/llvm@15/15.0.7/lib/c++ -Wl,-rpath,/opt/homebrew/Cellar/llvm@15/15.0.7/lib/c++
 	endif
 	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag+pauth -mbranch-protection=bti
+	LIB_LDFLAGS := -march=armv8.5-a+memtag+pauth -mbranch-protection=bti
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag+pauth -mbranch-protection=bti
 	endif
