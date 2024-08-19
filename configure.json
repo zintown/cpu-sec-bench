@@ -3507,90 +3507,6 @@
             "290": "cheri capabilities enabled."
         }
     },
-    "mss-write-cross-object-ptr-stack-underflow": {
-        "program": "mss-write-cross-object-by-pointer",
-        "arguments": {
-            "0": [
-                "1"
-            ]
-        },
-        "conf-macro": {
-            "0": {
-                "BUFFER_SIZE": "8",
-                "REGION_KIND": "0",
-                "BUFFER_KIND": "1"
-            }
-        },
-        "require-comment": [
-            "relaxation"
-        ],
-        "require": {
-            "0": [
-                [
-                    "mss-write-by-bare-array-pointer-stack-underflow"
-                ]
-            ]
-        },
-        "expect-results": {
-            "290": "cheri capabilities enabled."
-        }
-    },
-    "mss-write-cross-object-ptr-heap-underflow": {
-        "program": "mss-write-cross-object-by-pointer",
-        "arguments": {
-            "0": [
-                "1"
-            ]
-        },
-        "conf-macro": {
-            "0": {
-                "BUFFER_SIZE": "8",
-                "REGION_KIND": "1",
-                "BUFFER_KIND": "1"
-            }
-        },
-        "require-comment": [
-            "relaxation"
-        ],
-        "require": {
-            "0": [
-                [
-                    "mss-write-by-enclosing-array-pointer-heap-underflow"
-                ]
-            ]
-        },
-        "expect-results": {
-            "290": "cheri capabilities enabled."
-        }
-    },
-    "mss-write-cross-object-ptr-data-underflow": {
-        "program": "mss-write-cross-object-by-pointer",
-        "arguments": {
-            "0": [
-                "1"
-            ]
-        },
-        "conf-macro": {
-            "0": {
-                "BUFFER_SIZE": "8",
-                "REGION_KIND": "2",
-                "BUFFER_KIND": "1"
-            }
-        },
-        "require-comment": [
-            "relaxation"
-        ],
-        "require": {
-            "0": [
-                [
-                    "mss-write-by-enclosing-array-pointer-data-underflow"
-                ]
-            ]
-        },
-        "expect-results": {
-            "290": "cheri capabilities enabled."
-        }
-    },
     "mss-read-cross-frame-index": {
         "program": "mss-read-cross-frame-by-index",
         "require-comment": [
@@ -3650,8 +3566,7 @@
         "require": {
             "0": [
                 [
-                    "mss-write-cross-object-ptr-stack-overflow",
-                    "mss-write-cross-object-ptr-stack-underflow"
+                    "mss-write-cross-object-ptr-stack-overflow"
                 ]
             ]
         },
@@ -3721,9 +3636,6 @@
             "0": [
                 [
                     "mss-write-cross-object-ptr-stack-overflow"
-                ],
-                [
-                    "mss-write-cross-object-ptr-stack-underflow"
                 ]
             ]
         },
@@ -4444,7 +4356,7 @@
             ],
             "1": [
                 [
-                    "mss-write-cross-object-ptr-heap-underflow"
+                    "mss-write-cross-object-ptr-heap-overflow"
                 ]
             ]
         },
@@ -4512,7 +4424,7 @@
             ],
             "1": [
                 [
-                    "mss-write-cross-object-ptr-heap-underflow"
+                    "mss-write-cross-object-ptr-heap-overflow"
                 ]
             ]
         },
@@ -4580,7 +4492,7 @@
             ],
             "1": [
                 [
-                    "mss-write-cross-object-ptr-data-underflow"
+                    "mss-write-cross-object-ptr-data-overflow"
                 ]
             ]
         },
@@ -4648,7 +4560,7 @@
             ],
             "1": [
                 [
-                    "mss-write-cross-object-ptr-data-underflow"
+                    "mss-write-cross-object-ptr-data-overflow"
                 ]
             ]
         },
@@ -4672,8 +4584,7 @@
         "require": {
             "0": [
                 [
-                    "mss-write-cross-object-ptr-stack-overflow",
-                    "mss-write-cross-object-ptr-stack-underflow"
+                    "mss-write-cross-object-ptr-stack-overflow"
                 ]
             ]
         },
@@ -4698,7 +4609,7 @@
             "0": [
                 [
                     "mss-write-cross-object-ptr-heap-overflow",
-                    "mss-write-cross-object-ptr-heap-underflow"
+                    "mss-write-cross-object-ptr-heap-overflow"
                 ]
             ]
         },
@@ -4723,7 +4634,7 @@
             "0": [
                 [
                     "mss-write-cross-object-ptr-data-overflow",
-                    "mss-write-cross-object-ptr-data-underflow"
+                    "mss-write-cross-object-ptr-data-overflow"
                 ]
             ]
         },
