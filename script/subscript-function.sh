@@ -43,7 +43,8 @@ export_func(){
 
 	# Iterate over the columns array
 	for column in $columns_array; do
-		export "$column"
+	    column=$(echo "$column" | sed 's/;/,/g')
+		export "${column}"
 	done
 
 }
