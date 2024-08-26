@@ -19,7 +19,7 @@ int main(int argc, char* argv[]){
   }
   void *ret_label = (void*)&main;
   GET_LABEL_ADDRESS(ret_label,TARGET_LABEL);
-  if(cfi_offset == -1) { gvar_init(*(int*)ret_label);}   // impossible to happen
+  if(cfi_offset == -4) { GOTO_SAVED_LABEL(ret_label);}   // impossible to happen
 
   // call a function but illegally return
   Ret_From_Helper* obj = new Ret_From_Helper();

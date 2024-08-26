@@ -402,6 +402,7 @@ else
 	endif
 
 	ifdef enable_cet_shadow_stack
+		independent_assembly := lib/x86_64/indepassembly-with-cet-notes.o
 		FILE_CXXFLAGS += -fcf-protection=full
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -fcf-protection=full
@@ -412,6 +413,7 @@ else
 	ifdef disable_control_flow_protection
 	ifeq ($(ARCH),x86_64)
 		FILE_CXXFLAGS += -fcf-protection=none
+
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -fcf-protection=none
 		endif

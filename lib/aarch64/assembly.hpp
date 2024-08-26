@@ -6,11 +6,13 @@ extern "C" void assembly_return_site();
 
 // get the distance between two pointers
 #define GET_DISTANCE(dis, pa, pb)            \
+  {                                          \
   long long pa_tmp = PTR_MASK & pa;          \
   long long pb_tmp = PTR_MASK & pb;          \
   asm volatile(                              \
     "sub %0, %1, %2;"                        \
-    : "+r"(dis) : "r" (pa_tmp), "r"(pb_tmp)  )
+    : "+r"(dis) : "r" (pa_tmp), "r"(pb_tmp));\
+  }
 
 #define GET_DISTANCE_IMM(dis, pa, pb)        \
   asm volatile(                              \

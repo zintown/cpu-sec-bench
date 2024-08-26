@@ -26,31 +26,30 @@ void FORCE_NOINLINE helper(void *label) {
   offset = rand();
 }
 
-void* FORCE_NOINLINE helper2(int val) {
-  void* curr_return_addr = NULL;
-  GET_RA_ADDR(curr_return_addr);
-  if(fake_init_val > 0) gvar_init(fake_init_val); //imposibel happen
+void* FORCE_NOINLINE helper2(void* curr_return_addr, int sel) {
+  if(sel == 1){
+    GET_RA_ADDR(curr_return_addr);
+  }
   return curr_return_addr;
 }
 
 int main(int argc, char* argv[])
 {
   INIT_TRACE_FILE;
+  int sel;
   // get the offset of RA on stack
-  if(argc == 3){
-    std::string cmd_offset = argv[1];
-    offset = 4 * stoll(cmd_offset);
-    fake_init_val = stoll(std::string(argv[2]));
-  }else{
-    std::string cmd_offset = argv[1];
-    std::string extra_offset = argv[2];
-    offset = 4*(stoll(cmd_offset) + stoll(extra_offset));
-    fake_init_val = stoll(std::string(argv[3]));
-  }
+  std::string cmd_offset = argv[1];
+  offset = 4 * stoll(cmd_offset);
+  fake_init_val = stol(std::string(argv[2]));
+  sel = stol(std::string(argv[3]));
+
   void *ret_label = (void*)&main;
+  GET_LABEL_ADDRESS(ret_label,TARGET_LABEL);
+  if(offset == -1) { GOTO_SAVED_LABEL(ret_label);}   // impossible to happen
   gvar_init(fake_init_val);
   // call a function but illegally return
-  ret_label = helper2(fake_init_val);
+  ret_label = helper2(ret_label,sel);
+TARGET_LABEL(argc)
   gvar_incr();
   helper(ret_label); // if successful, it will return to gvar_incr()
   COMPILER_BARRIER;
