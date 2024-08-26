@@ -14,7 +14,7 @@ else
 endif
 
 # set variables
-STATIC          ?= yes
+STATIC          ?= no
 OPT_LEVEL       ?= O2
 SIMPLE_FLAGS    := default
 # extra security features (comment them out if not needed)
@@ -103,7 +103,7 @@ ifeq ($(OSType),Windows_NT)
 	endif
 	SCHEDULER_CXXFLAGS  := /O2 $(CXXFLAGS_BASE) /I. /DRUN_PREFIX="\"$(RUN_PREFIX)\""
 	OBJECT_CXXFLAGS     := /$(OPT_LEVEL) /Zi $(CXXFLAGS_BASE)
-	CXXFLAGS      := /$(OPT_LEVEL) /Zi $(CXXFLAGS_BASE)
+	FILE_CXXFLAGS      := /$(OPT_LEVEL) /Zi $(CXXFLAGS_BASE)
 	ASMFLAGS      := /nologo /Zi /c
 	# If there is a whitespace between windows msvc's output option and output file,
 	# will raise error
@@ -122,7 +122,7 @@ ifeq ($(OSType),Windows_NT)
 
 	# define compiling flags
 	ifdef enable_stack_nx_protection
-		CXXFLAGS += /NXCOMPAT
+		FILE_CXXFLAGS += /NXCOMPAT
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += /NXCOMPAT
 		endif
@@ -132,7 +132,7 @@ ifeq ($(OSType),Windows_NT)
 	endif
 
 	ifdef disable_stack_nx_protection
-		CXXFLAGS += /NXCOMPAT:NO
+		FILE_CXXFLAGS += /NXCOMPAT:NO
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += /NXCOMPAT:NO
 		endif
@@ -141,7 +141,7 @@ ifeq ($(OSType),Windows_NT)
 	endif
 
 	ifdef enable_stack_protection
-		CXXFLAGS += /GS
+		FILE_CXXFLAGS += /GS
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += /GS
 		endif
@@ -149,7 +149,7 @@ ifeq ($(OSType),Windows_NT)
 	endif
 
 	ifdef disable_stack_protection
-		CXXFLAGS += /GS-
+		FILE_CXXFLAGS += /GS-
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += /GS
 		endif
@@ -167,7 +167,7 @@ ifeq ($(OSType),Windows_NT)
 	endif
 
 	ifdef enable_control_flow_protection
-		CXXFLAGS += /guard:cf
+		FILE_CXXFLAGS += /guard:cf
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += /guard:cf
 		endif
@@ -176,7 +176,7 @@ ifeq ($(OSType),Windows_NT)
 	endif
 
 	ifdef disable_control_flow_protection
-		CXXFLAGS += /guard:cf-
+		FILE_CXXFLAGS += /guard:cf-
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += /guard:cf-
 		endif
@@ -189,7 +189,7 @@ ifeq ($(OSType),Windows_NT)
 	endif
 
 	ifdef enable_heap_integrity
-		CXXFLAGS += /sdl /GS
+		FILE_CXXFLAGS += /sdl /GS
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += /sdl /GS
 		endif
@@ -197,7 +197,7 @@ ifeq ($(OSType),Windows_NT)
 	endif
 
 	ifdef enable_extra_stack_protection
-		CXXFLAGS += /RTCs
+		FILE_CXXFLAGS += /RTCs
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += /RTCs
 		endif
@@ -205,7 +205,7 @@ ifeq ($(OSType),Windows_NT)
 	endif
 
 	ifdef enable_default_address_sanitizer
-		CXXFLAGS += /fsanitize=address
+		FILE_CXXFLAGS += /fsanitize=address
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += /fsanitize=address
 		endif
@@ -213,7 +213,7 @@ ifeq ($(OSType),Windows_NT)
 	endif
 
 	ifdef enable_fuzzer_address_sanitizer
-		CXXFLAGS += /fsanitize=fuzzer
+		FILE_CXXFLAGS += /fsanitize=fuzzer
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += /fsanitize=fuzzer
 		endif
@@ -221,13 +221,13 @@ ifeq ($(OSType),Windows_NT)
 	endif
 
 	ifdef enable_fuzzer_address_sanitizer_withou_object_flags
-		CXXFLAGS += /fsanitize=fuzzer
+		FILE_CXXFLAGS += /fsanitize=fuzzer
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-f-no-asan
 	endif
 
 	# experimantal option, must be used with -fsanitize=address, msvc not support it well(false positvie) til 2024.4.26
 	ifdef enable_return_address_sanitizer
-		CXXFLAGS += /fsanitize-address-use-after-return
+		FILE_CXXFLAGS += /fsanitize-address-use-after-return
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += /fsanitize-address-use-after-return
 		endif
@@ -279,7 +279,7 @@ else
 	endif
 	SCHEDULER_CXXFLAGS  := -O2 $(CXXFLAGS_BASE) -I. -DRUN_PREFIX="\"$(RUN_PREFIX)\""
 	OBJECT_CXXFLAGS     := -$(OPT_LEVEL) $(CXXFLAGS_BASE)
-	CXXFLAGS      := $(CXXFLAGS_BASE)
+	FILE_CXXFLAGS      := $(CXXFLAGS_BASE)
 	ASMFLAGS      :=
 	OUTPUT_EXE_OPTION := -o 
 	OUTPUT_LIB_OPTION := -c -o 
@@ -312,20 +312,20 @@ else
 
 	ifeq ($(CXX),$(filter $(CXX),clang++ c++))
 		ifneq ($(OSType),Darwin)
-			CXXFLAGS += -fuse-ld=lld
+			FILE_CXXFLAGS += -fuse-ld=lld
 		endif
 	endif
 
 	# define compiling flags
 	ifdef disable_stack_nx_protection
-		CXXFLAGS += -z execstack
+		FILE_CXXFLAGS += -z execstack
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -z execstack
 		endif
 	endif
 
 	ifdef disable_stack_nx_protection
-		CXXFLAGS += -z noexecstack
+		FILE_CXXFLAGS += -z noexecstack
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -z noexecstack
 		endif
@@ -333,25 +333,25 @@ else
 	
 	# -fstack-protector-all > -fstack-protector-strong
 	ifdef enable_stack_protection
-		CXXFLAGS += -Wstack-protector -fstack-protector-all
+		FILE_CXXFLAGS += -Wstack-protector -fstack-protector-all
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -Wstack-protector -fstack-protector-all
 		endif
 	ifeq ($(ARCH),x86_64)
-		CXXFLAGS += -mstack-protector-guard=global
+		FILE_CXXFLAGS += -mstack-protector-guard=global
 	endif
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-stack_p
 	endif
 
 	ifdef disable_stack_protection
-		CXXFLAGS += -fno-stack-protector
+		FILE_CXXFLAGS += -fno-stack-protector
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -fno-stack-protector
 		endif
 	endif
 
 	ifdef enable_aslr_protection
-		CXXFLAGS += pie -fPIE
+		FILE_CXXFLAGS += pie -fPIE
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += pie -fPIE
 		endif
@@ -360,7 +360,7 @@ else
 	endif
 
 	ifdef disable_aslr_protection
-		CXXFLAGS += -no-pie
+		FILE_CXXFLAGS += -no-pie
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -no-pie
 		endif
@@ -377,7 +377,7 @@ else
 	endif
 
 	ifdef enable_vtable_verify
-		CXXFLAGS += -Wl,--rpath=../gcc_build/lib64 -fvtable-verify=std
+		FILE_CXXFLAGS += -Wl,--rpath=../gcc_build/lib64 -fvtable-verify=std
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -Wl,--rpath=../gcc_build/lib64 -fvtable-verify=std
 		endif
@@ -385,7 +385,7 @@ else
 	endif
 
 	ifdef disable_vtable_verify
-		CXXFLAGS += -fvtable-verify=none
+		FILE_CXXFLAGS += -fvtable-verify=none
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -fvtable-verify=none
 		endif
@@ -393,7 +393,7 @@ else
 
 	ifdef enable_control_flow_protection
 	ifeq ($(ARCH),x86_64)
-		CXXFLAGS += -fcf-protection=full
+		FILE_CXXFLAGS += -fcf-protection=full
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -fcf-protection=full
 		endif
@@ -402,16 +402,16 @@ else
 	endif
 
 	ifdef enable_cet_shadow_stack
-		CXXFLAGS += -Wl,--rpath=../glibc/build/lib -Wl,--dynamic-linker=../glibc/build/lib/ld-linux-x86-64.so.2 -fcf-protection=full
+		FILE_CXXFLAGS += -fcf-protection=full
 		ifndef without_extra_ojbect_safety_options
-			OBJECT_CXXFLAGS += -Wl,--rpath=../glibc/build/lib -Wl,--dynamic-linker=../glibc/build/lib/ld-linux-x86-64.so.2 -fcf-protection=full
+			OBJECT_CXXFLAGS += -fcf-protection=full
 		endif
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-cet_ss
 	endif
 
 	ifdef disable_control_flow_protection
 	ifeq ($(ARCH),x86_64)
-		CXXFLAGS += -fcf-protection=none
+		FILE_CXXFLAGS += -fcf-protection=none
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -fcf-protection=none
 		endif
@@ -419,7 +419,7 @@ else
 	endif
 
 	ifdef enable_stack_clash_protection
-		CXXFLAGS += -fstack-clash-protection
+		FILE_CXXFLAGS += -fstack-clash-protection
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -fstack-clash-protection
 		endif
@@ -427,7 +427,7 @@ else
 	endif
 
 	ifdef enable_fortify_source
-		CXXFLAGS += -D_FORTIFY_SOURCE=3
+		FILE_CXXFLAGS += -D_FORTIFY_SOURCE=3
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -D_FORTIFY_SOURCE=3
 		endif
@@ -435,7 +435,7 @@ else
 	endif
 
 	ifdef enable_address_sanitizer_without_leaker
-		CXXFLAGS += -fsanitize=address -fno-sanitize-recover=all -U_FORTIFY_SOURCE
+		FILE_CXXFLAGS += -fsanitize=address -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -fsanitize=address -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		endif
@@ -444,13 +444,13 @@ else
 		# 	LDFLAGS  += -static-libsan
 		# else
 		# 	LDFLAGS  += -static-libasan
-		# 	CXXFLAGS += --param=asan-stack=1
+		# 	FILE_CXXFLAGS += --param=asan-stack=1
 		# endif
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-nl-asan
 	endif
 
 	ifdef enable_default_address_sanitizer
-		CXXFLAGS += -fsanitize=address -fno-sanitize-recover=all -U_FORTIFY_SOURCE
+		FILE_CXXFLAGS += -fsanitize=address -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -fsanitize=address -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		endif
@@ -458,18 +458,18 @@ else
 		# 	LDFLAGS  += -static-libsan
 		# else
 		# 	LDFLAGS  += -static-libasan
-		# 	CXXFLAGS += --param=asan-stack=1
+		# 	FILE_CXXFLAGS += --param=asan-stack=1
 		# endif
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-asan
 	endif
 
 	ifdef enable_full_address_sanitizer
-		CXXFLAGS += -fsanitize=address -fsanitize-address-use-after-scope -fno-common -fsanitize=pointer-compare -fsanitize=pointer-subtract -fno-sanitize-recover=all -U_FORTIFY_SOURCE
+		FILE_CXXFLAGS += -fsanitize=address -fsanitize-address-use-after-scope -fno-common -fsanitize=pointer-compare -fsanitize=pointer-subtract -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -fsanitize=address -fsanitize-address-use-after-scope -fno-common -fsanitize=pointer-compare -fsanitize=pointer-subtract -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		endif
 		ifeq ($(CXX),$(filter $(CXX),clang++ c++))
-			CXXFLAGS += -fsanitize-address-use-after-return=always
+			FILE_CXXFLAGS += -fsanitize-address-use-after-return=always
 			OBJECT_CXXFLAGS += -fsanitize-address-use-after-return=always
 		endif
 		RUN_PREFIX += ASAN_OPTIONS=detect_stack_use_after_return=1:detect_invalid_pointer_pairs=2
@@ -477,7 +477,7 @@ else
 	endif
 
 	ifdef enable_undefined_sanitizer
-		CXXFLAGS += -fsanitize=undefined -fno-sanitize-recover=all -U_FORTIFY_SOURCE
+		FILE_CXXFLAGS += -fsanitize=undefined -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -fsanitize=undefined -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		endif
@@ -485,19 +485,19 @@ else
 	endif
 
 	ifdef enable_full_undefined_sanitizer
-		CXXFLAGS += -fsanitize=undefined -fsanitize=signed-integer-overflow -fno-sanitize-recover=all -U_FORTIFY_SOURCE
+		FILE_CXXFLAGS += -fsanitize=undefined -fsanitize=signed-integer-overflow -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -fsanitize=undefined -fsanitize=signed-integer-overflow -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		endif
 		ifeq ($(CXX),$(filter $(CXX),clang++ c++))
-			CXXFLAGS += -fsanitize=local-bounds -fsanitize=unsigned-integer-overflow
+			FILE_CXXFLAGS += -fsanitize=local-bounds -fsanitize=unsigned-integer-overflow
 			OBJECT_CXXFLAGS += -fsanitize=local-bounds -fsanitize=unsigned-integer-overflow
 		endif
 		SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-fulluasan
 	endif
 
 	ifdef enable_safe_stack
-		CXXFLAGS += -fsanitize=safe-stack -fno-sanitize-recover=all -U_FORTIFY_SOURCE
+		FILE_CXXFLAGS += -fsanitize=safe-stack -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		ifndef without_extra_ojbect_safety_options
 			OBJECT_CXXFLAGS += -fsanitize=safe-stack -fno-sanitize-recover=all -U_FORTIFY_SOURCE
 		endif
@@ -507,7 +507,7 @@ endif
 
 ifdef enable_riscv64_cheri_default
 	ARCH :=cheri_riscv64
-	CXXFLAGS += -mno-relax -fuse-ld=lld -march=rv64gcxcheri -mabi=l64pc128d
+	FILE_CXXFLAGS += -mno-relax -fuse-ld=lld -march=rv64gcxcheri -mabi=l64pc128d
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d
 	endif
@@ -517,7 +517,7 @@ endif
 
 ifdef enable_riscv64_cheri_everywhere_unsafe
 	ARCH :=cheri_riscv64
-	CXXFLAGS += -mno-relax -fuse-ld=lld -march=rv64gcxcheri -mabi=l64pc128d -cheri-bounds=everywhere-unsafe
+	FILE_CXXFLAGS += -mno-relax -fuse-ld=lld -march=rv64gcxcheri -mabi=l64pc128d -cheri-bounds=everywhere-unsafe
 	SCHEDULER_CXXFLAGS += -mno-relax
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -mno-relax -march=rv64gcxcheri -mabi=l64pc128d -cheri-bounds=everywhere-unsafe
@@ -527,7 +527,7 @@ endif
 
 ifdef enable_aarch64_morello_default
 	ARCH        :=aarch64
-	CXXFLAGS += -march=morello -mabi=purecap
+	FILE_CXXFLAGS += -march=morello -mabi=purecap
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -march=morello -mabi=purecap
 	endif
@@ -536,7 +536,7 @@ endif
 
 ifdef enable_aarch64_morello_everywhere_unsafe
 	ARCH        :=aarch64
-	CXXFLAGS += -march=morello -mabi=purecap -cheri-bounds=everywhere-unsafe
+	FILE_CXXFLAGS += -march=morello -mabi=purecap -cheri-bounds=everywhere-unsafe
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -march=morello -mabi=purecap -cheri-bounds=everywhere-unsafe
 	endif
@@ -544,7 +544,7 @@ ifdef enable_aarch64_morello_everywhere_unsafe
 endif
 
 ifdef enable_aarch64_tbi
-	CXXFLAGS := $(CXXFLAGS) -fsanitize=hwaddress -fno-sanitize-recover=all
+	FILE_CXXFLAGS := $(FILE_CXXFLAGS) -fsanitize=hwaddress -fno-sanitize-recover=all
 	LIB_LDFLAGS := -fsanitize=hwaddress -fno-sanitize-recover=all
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -fsanitize=hwaddress -fno-sanitize-recover=all
@@ -553,7 +553,7 @@ ifdef enable_aarch64_tbi
 endif
 
 ifdef enable_aarch64_mte
-	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag -fsanitize=memtag -fno-sanitize-recover=all
+	FILE_CXXFLAGS := $(FILE_CXXFLAGS) -march=armv8.5-a+memtag -fsanitize=memtag -fno-sanitize-recover=all
 	LIB_LDFLAGS := -march=armv8.5-a+memtag -fsanitize=memtag -fno-sanitize-recover=all
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag -fsanitize=memtag -fno-sanitize-recover=all
@@ -562,7 +562,7 @@ ifdef enable_aarch64_mte
 endif
 
 ifdef enable_aarch64_mte_heap
-	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag -fsanitize=memtag-heap -fno-sanitize-recover=all
+	FILE_CXXFLAGS := $(FILE_CXXFLAGS) -march=armv8.5-a+memtag -fsanitize=memtag-heap -fno-sanitize-recover=all
 	LIB_LDFLAGS := -march=armv8.5-a+memtag -fsanitize=memtag-heap -fno-sanitize-recover=all
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag -fsanitize=memtag-heap -fno-sanitize-recover=all
@@ -571,7 +571,7 @@ ifdef enable_aarch64_mte_heap
 endif
 
 ifdef enable_aarch64_mte_stack
-	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag -fsanitize=memtag-stack -fno-sanitize-recover=all
+	FILE_CXXFLAGS := $(FILE_CXXFLAGS) -march=armv8.5-a+memtag -fsanitize=memtag-stack -fno-sanitize-recover=all
 	LIB_LDFLAGS := -march=armv8.5-a+memtag -fsanitize=memtag-stack -fno-sanitize-recover=all
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag -fsanitize=memtag-stack -fno-sanitize-recover=all
@@ -580,7 +580,7 @@ ifdef enable_aarch64_mte_stack
 endif
 
 ifdef enable_aarch64_mte_default
-	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag+pauth -fsanitize=memtag -fno-sanitize-recover=all
+	FILE_CXXFLAGS := $(FILE_CXXFLAGS) -march=armv8.5-a+memtag+pauth -fsanitize=memtag -fno-sanitize-recover=all
 	LIB_LDFLAGS := -march=armv8.5-a+memtag+pauth -fsanitize=memtag -fno-sanitize-recover=all
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag+pauth -fsanitize=memtag -fno-sanitize-recover=all
@@ -589,7 +589,7 @@ ifdef enable_aarch64_mte_default
 endif
 
 ifdef enable_aarch64_pa
-	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag+pauth -mbranch-protection=pac-ret
+	FILE_CXXFLAGS := $(FILE_CXXFLAGS) -march=armv8.5-a+memtag+pauth -mbranch-protection=pac-ret
 	LIB_LDFLAGS := -march=armv8.5-a+memtag+pauth -mbranch-protection=pac-ret
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag+pauth -mbranch-protection=pac-ret
@@ -604,7 +604,7 @@ ifdef enable_aarch64_bti
 	ifeq ($(APPLE),M1)
 		LDFLAGS += -L/opt/homebrew/Cellar/llvm@15/15.0.7/lib/c++ -Wl,-rpath,/opt/homebrew/Cellar/llvm@15/15.0.7/lib/c++
 	endif
-	CXXFLAGS := $(CXXFLAGS) -march=armv8.5-a+memtag+pauth -mbranch-protection=bti
+	FILE_CXXFLAGS := $(FILE_CXXFLAGS) -march=armv8.5-a+memtag+pauth -mbranch-protection=bti
 	LIB_LDFLAGS := -march=armv8.5-a+memtag+pauth -mbranch-protection=bti
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag+pauth -mbranch-protection=bti
@@ -613,10 +613,10 @@ ifdef enable_aarch64_bti
 endif
 
 ifdef enable_arm64e_pa
-	ifneq (arm64e,$(filter arm64e,$(CXXFLAGS)))
+	ifneq (arm64e,$(filter arm64e,$(FILE_CXXFLAGS)))
 		ARCH_FLAGS := -arch arm64e
 	endif
-	CXXFLAGS := $(CXXFLAGS) $(ARCH_FLAGS) -ftrivial-auto-var-init-skip-non-ptr-array -fptrauth-calls -fptrauth-indirect-gotos -fptrauth-intrinsics -fptrauth-returns -fptrauth-vtable-pointer-type-discrimination -fptrauth-vtable-pointer-address-discrimination
+	FILE_CXXFLAGS := $(FILE_CXXFLAGS) $(ARCH_FLAGS) -ftrivial-auto-var-init-skip-non-ptr-array -fptrauth-calls -fptrauth-indirect-gotos -fptrauth-intrinsics -fptrauth-returns -fptrauth-vtable-pointer-type-discrimination -fptrauth-vtable-pointer-address-discrimination
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += $(ARCH_FLAGS) -ftrivial-auto-var-init-skip-non-ptr-array -fptrauth-calls  -fptrauth-indirect-gotos -fptrauth-intrinsics -fptrauth-returns -fptrauth-vtable-pointer-type-discrimination -fptrauth-vtable-pointer-address-discrimination
 	endif
@@ -624,10 +624,10 @@ ifdef enable_arm64e_pa
 endif
 
 ifdef enable_arm64e_bti
-	ifneq (arm64e,$(filter arm64e,$(CXXFLAGS)))
+	ifneq (arm64e,$(filter arm64e,$(FILE_CXXFLAGS)))
 		ARCH_FLAGS := -arch arm64e
 	endif
-	CXXFLAGS := $(CXXFLAGS) $(ARCH_FLAGS) -fbranch-target-identification
+	FILE_CXXFLAGS := $(FILE_CXXFLAGS) $(ARCH_FLAGS) -fbranch-target-identification
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += $(ARCH_FLAGS) -fbranch-target-identification
 	endif
@@ -635,11 +635,11 @@ ifdef enable_arm64e_bti
 endif
 
 ifdef enable_arm64e_mte
-	ifneq (arm64e,$(filter arm64e,$(CXXFLAGS)))
+	ifneq (arm64e,$(filter arm64e,$(FILE_CXXFLAGS)))
 		ARCH_FLAGS := -arch arm64e
 	endif
 	# remove -fsanitize=memtag, for signal 4(illegal instruction) in apple M1/2/3(not supported MTE).
-	CXXFLAGS := $(CXXFLAGS) $(ARCH_FLAGS) -march=armv8a+memtag -fno-sanitize-recover=all
+	FILE_CXXFLAGS := $(FILE_CXXFLAGS) $(ARCH_FLAGS) -march=armv8a+memtag -fno-sanitize-recover=all
 	ifndef without_extra_ojbect_safety_options
 		OBJECT_CXXFLAGS += $(ARCH_FLAGS) -march=armv8a+memtag -fno-sanitize-recover=all
 	endif
@@ -709,7 +709,7 @@ $(test-path)/sys_info.txt:
 	Reg Query "HKLM\SOFTWARE\WOW6432Node\Microsoft\Microsoft SDKs\Windows\v10.0" >> $(test-path)/sys_info.txt
 	echo "Flags : " >> $(test-path)/sys_info.txt
 	echo "OBJECT_CXXFLAGS = " $(OBJECT_CXXFLAGS) >> $(test-path)/sys_info.txt
-	echo "CXXFLAGS = " $(CXXFLAGS) >> $(test-path)/sys_info.txt
+	echo "FILE_CXXFLAGS = " $(FILE_CXXFLAGS) >> $(test-path)/sys_info.txt
 	echo "LDFLAGS = " $(LDFLAGS) >> $(test-path)/sys_info.txt
 
 rubbish += run-test.exe
@@ -730,7 +730,7 @@ $(test-path)/sys_info.txt:
 	$(OBJDUMP) --version >> $(test-path)/sys_info.txt
 	echo "Flags : " >> $(test-path)/sys_info.txt
 	echo "OBJECT_CXXFLAGS = " $(OBJECT_CXXFLAGS) >> $(test-path)/sys_info.txt
-	echo "CXXFLAGS = " $(CXXFLAGS) >> $(test-path)/sys_info.txt
+	echo "FILE_CXXFLAGS = " $(FILE_CXXFLAGS) >> $(test-path)/sys_info.txt
 	echo "LDFLAGS = " $(LDFLAGS) >> $(test-path)/sys_info.txt
 
 rubbish += run-test
@@ -769,62 +769,62 @@ EXEFILE := $(test-path)/$(CURR_CASE_NAME)
 $(mss-obj): $(test-path)/mss-%$(MIDFILE_SUFFIX):$(mss-path)/%.cpp
 	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$(MIDFILE) $(LIB_LDFLAGS)
 $(mss-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(libmss) $(independent_assembly)
-	$(CXX) $(CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(libmss) $(OUTPUT_EXE_OPTION)$(EXEFILE) $(LDFLAGS)
+	$(CXX) $(FILE_CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(libmss) $(OUTPUT_EXE_OPTION)$(EXEFILE) $(LDFLAGS)
 
 $(mts-obj): $(test-path)/mts-%$(MIDFILE_SUFFIX):$(mts-path)/%.cpp
 	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$(MIDFILE) $(LIB_LDFLAGS)
 
 $(mts-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(libmss) $(independent_assembly)
-	$(CXX) $(CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(libmss) $(OUTPUT_EXE_OPTION)$(EXEFILE)$(LDFLAGS)
+	$(CXX) $(FILE_CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(libmss) $(OUTPUT_EXE_OPTION)$(EXEFILE)$(LDFLAGS)
 
 $(acc-obj): $(test-path)/acc-%$(MIDFILE_SUFFIX):$(acc-path)/%.cpp
 	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$(MIDFILE) $(LIB_LDFLAGS)
 
 $(acc-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(independent_assembly)
-	$(CXX) $(CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(OUTPUT_EXE_OPTION)$(EXEFILE) $(LDFLAGS)
+	$(CXX) $(FILE_CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(OUTPUT_EXE_OPTION)$(EXEFILE) $(LDFLAGS)
 
 $(cpi-obj): $(test-path)/cpi-%$(MIDFILE_SUFFIX):$(cpi-path)/%.cpp
 	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$(MIDFILE) $(LIB_LDFLAGS)
 
 $(cpi-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(dynlibcfi) $(independent_assembly)
-	$(CXX) $(CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(DYNCFI_OPTION) $(OUTPUT_EXE_OPTION)$(EXEFILE)  $(LDFLAGS)
+	$(CXX) $(FILE_CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(DYNCFI_OPTION) $(OUTPUT_EXE_OPTION)$(EXEFILE)  $(LDFLAGS)
 
 $(cfi-obj): $(test-path)/cfi-%$(MIDFILE_SUFFIX):$(cfi-path)/%.cpp
 	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$(MIDFILE) $(LIB_LDFLAGS)
 
 $(cfi-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(dynlibcfi) $(independent_assembly)
-	$(CXX) $(CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(DYNCFI_OPTION) $(OUTPUT_EXE_OPTION)$(EXEFILE) $(LDFLAGS)
+	$(CXX) $(FILE_CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(DYNCFI_OPTION) $(OUTPUT_EXE_OPTION)$(EXEFILE) $(LDFLAGS)
 
 else
 
 $(mss-obj): $(test-path)/mss-%$(MIDFILE_SUFFIX):$(mss-path)/%.cpp
 	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$@ $(LIB_LDFLAGS)
 $(mss-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(libmss) $(independent_assembly)
-	$(CXX) $(CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(libmss) $(OUTPUT_EXE_OPTION)$@ $(LDFLAGS)
+	$(CXX) $(FILE_CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(libmss) $(OUTPUT_EXE_OPTION)$@ $(LDFLAGS)
 
 $(mts-obj): $(test-path)/mts-%$(MIDFILE_SUFFIX):$(mts-path)/%.cpp
 	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$@ $(LIB_LDFLAGS)
 
 $(mts-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(libmss) $(independent_assembly)
-	$(CXX) $(CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(libmss) $(OUTPUT_EXE_OPTION)$@ $(LDFLAGS)
+	$(CXX) $(FILE_CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(libmss) $(OUTPUT_EXE_OPTION)$@ $(LDFLAGS)
 
 $(acc-obj): $(test-path)/acc-%$(MIDFILE_SUFFIX):$(acc-path)/%.cpp
 	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$@ $(LIB_LDFLAGS)
 
 $(acc-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(independent_assembly)
-	$(CXX) $(CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(OUTPUT_EXE_OPTION)$@ $(LDFLAGS)
+	$(CXX) $(FILE_CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(OUTPUT_EXE_OPTION)$@ $(LDFLAGS)
 
 $(cpi-obj): $(test-path)/cpi-%$(MIDFILE_SUFFIX):$(cpi-path)/%.cpp
 	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$@ $(LIB_LDFLAGS)
 
 $(cpi-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(dynlibcfi) $(independent_assembly)
-	$(CXX) $(CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(DYNCFI_OPTION) $(OUTPUT_EXE_OPTION)$@  $(LDFLAGS)
+	$(CXX) $(FILE_CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(DYNCFI_OPTION) $(OUTPUT_EXE_OPTION)$@  $(LDFLAGS)
 
 $(cfi-obj): $(test-path)/cfi-%$(MIDFILE_SUFFIX):$(cfi-path)/%.cpp
 	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$@ $(LIB_LDFLAGS)
 
 $(cfi-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(dynlibcfi) $(independent_assembly)
-	$(CXX) $(CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(DYNCFI_OPTION) $(OUTPUT_EXE_OPTION)$@ $(LDFLAGS)
+	$(CXX) $(FILE_CXXFLAGS) $< $(extra_objects) $(independent_assembly) $(DYNCFI_OPTION) $(OUTPUT_EXE_OPTION)$@ $(LDFLAGS)
 
 endif
 
@@ -843,19 +843,19 @@ else
 endif
 
 $(mss-cpps-prep): %.prep:%
-	$(CXX) -E $(CXXFLAGS) $< > $@
+	$(CXX) -E $(FILE_CXXFLAGS) $< > $@
 
 $(mts-cpps-prep): %.prep:%
-	$(CXX) -E $(CXXFLAGS) $< > $@
+	$(CXX) -E $(FILE_CXXFLAGS) $< > $@
 
 $(acc-cpps-prep): %.prep:%
-	$(CXX) -E $(CXXFLAGS) $< > $@
+	$(CXX) -E $(FILE_CXXFLAGS) $< > $@
 
 $(cpi-cpps-prep): %.prep:%
-	$(CXX) -E $(CXXFLAGS) $< > $@
+	$(CXX) -E $(FILE_CXXFLAGS) $< > $@
 
 $(cfi-cpps-prep): %.prep:%
-	$(CXX) -E $(CXXFLAGS) $< > $@
+	$(CXX) -E $(FILE_CXXFLAGS) $< > $@
 
 dump: $(sec-tests-dump)
 $(sec-tests-dump): %.dump:%
