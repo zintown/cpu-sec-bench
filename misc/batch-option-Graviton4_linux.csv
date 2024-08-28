@@ -1,24 +1,13 @@
-Armv8.5-Lin-G,exhausted-run,CXX=g++,CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-Armv8.5-Lin-L,exhausted-run,CXX=clang++,CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-GCC-TBI,exhausted-run,CXX=g++,enable_aarch64_tbi="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-GCC-PA,exhausted-run,CXX=g++,enable_aarch64_pa="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-GCC-BTI,exhausted-run,CXX=g++,enable_aarch64_bti="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-GCC-MTE,exhausted-run,CXX=g++,enable_aarch64_mte="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-LLVM-TBI,exhausted-run,CXX=clang++,enable_aarch64_tbi="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-LLVM-PA,exhausted-run,CXX=clang++,enable_aarch64_pa="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-LLVM-BTI,exhausted-run,CXX=clang++,enable_aarch64_bti="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-LLVM-MTE,exhausted-run,CXX=clang++,enable_aarch64_mte="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-LLVM-ASan-full,exhausted-run,CXX=clang++,enable_full_address_sanitizer="yes",enable_full_undefined_sanitizer="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-GCC-ASan-full,exhausted-run,CXX=g++,enable_full_address_sanitizer="yes",enable_full_undefined_sanitizer="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-Armv8.5-Lin-G,fast-run,CXX=g++,CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-Armv8.5-Lin-L,fast-run,CXX=clang++,CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-GCC-TBI,fast-run,CXX=g++,enable_aarch64_tbi="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-GCC-PA,fast-run,CXX=g++,enable_aarch64_pa="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-GCC-BTI,fast-run,CXX=g++,enable_aarch64_bti="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-GCC-MTE,fast-run,CXX=g++,enable_aarch64_mte="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-LLVM-TBI,fast-run,CXX=clang++,enable_aarch64_tbi="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-LLVM-PA,fast-run,CXX=clang++,enable_aarch64_pa="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-LLVM-BTI,fast-run,CXX=clang++,enable_aarch64_bti="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-LLVM-MTE,fast-run,CXX=clang++,enable_aarch64_mte="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-LLVM-ASan-full,fast-run,CXX=clang++,enable_full_address_sanitizer="yes",enable_full_undefined_sanitizer="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
-G3-GCC-ASan-full,fast-run,CXX=g++,enable_full_address_sanitizer="yes",enable_full_undefined_sanitizer="yes",CXXFLAGS="-Wl,--rpath=../glibc-build/lib -Wl,--dynamic-linker=../glibc-build/lib/ld-linux-x86-64.so.2"
+Armv8.5-Lin-NG,exhausted-run,CXX=/home/ubuntu/gcc-build-14.2.0/bin/aarch64-unknown-linux-gnu-g++,CXXFLAGS=-Wl;--rpath=/home/ubuntu/glibc-build/lib -Wl;--dynamic-linker=/home/ubuntu/glibc-build/lib/ld-linux-aarch64.so.1
+Armv8.5-Lin-L,exhausted-run,CXX=clang++
+Armv8.5-Lin-G,exhausted-run,CXX=g++
+G4-GCC-TBI,exhausted-run,CXX=/home/ubuntu/gcc-build-14.2.0/bin/aarch64-unknown-linux-gnu-g++,enable_aarch64_tbi=yes,CXXFLAGS=-Wl;--rpath=/home/ubuntu/glibc-build/lib -Wl;--dynamic-linker=/home/ubuntu/glibc-build/lib/ld-linux-aarch64.so.1
+G4-GCC-PA,exhausted-run,CXX=/home/ubuntu/gcc-build-14.2.0/bin/aarch64-unknown-linux-gnu-g++,enable_aarch64_pa=yes,CXXFLAGS=-Wl;--rpath=/home/ubuntu/glibc-build/lib -Wl;--dynamic-linker=/home/ubuntu/glibc-build/lib/ld-linux-aarch64.so.1
+G4-GCC-BTI,exhausted-run,CXX=/home/ubuntu/gcc-build-14.2.0/bin/aarch64-unknown-linux-gnu-g++,enable_aarch64_bti=yes,CXXFLAGS=-Wl;--rpath=/home/ubuntu/glibc-build/lib -Wl;--dynamic-linker=/home/ubuntu/glibc-build/lib/ld-linux-aarch64.so.1
+G4-GCC-MTE,exhausted-run,CXX=/home/ubuntu/gcc-build-14.2.0/bin/aarch64-unknown-linux-gnu-g++,enable_aarch64_mte=yes,CXXFLAGS=-Wl;--rpath=/home/ubuntu/glibc-build/lib -Wl;--dynamic-linker=/home/ubuntu/glibc-build/lib/ld-linux-aarch64.so.1
+G4-LLVM-TBI,exhausted-run,CXX=clang++,enable_aarch64_tbi=yes
+G4-LLVM-PA,exhausted-run,CXX=clang++,enable_aarch64_pa=yes
+G4-LLVM-BTI,exhausted-run,CXX=clang++,enable_aarch64_bti=yes
+G4-LLVM-MTE,exhausted-run,CXX=clang++,enable_aarch64_mte=yes
+G4-LLVM-ASan-full,exhausted-run,CXX=clang++,enable_full_address_sanitizer=yes,enable_full_undefined_sanitizer=yes
+G4-GCC-ASan-full,exhausted-run,CXX=/home/ubuntu/gcc-build-14.2.0/bin/aarch64-unknown-linux-gnu-g++,enable_full_address_sanitizer=yes,enable_full_undefined_sanitizer=yes,CXXFLAGS=-Wl;--rpath=/home/ubuntu/glibc-build/lib -Wl;--dynamic-linker=/home/ubuntu/glibc-build/lib/ld-linux-aarch64.so.1
