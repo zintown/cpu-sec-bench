@@ -253,7 +253,7 @@ else
 	else
 		CXX         ?= g++
 	endif
-	ASM           := g++
+	ASM           := $(CXX)
 	CLIBAPI       := posix
 	OBJDUMP       := objdump
 
