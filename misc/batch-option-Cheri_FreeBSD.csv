@@ -1,4 +1,3 @@
 CHERI-default,exhausted-run,CXX=clang++,ARCH=riscv64,enable_riscv64_cheri_default="yes"
 CHERI-strong,exhausted-run,CXX=clang++,ARCH=riscv64,enable_riscv64_cheri_everywhere_unsafe="yes"
-CHERI-default,fast-run,CXX=clang++,ARCH=riscv64,enable_riscv64_cheri_default="yes"
-CHERI-strong,fast-run,CXX=clang++,ARCH=riscv64,enable_riscv64_cheri_everywhere_unsafe="yes"
+

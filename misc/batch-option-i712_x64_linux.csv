@@ -12,17 +12,3 @@ G12-GCC-CET,exhausted-run,CXX=g++,enable_cet_shadow_stack="yes",GLIBC_TUNABLES=g
 G12-GCC-FULL,exhausted-run,CC=~/Desktop/my_test/gcc_build/bin/gcc,CXX=~/Desktop/my_test/gcc_build/bin/g++,enable_stack_protection="yes",enable_stack_clash_protection="yes",enable_cet_shadow_stack="yes",GLIBC_TUNABLES=glibc.cpu.hwcaps=SHSTK,enable_vtable_verify="yes",enable_fortify_source="yes",CXXFLAGS=-Wl;--rpath=/home/ciyan/Desktop/my_test/glibc/build/lib -Wl;--dynamic-linker=/home/ciyan/Desktop/my_test/glibc/build/lib/ld-linux-x86-64.so.2
 G12-LLVM-full,exhausted-run,CXX=clang++,enable_stack_protection="yes",enable_stack_clash_protection="yes",enable_cet_shadow_stack="yes",GLIBC_TUNABLES=glibc.cpu.hwcaps=SHSTK,enable_fortify_source="yes",CXXFLAGS=-Wl;--rpath=/home/ciyan/Desktop/my_test/glibc/build/lib -Wl;--dynamic-linker=/home/ciyan/Desktop/my_test/glibc/build/lib/ld-linux-x86-64.so.2
 G12-GCC-vtv,exhausted-run,CC=~/Desktop/my_test/gcc_build/bin/gcc,CXX=~/Desktop/my_test/gcc_build/bin/g++,enable_vtable_verify="yes"
-X86-64-Lin-G,fast-run,CXX=g++
-X86-64-Lin-L,fast-run,CXX=clang++
-GCC-ASan-address,fast-run,CXX=g++,enable_default_address_sanitizer="yes"
-LLVM-ASan-address,fast-run,CXX=clang++,enable_default_address_sanitizer="yes"
-GCC-ASan-undefined,fast-run,CXX=g++,enable_undefined_sanitizer="yes"
-LLVM-ASan-undefined,fast-run,CXX=clang++,enable_undefined_sanitizer="yes"
-LLVM-Safe-stack,fast-run,CXX=clang++,enable_safe_stack="yes"
-GCC-ASan-full,fast-run,CXX=g++,enable_full_address_sanitizer="yes",enable_full_undefined_sanitizer="yes"
-LLVM-ASan-full,fast-run,CXX=clang++,enable_full_address_sanitizer="yes",enable_full_undefined_sanitizer="yes"
-G12-GCC-stack,fast-run,CXX=g++,enable_stack_protection="yes",enable_stack_clash_protection="yes"
-G12-GCC-CET,fast-run,CXX=g++,enable_cet_shadow_stack="yes",GLIBC_TUNABLES=glibc.cpu.hwcaps=SHSTK,CXXFLAGS=-Wl;--rpath=/home/ciyan/Desktop/my_test/glibc/build/lib -Wl;--dynamic-linker=/home/ciyan/Desktop/my_test/glibc/build/lib/ld-linux-x86-64.so.2
-G12-GCC-FULL,fast-run,CC=~/Desktop/my_test/gcc_build/bin/gcc,CXX=~/Desktop/my_test/gcc_build/bin/g++,enable_stack_protection="yes",enable_stack_clash_protection="yes",enable_cet_shadow_stack="yes",GLIBC_TUNABLES=glibc.cpu.hwcaps=SHSTK,enable_vtable_verify="yes",enable_fortify_source="yes",CXXFLAGS=-Wl;--rpath=/home/ciyan/Desktop/my_test/glibc/build/lib -Wl;--dynamic-linker=/home/ciyan/Desktop/my_test/glibc/build/lib/ld-linux-x86-64.so.2
-G12-LLVM-full,fast-run,CXX=clang++,enable_stack_protection="yes",enable_stack_clash_protection="yes",enable_cet_shadow_stack="yes",GLIBC_TUNABLES=glibc.cpu.hwcaps=SHSTK,enable_fortify_source="yes",CXXFLAGS=-Wl;--rpath=/home/ciyan/Desktop/my_test/glibc/build/lib -Wl;--dynamic-linker=/home/ciyan/Desktop/my_test/glibc/build/lib/ld-linux-x86-64.so.2
-G12-GCC-vtv,fast-run,CC=~/Desktop/my_test/gcc_build/bin/gcc,CXX=~/Desktop/my_test/gcc_build/bin/g++,enable_vtable_verify="yes"

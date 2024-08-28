@@ -1,4 +1,2 @@
-Morello-default,fast-run,CXX=clang++,ARCH=aarch64,enable_aarch64_morello_default="yes"
-Morello-strong,fast-run,CXX=clang++,ARCH=aarch64,enable_aarch64_morello_everywhere_unsafe="yes"
 Morello-default,exhausted-run,CXX=clang++,ARCH=aarch64,enable_aarch64_morello_default="yes"
 Morello-strong,exhausted-run,CXX=clang++,ARCH=aarch64,enable_aarch64_morello_everywhere_unsafe="yes"
