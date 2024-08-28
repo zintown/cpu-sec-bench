@@ -9,7 +9,7 @@ directory_path = os.path.abspath(sys.argv[1])
 
 for filename in os.listdir(directory_path):
     print(filename)
-    if "resu" in filename:
+    if "dat" in filename:
         file_path = os.path.join(directory_path, filename)
         db = {
             "acc": [0, 0],
