@@ -119,6 +119,7 @@ ifeq ($(OSType),Windows_NT)
 	func-opcode-gen   := .\script\get_x64_func_inst.bat
 	dynlibcfi := $(addsuffix $(DLL_SUFFIX), libcfi)
 	independent_assembly := lib/x86_64/visualcpp_indepassembly_func.obj
+	assembly_suffix   :=  .asm
 
 	# define compiling flags
 	ifdef enable_stack_nx_protection
@@ -252,7 +253,7 @@ else
 	else
 		CXX         ?= g++
 	endif
-	ASM           := as
+	ASM           := g++
 	CLIBAPI       := posix
 	OBJDUMP       := objdump
 
@@ -280,7 +281,7 @@ else
 	SCHEDULER_CXXFLAGS  := -O2 $(CXXFLAGS_BASE) -I. -DRUN_PREFIX="\"$(RUN_PREFIX)\""
 	OBJECT_CXXFLAGS     := -$(OPT_LEVEL) $(CXXFLAGS_BASE)
 	FILE_CXXFLAGS      := $(CXXFLAGS_BASE)
-	ASMFLAGS      :=
+	ASMFLAGS      = $(FILE_CXXFLAGS)
 	OUTPUT_EXE_OPTION := -o 
 	OUTPUT_LIB_OPTION := -c -o 
 	MIDFILE_SUFFIX    := .o
@@ -308,6 +309,7 @@ else
 	endif
 	dynlibcfi := $(addsuffix $(DLL_SUFFIX), lib/common/libcfi)
 	independent_assembly := $(addprefix lib/$(ARCH)/, indepassembly.o)
+	assembly_suffix := .S
 	
 
 	ifeq ($(CXX),$(filter $(CXX),clang++ c++))
@@ -753,7 +755,7 @@ $(extra_objects): %$(MIDFILE_SUFFIX) : %.cpp $(headers)
 
 rubbish += $(extra_objects)
 
-$(independent_assembly): %$(MIDFILE_SUFFIX) : %.asm
+$(independent_assembly): %$(MIDFILE_SUFFIX) : %$(assembly_suffix)
 	$(ASM) $(OUTPUT_LIB_OPTION)$@ $(ASMFLAGS) $^ $(LIB_LDFLAGS)
 
 rubbish += $(independent_assembly)
