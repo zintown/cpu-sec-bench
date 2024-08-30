@@ -308,7 +308,7 @@ else
 		func-opcode-gen := ./script/get_riscv64_func_inst.sh
 	endif
 	dynlibcfi := $(addsuffix $(DLL_SUFFIX), lib/common/libcfi)
-	independent_assembly := $(addprefix lib/$(ARCH)/, indepassembly.o)
+	independent_assembly = $(addprefix lib/$(ARCH)/, indepassembly.o)
 	assembly_suffix := .S
 	
 

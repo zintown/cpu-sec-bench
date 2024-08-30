@@ -4,6 +4,7 @@
 #define TRACE_EXTERN_RELATED_GLOBALVAR
 #define DLL_DEFINITION DllExport
 
+#define INTERN_RELATED_GLOBALVAR
 #include "include/cfi.hpp"
 
 volatile arch_int_t cfi_offset;

@@ -30,10 +30,10 @@ FORCE_NOINLINE void func_to_modify_caller_parameter(int target_register);
 
 #define GET_SP_BASE(ra_addr)                 \
   RtlCaptureContext(&sp_loc_context);        \
-  ra_addr += (long long)sp_loc_context.Rsp ; \
+  ra_addr += (long long)sp_loc_context.Rsp
 
 #define GET_RA_ADDR(ra_addr)                 \
-  ra_addr = (void*)_ReturnAddress();         \
+  ra_addr = (void*)_ReturnAddress()
 
 #define MOD_STACK_DAT(dat, offset)           \
   RtlCaptureContext(&sp_loc_context);        \
@@ -111,4 +111,5 @@ void FORCE_INLINE assign_fake_machine_code(unsigned char *p) {
   RtlCaptureContext(&sp_loc_context);                         \
   offset = (arch_int_t)((long long) _AddressOfReturnAddress()-\
            (long long) sp_loc_context.Rsp)
+
 #endif
