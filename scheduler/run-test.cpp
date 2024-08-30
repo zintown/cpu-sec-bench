@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <spawn.h>
 #include <sys/wait.h>
+#include <signal.h>
 #endif
 
 // standard cpp library
@@ -59,7 +60,6 @@ void add_extra_run_prefix(char **);
 #ifdef RUN_PREFIX
   static char run_prefix[] = RUN_PREFIX;
 #endif
-#define TIMEOUT_TIME 60
 #define MAKE_ERROR 119
 std::list<char *> extra_run_prefix;
 std::list<std::string> collect_case_list();
@@ -80,7 +80,7 @@ char ** argv_conv(const std::string &cmd, const str_list_t &args1, const str_map
 int run_cmd(char* argv[], char** runv, long long& time_count);
 bool run_tests(std::list<std::string> cases);
 long long get_file_size(const std::string& filename);
-
+long time_out = 6000;
 
 int main(int argc, char* argv[], char* envp[]) {
   // parse argument
@@ -101,6 +101,7 @@ int main(int argc, char* argv[], char* envp[]) {
       std::cout << "  no-make             Due to make the test cases as they are made aleady." << std::endl;
       std::cout << "  fast-run            Only run the test case that their requirement runs successfully, and then generate a report." << std::endl;
       std::cout << "  exhausted-run       Run all tests until the total test case is exhausted, and then generate a report." << std::endl;
+      std::cout << "  time-out            Run all tests until the total test case is exhausted or time out, and then generate a report.";
       std::cout << "  print-trace         Print the trace log of the attacked target." << std::endl;
       return 0;
     }
@@ -113,6 +114,7 @@ int main(int argc, char* argv[], char* envp[]) {
     else if(param == "no-make")   {make_run   = false; debug_run  = 1; exhausted_run    = true; report_run = true;}
     else if(param == "fast-run")  {debug_run  = 1; report_run = true;}
     else if(param == "exhausted-run")   { debug_run  = 1; exhausted_run    = true; report_run = true;}
+    else if(param == "time-out") {debug_run  = 1; exhausted_run    = true; report_run = true; time_out = strtol(argv[++i], NULL, 10);}
     else if(param == "print-trace") {trace_run = true; }
     else {std::cout << "The scheduler has no "<< param << " option" << std::endl; exit(1);}
   }
@@ -509,7 +511,7 @@ int run_cmd(char *argv[], char **runv, long long& time_count) {
 
   pid_t timeout_pid = fork();
   if (timeout_pid == 0) {
-      sleep(TIMEOUT_TIME);
+      sleep(time_out);
       _exit(0);
   }
 
