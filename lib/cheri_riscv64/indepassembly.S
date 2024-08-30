@@ -27,7 +27,9 @@ assembly_return_site:
   sd s0, 0(sp)
   # set return code
   li a0, 0
-  call exit
+  # exit
+  li a7, 93
+  ecall
   # restore frame pointer
   ld s0, 0(sp)
   # restore return address

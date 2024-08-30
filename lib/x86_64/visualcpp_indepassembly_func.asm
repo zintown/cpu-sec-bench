@@ -18,4 +18,26 @@ exitcode:       push rax;
 
 push_fake_ret ENDP
 
+assembly_helper PROC PUBLIC
+  ; Save address
+  movq %rdi, %rax
+  ; Pop the return address from the stack
+  popq %rbx
+  ; Save the fake return address to the stack
+  pushq %rax
+  ret
+
+
+assembly_return_site PROC PUBLIC
+  ; Save the stack info
+  push %rbp
+  movq %rsp, %rbp
+  ; Set exit code
+  xor %rdi, %rdi
+  call exit
+  ; Restore stack info
+  movq %rbp, %rsp
+  pop %rbp
+  ret
+
 END
