@@ -5,34 +5,34 @@
 .type exit, @function
 
 assembly_helper:
-  addi sp, sp, -16
+  addi csp, csp, -16
   # save return address
-  sd ra, 8(sp)
+  sc.cap ra, 8(csp)
   # save frame pointer
-  sd s0, 0(sp)
+  sc.cap s0, 0(csp)
   # modify return address
-  sd a0, 8(sp)
+  sc.cap a0, 8(csp)
   # restore frame pointer
-  ld s0, 0(sp)
+  ld s0, 0(csp)
   # restore return address
-  ld ra, 8(sp)
-  addi sp, sp, 16
+  ld ra, 8(csp)
+  addi csp, csp, 16
   ret
 
 assembly_return_site:
-  addi sp, sp, -16
+  addi csp, csp, -16
   # save return address
-  sd ra, 8(sp)
+  sc.cap ra, 8(csp)
   # save frame pointer
-  sd s0, 0(sp)
+  sc.cap s0, 0(csp)
   # set return code
   li a0, 0
   # exit
   li a7, 93
   ecall
   # restore frame pointer
-  ld s0, 0(sp)
+  ld s0, 0(csp)
   # restore return address
-  ld ra, 8(sp)
-  addi sp, sp, 16
+  ld ra, 8(csp)
+  addi csp, csp, 16
   ret
