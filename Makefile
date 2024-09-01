@@ -779,7 +779,7 @@ $(mts-obj): $(test-path)/mts-%$(MIDFILE_SUFFIX):$(mts-path)/%.cpp
 	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$(MIDFILE) $(LIB_LDFLAGS)
 
 $(mts-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(libmss) $(independent_assembly)
-	$(CXX) $(FILE_CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(libmss) $(OUTPUT_EXE_OPTION)$(EXEFILE)$(LDFLAGS)
+	$(CXX) $(FILE_CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(libmss) $(OUTPUT_EXE_OPTION)$(EXEFILE) $(LDFLAGS)
 
 $(acc-obj): $(test-path)/acc-%$(MIDFILE_SUFFIX):$(acc-path)/%.cpp
 	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$(MIDFILE) $(LIB_LDFLAGS)
@@ -791,7 +791,7 @@ $(cpi-obj): $(test-path)/cpi-%$(MIDFILE_SUFFIX):$(cpi-path)/%.cpp
 	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$(MIDFILE) $(LIB_LDFLAGS)
 
 $(cpi-tests): %:%$(MIDFILE_SUFFIX) $(extra_objects) $(dynlibcfi) $(independent_assembly)
-	$(CXX) $(FILE_CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(DYNCFI_OPTION) $(OUTPUT_EXE_OPTION)$(EXEFILE)  $(LDFLAGS)
+	$(CXX) $(FILE_CXXFLAGS) $(MIDFILE) $(extra_objects) $(independent_assembly) $(DYNCFI_OPTION) $(OUTPUT_EXE_OPTION)$(EXEFILE) $(LDFLAGS)
 
 $(cfi-obj): $(test-path)/cfi-%$(MIDFILE_SUFFIX):$(cfi-path)/%.cpp
 	$(CXX) $(OBJECT_CXXFLAGS) $< $(OUTPUT_LIB_OPTION)$(MIDFILE) $(LIB_LDFLAGS)

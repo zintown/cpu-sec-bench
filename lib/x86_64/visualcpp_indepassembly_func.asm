@@ -2,6 +2,8 @@
 
 option casemap:none
 
+extern exit: PROC
+
 ; push_fake_ret(fake_label, fsize)
 push_fake_ret PROC PUBLIC
 ; load return address in rax
@@ -20,24 +22,24 @@ push_fake_ret ENDP
 
 assembly_helper PROC PUBLIC
   ; Save address
-  movq %rdi, %rax
+  mov rax, rdi
   ; Pop the return address from the stack
-  popq %rbx
+  pop rbx
   ; Save the fake return address to the stack
-  pushq %rax
+  push rax
   ret
-
+assembly_helper ENDP
 
 assembly_return_site PROC PUBLIC
   ; Save the stack info
-  push %rbp
-  movq %rsp, %rbp
+  push rbp
+  mov rbp, rsp
   ; Set exit code
-  xor %rdi, %rdi
+  xor rdi, rdi
   call exit
   ; Restore stack info
-  movq %rbp, %rsp
-  pop %rbp
+  mov rsp, rbp
+  pop rbp
   ret
-
+assembly_return_site ENDP
 END
