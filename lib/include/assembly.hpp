@@ -4,7 +4,6 @@
 #define ASSEMBLY_HPP_INCLUDED
 
 #include "include/builtin.hpp"
-#include "include/global_var.hpp"
 
 // detect ISA
 #if defined(__x86_64) || defined(_M_X64)

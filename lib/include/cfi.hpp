@@ -4,6 +4,7 @@
 #define CFI_HPP_INCLUDED
 
 #include "include/assembly.hpp"
+#include "include/global_var.hpp"
 
 // define a type of function
 typedef void (*pfunc_t)();
