@@ -1,8 +1,8 @@
-G4-GCC-TBI,exhausted-run,CXX=eg++,enable_aarch64_tbi=yes
-G4-GCC-PA,exhausted-run,CXX=eg++,enable_aarch64_pa=yes
-G4-GCC-BTI,exhausted-run,CXX=eg++,enable_aarch64_bti=yes
-G4-GCC-MTE,exhausted-run,CXX=eg++,enable_aarch64_mte=yes
-G4-LLVM-TBI,exhausted-run,CXX=clang++,enable_aarch64_tbi=yes
-G4-LLVM-PA,exhausted-run,CXX=clang++,enable_aarch64_pa=yes
-G4-LLVM-BTI,exhausted-run,CXX=clang++,enable_aarch64_bti=yes
-G4-LLVM-MTE,exhausted-run,CXX=clang++,enable_aarch64_mte=yes
+G4-GCC-TBI,exhausted-run,CXX=eg++,enable_aarch64_tbi=yes,ARCH=aarch64
+G4-GCC-PA,exhausted-run,CXX=eg++,enable_aarch64_pa=yes,ARCH=aarch64
+G4-GCC-BTI,exhausted-run,CXX=eg++,enable_aarch64_bti=yes,ARCH=aarch64
+G4-GCC-MTE,exhausted-run,CXX=eg++,enable_aarch64_mte=yes,ARCH=aarch64
+G4-LLVM-TBI,exhausted-run,CXX=clang++,enable_aarch64_tbi=yes,ARCH=aarch64
+G4-LLVM-PA,exhausted-run,CXX=clang++,enable_aarch64_pa=yes,ARCH=aarch64
+G4-LLVM-BTI,exhausted-run,CXX=clang++,enable_aarch64_bti=yes,ARCH=aarch64
+G4-LLVM-MTE,exhausted-run,CXX=clang++,enable_aarch64_mte=yes,ARCH=aarch64
