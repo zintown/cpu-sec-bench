@@ -5,7 +5,7 @@
 volatile arch_int_t offset;
 volatile arch_int_t fake_val;
 
-void* FORCE_NOINLINE helper(void *label, int get_offset_method, int get_ra_method) {
+FORCE_NOINLINE void* helper(void *label, int get_offset_method, int get_ra_method) {
   void* curr_return_addr = NULL;
   if(get_ra_method){
     GET_RA_ADDR(curr_return_addr);
@@ -44,7 +44,7 @@ void* FORCE_NOINLINE helper(void *label, int get_offset_method, int get_ra_metho
   }
 }
 
-void* FORCE_NOINLINE helper(void *label, int sel) {
+FORCE_NOINLINE void* helper(void *label, int sel) {
   void* curr_return_addr = NULL;
   GET_RA_ADDR(curr_return_addr);
   gvar_incr();

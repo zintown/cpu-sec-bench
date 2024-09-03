@@ -19,9 +19,9 @@ typedef pfunc_t *pvtable_t;
 #endif
 
 // create a fake virtual table on heap with `nfunc' number of `pfunc_t'
-DLL_DEFINITION extern pvtable_t create_fake_vtable_on_heap(unsigned int nfunc);
-DLL_DEFINITION extern void free_fake_vtable_on_heap(pvtable_t addr);
-
+extern DLL_DEFINITION  pvtable_t create_fake_vtable_on_heap(unsigned int nfunc);
+extern DLL_DEFINITION  void free_fake_vtable_on_heap(pvtable_t addr);
+extern "C" DLL_DEFINITION   arch_int_t cfi_offset;
 
 class DLL_DEFINITION Base
 {
@@ -107,11 +107,11 @@ public:
 };
 
 // read the vtable pointer of an object
-DLL_DEFINITION extern pvtable_t read_vtable_pointer(const Base *);
-DLL_DEFINITION extern pvtable_t read_vtable_pointer(const BaseM *);
+extern DLL_DEFINITION  pvtable_t read_vtable_pointer(const Base *);
+extern DLL_DEFINITION  pvtable_t read_vtable_pointer(const BaseM *);
 
 // write the vtable pointer of an object
-DLL_DEFINITION extern void write_vtable_pointer(Base *, pvtable_t);
-DLL_DEFINITION extern void write_vtable_pointer(BaseM *, pvtable_t);
+extern DLL_DEFINITION  void write_vtable_pointer(Base *, pvtable_t);
+extern DLL_DEFINITION  void write_vtable_pointer(BaseM *, pvtable_t);
 
 #endif

@@ -7,7 +7,7 @@
 #define INTERN_RELATED_GLOBALVAR
 #include "include/cfi.hpp"
 
-volatile arch_int_t cfi_offset;
+arch_int_t cfi_offset;
 
 void Ret_From_Helper::virtual_func(void *label) {
   COMPILER_BARRIER;

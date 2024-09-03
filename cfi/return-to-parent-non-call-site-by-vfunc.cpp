@@ -2,8 +2,6 @@
 #include "include/cfi.hpp"
 #include <string>
 
-extern volatile arch_int_t cfi_offset;
-
 int main(int argc, char* argv[]){
 
   INIT_TRACE_FILE;

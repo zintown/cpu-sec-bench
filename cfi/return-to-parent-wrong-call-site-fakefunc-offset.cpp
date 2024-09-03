@@ -5,7 +5,7 @@
 
 volatile arch_int_t offset;
 int fake_init_val; // init in configure.json and is -2
-void FORCE_NOINLINE helper(void *label) {
+FORCE_NOINLINE void helper(void *label) {
   COMPILER_BARRIER;
   GET_RAA_SP_OFFSET(offset);
   #ifdef TRACE_RUN
@@ -26,7 +26,7 @@ void FORCE_NOINLINE helper(void *label) {
   offset = rand();
 }
 
-void* FORCE_NOINLINE helper2(void* curr_return_addr, int sel) {
+FORCE_NOINLINE void* helper2(void* curr_return_addr, int sel) {
   if(sel == 1){
     GET_RA_ADDR(curr_return_addr);
   }
