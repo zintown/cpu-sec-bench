@@ -80,7 +80,7 @@ char ** argv_conv(const std::string &cmd, const str_list_t &args1, const str_map
 int run_cmd(char* argv[], char** runv, long long& time_count);
 bool run_tests(std::list<std::string> cases);
 long long get_file_size(const std::string& filename);
-long time_out = 6000;
+// long time_out = 6000;
 
 int main(int argc, char* argv[], char* envp[]) {
   // parse argument
@@ -101,7 +101,7 @@ int main(int argc, char* argv[], char* envp[]) {
       std::cout << "  no-make             Due to make the test cases as they are made aleady." << std::endl;
       std::cout << "  fast-run            Only run the test case that their requirement runs successfully, and then generate a report." << std::endl;
       std::cout << "  exhausted-run       Run all tests until the total test case is exhausted, and then generate a report." << std::endl;
-      std::cout << "  time-out            Run all tests until the total test case is exhausted or time out, and then generate a report.";
+      //std::cout << "  time-out            Run all tests until the total test case is exhausted or time out, and then generate a report.";
       std::cout << "  print-trace         Print the trace log of the attacked target." << std::endl;
       return 0;
     }
@@ -114,7 +114,7 @@ int main(int argc, char* argv[], char* envp[]) {
     else if(param == "no-make")   {make_run   = false; debug_run  = 1; exhausted_run    = true; report_run = true;}
     else if(param == "fast-run")  {debug_run  = 1; report_run = true;}
     else if(param == "exhausted-run")   { debug_run  = 1; exhausted_run    = true; report_run = true;}
-    else if(param == "time-out") {debug_run  = 1; exhausted_run    = true; report_run = true; time_out = strtol(argv[++i], NULL, 10);}
+    //else if(param == "time-out") {debug_run  = 1; exhausted_run    = true; report_run = true; time_out = strtol(argv[++i], NULL, 10);}
     else if(param == "print-trace") {trace_run = true; }
     else {std::cout << "The scheduler has no "<< param << " option" << std::endl; exit(1);}
   }
@@ -509,11 +509,11 @@ int run_cmd(char *argv[], char **runv, long long& time_count) {
     std::cout << std::endl;
   }
 
-  pid_t timeout_pid = fork();
-  if (timeout_pid == 0) {
-      sleep(time_out);
-      _exit(0);
-  }
+  // pid_t timeout_pid = fork();
+  // if (timeout_pid == 0) {
+  //     sleep(time_out);
+  //     _exit(0);
+  // }
 
   auto start = std::chrono::high_resolution_clock::now();
   int rv = posix_spawnp(&pid, argv[0], NULL, NULL, const_cast<char *const*>(argv), runv);
@@ -527,24 +527,28 @@ int run_cmd(char *argv[], char **runv, long long& time_count) {
     }
   }
 
-  int s, t, status,time_status;
+  //int s, t, status,time_status;
+  int s,status;
   do {
-     s = waitpid(pid, &status, WNOHANG | WUNTRACED | WCONTINUED);
-     t = waitpid(timeout_pid, &time_status, WNOHANG );
-     if(s == -1 || t == -1) {
+     s = waitpid(pid, &status, WUNTRACED | WCONTINUED);
+     //s = waitpid(pid, &status, WNOHANG | WUNTRACED | WCONTINUED);
+     //t = waitpid(timeout_pid, &time_status, WNOHANG );
+     //if(s == -1 || t == -1) {
+      if(s==-1){
        std::cerr << "waitpid() is NOT supported in this system!" << std::endl;
        exit(1);
      }
-     if(s > 0){
-      kill(timeout_pid, SIGKILL);
-      break;
-     }
-     if(t > 0){
-      kill(pid, SIGKILL);
-      std::cerr << "terminated by time out" << std::endl;
-      return 1;
-     }
-  } while (1);
+    //  if(s > 0){
+    //   kill(timeout_pid, SIGKILL);
+    //   break;
+    //  }
+    //  if(t > 0){
+    //   kill(pid, SIGKILL);
+    //   std::cerr << "terminated by time out" << std::endl;
+    //   return 1;
+    //  }
+  //} while (1);
+  } while (!WIFEXITED(status) && !WIFSIGNALED(status));
 
   auto stop = std::chrono::high_resolution_clock::now();
   time_count = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count();
