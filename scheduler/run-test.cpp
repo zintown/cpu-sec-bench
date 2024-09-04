@@ -656,7 +656,7 @@ bool run_tests(std::list<std::string> cases) {
         if( test_run == false || test_cond == 0) {
           if(debug_run >= 1)std::cout << "\n------ " << cn << " ------" << std::endl;
           int make_result = -2;
-          if(make_run || need_build){
+          if(make_run && need_build){
             long long one_make_time, curr_size;
 
             make_option_list.push_front("test/" + prog);
