@@ -27,5 +27,6 @@ int main(int argc, char* argv[]){
   // the elligal return site
 TARGET_LABEL(argc)
   gvar_decr();
+  delete obj;
   exit(gvar());
 }
