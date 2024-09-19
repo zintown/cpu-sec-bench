@@ -17,10 +17,10 @@ int main(int argc, char* argv[]){
   }
   void *ret_label = (void*)&main;
   GET_LABEL_ADDRESS(ret_label,TARGET_LABEL);
-  if(cfi_offset == -4) { GOTO_SAVED_LABEL(ret_label);}   // impossible to happen
-
   // call a function but illegally return
   Ret_From_Helper* obj = new Ret_From_Helper();
+  if(cfi_offset == -4) { GOTO_SAVED_LABEL(ret_label);}   // impossible to happen
+
   obj->virtual_func(ret_label);
   gvar_decr();
   COMPILER_BARRIER;
