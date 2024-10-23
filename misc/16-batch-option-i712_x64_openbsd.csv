@@ -1,0 +1,7 @@
+X86-64-BSD-G,exhausted-run,CXX=eg++,ARCH=x86_64
+X86-64-BSD-L,exhausted-run,CXX=clang++,ARCH=x86_64
+G12-BSD-GCC-stack,exhausted-run,CXX=eg++,enable_stack_protection="yes",enable_stack_clash_protection="yes",ARCH=x86_64
+G12-GCC-CET,exhausted-run,CXX=eg++,enable_cet_shadow_stack="yes",ARCH=x86_64
+G12-GCC-FULL,exhausted-run,CXX=eg++,enable_stack_protection="yes",enable_stack_clash_protection="yes",enable_cet_shadow_stack="yes",enable_vtable_verify="yes",enable_fortify_source="yes",ARCH=x86_64
+G12-LLVM-full,exhausted-run,CXX=clang++,enable_stack_protection="yes",enable_stack_clash_protection="yes",enable_cet_shadow_stack="yes",enable_fortify_source="yes",ARCH=x86_64
+G12-LLVM-CET,exhausted-run,CXX=clang++,enable_cet_shadow_stack="yes",ARCH=x86_64
