@@ -1,0 +1,1 @@
+i512-Windows-MSVC,enable_default_address_sanitizer="yes",enable_return_address_sanitizer="yes",enable_control_flow_protection="yes",enable_extra_stack_protection="yes",enable_cet_shadow_stack="yes",enable_heap_integrity="yes"

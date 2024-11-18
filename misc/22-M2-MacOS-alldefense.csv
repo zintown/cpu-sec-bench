@@ -1,0 +1,1 @@
+M2-MacOS-AppleLLVM,exhausted-run,CXX=c++,enable_full_address_sanitizer="yes",enable_undefined_sanitizer="yes",ASAN_OPTIONS=detect_odr_violation=0,enable_safe_stack="yes",enable_stack_protection="yes",enable_stack_clash_protection="yes",enable_vtable_verify="yes",enable_llvm_cfi_san="yes",enable_aarch64_tbi=yes,enable_arm64e_pa="yes",enable_arm64e_bti="yes",enable_arm64e_mte="yes"
