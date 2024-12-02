@@ -468,9 +468,9 @@ else
 	endif
 
 	ifdef enable_full_address_sanitizer
-		FILE_CXXFLAGS += -fsanitize=address -fsanitize-address-use-after-scope -fno-common -fsanitize=pointer-compare -fsanitize=pointer-subtract -fno-sanitize-recover=all -U_FORTIFY_SOURCE
+		FILE_CXXFLAGS += -fsanitize-address-use-after-scope 
 		ifndef without_extra_ojbect_safety_options
-			OBJECT_CXXFLAGS += -fsanitize=address -fsanitize-address-use-after-scope -fno-common -fsanitize=pointer-compare -fsanitize=pointer-subtract -fno-sanitize-recover=all -U_FORTIFY_SOURCE
+			OBJECT_CXXFLAGS += -fsanitize-address-use-after-scope -U_FORTIFY_SOURCE
 		endif
 		ifeq ($(CXX),$(filter $(CXX),clang++ c++))
 			FILE_CXXFLAGS += -fsanitize-address-use-after-return=always
@@ -593,10 +593,10 @@ ifdef enable_aarch64_mte_default
 endif
 
 ifdef enable_aarch64_pa
-	FILE_CXXFLAGS := $(FILE_CXXFLAGS) -march=armv8.5-a+memtag+pauth -mbranch-protection=pac-ret
-	LIB_LDFLAGS := -march=armv8.5-a+memtag+pauth -mbranch-protection=pac-ret
+	FILE_CXXFLAGS := $(FILE_CXXFLAGS) -mbranch-protection=pac-ret
+	LIB_LDFLAGS := -mbranch-protection=pac-ret
 	ifndef without_extra_ojbect_safety_options
-		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag+pauth -mbranch-protection=pac-ret
+		OBJECT_CXXFLAGS += -mbranch-protection=pac-ret
 	endif
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-pa
 endif
@@ -608,10 +608,10 @@ ifdef enable_aarch64_bti
 	ifeq ($(APPLE),M1)
 		LDFLAGS += -L/opt/homebrew/Cellar/llvm@15/15.0.7/lib/c++ -Wl,-rpath,/opt/homebrew/Cellar/llvm@15/15.0.7/lib/c++
 	endif
-	FILE_CXXFLAGS := $(FILE_CXXFLAGS) -march=armv8.5-a+memtag+pauth -mbranch-protection=bti
-	LIB_LDFLAGS := -march=armv8.5-a+memtag+pauth -mbranch-protection=bti
+	FILE_CXXFLAGS := $(FILE_CXXFLAGS) -mbranch-protection=bti
+	LIB_LDFLAGS := -mbranch-protection=bti
 	ifndef without_extra_ojbect_safety_options
-		OBJECT_CXXFLAGS += -march=armv8.5-a+memtag+pauth -mbranch-protection=bti
+		OBJECT_CXXFLAGS += -mbranch-protection=bti
 	endif
 	SIMPLE_FLAGS :=$(SIMPLE_FLAGS)-bti
 endif

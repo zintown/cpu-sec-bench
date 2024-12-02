@@ -13,9 +13,9 @@ rename_log() {
 }
 
 run_test(){
-	make cleanall >temp.log 2>&1
-	make -e >>temp.log 2>&1
-	./run-test "$2" >>temp.log 2>&1
+	#make cleanall >temp.log 2>&1
+	make -e 2>&1 | tee -a temp.log
+	./run-test "$2" 2>&1 | tee -a temp.log
 	base_name=$(rename_log)
 	final_name="$1"_"${base_name}"
 	echo "$final_name"
